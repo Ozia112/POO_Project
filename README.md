@@ -1,6 +1,6 @@
 # POO REPO
 
-Rama pesonal de ``TM-01`` para subir actividades personales
+Rama pesonal de ``TM-02`` para subir actividades personales
 
 - [CRUD en C](../POO_Project/Actividades%20individuales/CRUD%20en%20C/ "Carpeta de codigo en c")
 - [CRUD en java](../POO_Project/Actividades%20individuales/CRUD%20en%20java/ "Carpeta de codigo en java")
