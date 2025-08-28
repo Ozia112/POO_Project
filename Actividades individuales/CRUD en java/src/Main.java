@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Main {
 
-    /* ---- Fecha “fija” para la edad (igual que tu versión) ---- */
+    /* ---- Fecha “fija”  ---- */
     static final int CURRENT_YEAR = 2025;
     static final int CURRENT_MONTH = 8;
     static final int CURRENT_DAY = 18;
@@ -44,7 +44,7 @@ public class Main {
     }
 
     /* ===========================================================
-       Helpers cortos primero (renombrados)
+       Helpers cortos
        =========================================================== */
 
     static void leerTextoLineaMayus(Scanner sc, String[] destino) {
@@ -138,7 +138,7 @@ public class Main {
     }
 
     /* ===========================================================
-       Funciones “grandes”
+       Funciones 
        =========================================================== */
 
     static void crearCurp(Registro r) {
@@ -253,7 +253,7 @@ public class Main {
         sc.close();
     }
 
-    /* ---- util para leer enteros “a la scanf” ---- */
+
     static int leerEntero(Scanner sc) {
         while (true) {
             if (sc.hasNextInt()) {
