@@ -47,7 +47,7 @@ struct Registro {
 };
 
 /* ===========================================================
-Helpers cortos primero 
+Helpers cortos 
 =========================================================== */
 
 void leerTexto(char *destino, int tam) {
@@ -155,7 +155,7 @@ const char* codigo_estado(const char* estado) {
 }
 
 /* ===========================================================
-Funciones “grandes”
+Funciones 
 =========================================================== */
 
 void crearCurp(struct Registro *r) {
