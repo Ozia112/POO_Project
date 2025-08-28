@@ -2,8 +2,8 @@
 
 Rama pesonal de ``TM-03`` para subir actividades personales
 
-- [CRUD en C](../POO_Project/Actividades%20individuales/CRUD%20en%20C/ "Carpeta de codigo en c")
-- [CRUD en java](../POO_Project/Actividades%20individuales/CRUD%20en%20java/ "Carpeta de codigo en java")
+- [CRUD en C](https://github.com/Ozia112/POO_Project/tree/TM-03/Actividades%20individuales/CRUD%20en%20C)
+- [CRUD en java](https://github.com/Ozia112/POO_Project/tree/TM-03/Actividades%20individuales/CRUD%20en%20C)
 
 
 > Wtrie by `TM-03`
