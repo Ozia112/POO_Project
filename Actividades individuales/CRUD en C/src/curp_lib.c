@@ -1,7 +1,5 @@
 #include "curp_lib.h"
 
-
-
 void asignar_id_entidad(struct Ciudadanos *ciudadano) {
     if (!ciudadano || !ciudadano->entidad) {
         strcpy(ciudadano->id_entidad, "NE");
