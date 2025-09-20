@@ -68,9 +68,9 @@ public class FormularioVentana extends Application {
         dinamicButton(botonEnviar, nombres, apellidoPaterno, apellidoMaterno, curp, email, telefono, distrito);
         gp.add(botonEnviar, 1, 7);
         gp.add(requiredNote, 0, 7);
-        stage.setScene(new Scene(root, 450, 350));
+        stage.setScene(new Scene(root, 450, 380));
         stage.getScene().getStylesheets().add("file:src/view/assets/estilos.css");
-        stage.setMinHeight(320);
+        stage.setMinHeight(369);
         stage.setMinWidth(410);
         stage.setTitle("Formulario de Ciudadano");
         stage.getIcons().add(new javafx.scene.image.Image("file:src/view/assets/icon.png"));
