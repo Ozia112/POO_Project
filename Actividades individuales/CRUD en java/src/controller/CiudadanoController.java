@@ -2,19 +2,90 @@ package controller;
 import java.time.LocalDate;
 import java.time.Period;
 
-import dto.FormularioCiudadano;
 import model.Ciudadano;
 
 public class CiudadanoController {
-    private Ciudadano ciudadanoValidado;
 
-    public void validar(FormularioCiudadano formulario) {
-        if (formulario == null) throw new IllegalArgumentException("Formulario no puede ser nulo");
-        if (esVacio(formulario.getPrimerNombre())) throw new IllegalArgumentException("Primer nombre obligatorio");
+    private FileManager fileManager;
 
-        String curp = formulario.getCurp();
-        // Referencia oficial: https://www.gob.mx/curp
-        // Estructura CURP: 4 letras (nombre y apellidos), 6 dígitos (fecha), 1 letra (sexo), 2 letras (entidad), 3 letras (consonantes internas), 1 alfanumérico (homoclave), 1 dígito verificador
+    public CiudadanoController(FileManager fileManager) {
+        this.fileManager = fileManager;
+    }
+
+    public Ciudadano procesarCiudadano(
+        String nombres,
+        String primerNombre,
+        String segundoNombre,
+        String apellidoPaterno,
+        String apellidoMaterno,
+        String curp,
+        String email,
+        String telefono,
+        String distritoStr,
+        int distrito,
+        int edad
+    ) throws Exception {
+
+        // Naturalizar entradas
+        nombres = safe(nombres);
+        apellidoPaterno = safe(apellidoPaterno);
+        apellidoMaterno = safe(apellidoMaterno);
+        curp = safe(curp).toUpperCase();
+        email = safe(email).toLowerCase();
+        telefono = safe(telefono);
+        distritoStr = safe(distritoStr);
+
+        // Validar obligatoriedad y formatos
+        validarObligatorios(nombres, apellidoPaterno, apellidoMaterno, curp, email, telefono, distritoStr);
+        validarCurp(curp);
+        validarEmail(email);
+        validarTelefono(telefono);
+
+        // Parseamientos
+        distrito = parseDistrito(distritoStr);
+        primerNombre = parsearNombres(nombres)[0];
+        segundoNombre = parsearNombres(nombres)[1];
+        edad = calcularEdadDesdeCurp(curp);
+
+        // Validaciones adicionales al parsear
+        validarDistrito(distrito);
+        validarEdad(edad);
+
+        // Validar unicidad de CURP y edad
+        if (fileManager.ciudadanoExiste(curp)) {
+            throw new IllegalArgumentException("CURP ya registrado");
+        }
+
+        // Crear y guardar ciudadano
+        Ciudadano ciudadano = new Ciudadano(primerNombre, segundoNombre, apellidoPaterno, apellidoMaterno, curp, email, telefono, distrito, edad);
+        
+        fileManager.guardarCiudadano(curp);
+
+        return ciudadano;
+    }
+
+    private String safe(String str) { return str == null ? "" : str.trim(); }
+
+    private void validarObligatorios(String... campos) {
+        for (String campo : campos) {
+            if (campo.isEmpty()) {
+                throw new IllegalArgumentException("Campos obligatorios no pueden estar vacíos");
+            }
+        }
+    }
+
+    private void validarCurp(String curp) {
+    /*
+    Estructura CURP referencia oficial: https://www.gob.mx/curp: 
+    - 4 letras (nombre y apellidos), 
+    - 6 dígitos (fecha),
+    - 1 letra (sexo),
+    - 2 letras (entidad), 
+    - 3 letras (consonantes internas),
+    - 1 alfanumérico (homoclave), 
+    - 1 dígito verificador
+    */
+
         String REGEX_FIRST_L = "[A-Z][AEIOU][A-Z]{2}";
         String REGEX_DATE = "\\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])";
         String REGEX_GNERE = "[HMX]";
@@ -23,41 +94,52 @@ public class CiudadanoController {
         String REGEX_HOMOCLAVE = "[A-Z0-9]";
         String REGEX_VERIF_DGT = "\\d";
 
-        String REGEX_CURP = "^" + REGEX_FIRST_L + REGEX_DATE + REGEX_GNERE + REGEX_ENTITY + REGEX_CONSO + REGEX_HOMOCLAVE + REGEX_VERIF_DGT + "$";
-        
+        String REGEX_CURP = "^" +
+                            REGEX_FIRST_L +
+                            REGEX_DATE +
+                            REGEX_GNERE +
+                            REGEX_ENTITY +
+                            REGEX_CONSO +
+                            REGEX_HOMOCLAVE +
+                            REGEX_VERIF_DGT +
+                            "$";
+
         if (curp == null || curp.length() != 18) throw new IllegalArgumentException("CURP debe tener 18 caracteres");
         if (!curp.matches(REGEX_CURP)) throw new IllegalArgumentException("CURP formato inválido");
+    }
+    
+    private void validarEmail(String email) {
+        if (!email.contains("@")) { 
+            throw new IllegalArgumentException("Email inválido");
+        }
+    }
 
-        int edad = calcularEdadDesdeCurp(curp);
-        if (edad < 18) throw new IllegalArgumentException("El ciudadano debe ser mayor de edad");
-
-        if (esVacio(formulario.getApellidoPaterno()) || esVacio(formulario.getApellidoMaterno()))
-            throw new IllegalArgumentException("Apellidos no pueden estar vacíos");
-
-        String telefono = formulario.getTelefono();
-        if (telefono == null || !telefono.matches("\\d{10}"))
+    private void validarTelefono(String telefono) {
+        if (!telefono.matches("\\d{10}")) {
             throw new IllegalArgumentException("Teléfono debe tener 10 dígitos numéricos");
-
-        String email = formulario.getEmail();
-        if (email == null || !email.contains("@")) throw new IllegalArgumentException("Email inválido");
-
-        int distrito = formulario.getDistrito();
-        if (distrito < 1 || distrito > 9) throw new IllegalArgumentException("Distrito fuera de rango (1-9)");
+        }
     }
 
-    public Ciudadano crearCiudadano(FormularioCiudadano formulario) {
-        validar(formulario);
-        int edad = calcularEdadDesdeCurp(formulario.getCurp());
-        ciudadanoValidado = Ciudadano.fromFormulario(formulario, edad);
-        return ciudadanoValidado;
+    private int parseDistrito(String distritoStr) {
+        int distrito;
+        try {
+            distrito = Integer.parseInt(distritoStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Distrito debe ser un número entero");
+        }
+        return distrito;
     }
 
-    public Ciudadano getCiudadanoValidado() {
-        return ciudadanoValidado;
+    private void validarDistrito(int distrito) {
+        if (distrito < 1 || distrito > 9) {
+            throw new IllegalArgumentException("Distrito fuera de rango (1-9)");
+        }
     }
 
-    private boolean esVacio(String str) {
-        return str == null || str.trim().isEmpty();
+    private void validarEdad(int edad) {
+        if (edad < 18) {
+            throw new IllegalArgumentException("El ciudadano debe ser mayor de edad");
+        }
     }
 
     private int calcularEdadDesdeCurp(String curp) {
@@ -77,5 +159,16 @@ public class CiudadanoController {
             return 0;
         }
         return Period.between(birth, LocalDate.now()).getYears();
+    }
+
+    public static String[] parsearNombres(String nombres) {
+        nombres = nombres.trim().replaceAll("\\s+", " "); // Reemplaza múltiples espacios por uno solo
+        int espacio = nombres.indexOf(' ');
+        if (espacio == -1) {
+            return new String[]{nombres, ""};
+        }
+        String primerNombre = nombres.substring(0, espacio).trim();
+        String segundoNombre = nombres.substring(espacio + 1).trim();
+        return new String[]{primerNombre, segundoNombre};
     }
 }

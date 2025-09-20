@@ -1,7 +1,5 @@
 package model;
 
-import dto.FormularioCiudadano;
-
 public class Ciudadano {
 
     private String primerNombre;
@@ -14,6 +12,26 @@ public class Ciudadano {
     private int distrito;
     private int edad;
 
+    public Ciudadano(String primerNombre,
+                     String segundoNombre,
+                     String apellidoPaterno,
+                     String apellidoMaterno,
+                     String curp,
+                     String email,
+                     String telefono,
+                     int distrito,
+                     int edad) {
+        this.primerNombre    = primerNombre;
+        this.segundoNombre   = segundoNombre;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
+        this.curp            = curp;
+        this.email           = email;
+        this.telefono        = telefono;
+        this.distrito        = distrito;
+        this.edad            = edad;
+    }
+
     // Metodos Get/Set
 
     public String getPrimerNombre() { return primerNombre; }
@@ -25,28 +43,4 @@ public class Ciudadano {
     public String getTelefono() { return telefono; }
     public int getDistrito() { return distrito; }
     public int getEdad() { return edad; }
-
-    public void setPrimerNombre(String primerNombre) { this.primerNombre = primerNombre; }
-    public void setSegundoNombre(String segundoNombre) { this.segundoNombre = segundoNombre; }
-    public void setApellidoPaterno(String apellidoPaterno) { this.apellidoPaterno = apellidoPaterno; }
-    public void setApellidoMaterno(String apellidoMaterno) { this.apellidoMaterno = apellidoMaterno; }
-    public void setCurp(String curp) { this.curp = curp; }
-    public void setEmail(String email) { this.email = email; }
-    public void setTelefono(String telefono) { this.telefono = telefono; }
-    public void setDistrito(int distrito) { this.distrito = distrito; }
-    public void setEdad(int edad) { this.edad = edad; }
-
-    public static Ciudadano fromFormulario(FormularioCiudadano formularioCiudadano, int edadCalculada) {
-        Ciudadano newCiudadano = new Ciudadano();
-        newCiudadano.setPrimerNombre(formularioCiudadano.getPrimerNombre());
-        newCiudadano.setSegundoNombre(formularioCiudadano.getSegundoNombre());
-        newCiudadano.setApellidoPaterno(formularioCiudadano.getApellidoPaterno());
-        newCiudadano.setApellidoMaterno(formularioCiudadano.getApellidoMaterno());
-        newCiudadano.setCurp(formularioCiudadano.getCurp());
-        newCiudadano.setEmail(formularioCiudadano.getEmail());
-        newCiudadano.setTelefono(formularioCiudadano.getTelefono());
-        newCiudadano.setDistrito(formularioCiudadano.getDistrito());
-        newCiudadano.setEdad(edadCalculada);
-        return newCiudadano;
-    }
 }
