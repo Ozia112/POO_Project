@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"java.project.sourcePaths": [
+			"CRUD-java/src",
+			"CRUD-Java\\src"
+		],
+		"java.project.referencedLibraries": [
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.base.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.controls.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.fxml.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.graphics.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.media.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.swing.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.web.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx-swt.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\jdk.jsobject.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\jfx.incubator.input.jar",
+			"CRUD-Java\\lib\\javafx-sdk-25\\lib\\jfx.incubator.richtext.jar"
+		]
+	}
+}

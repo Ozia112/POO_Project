@@ -13,6 +13,6 @@
     "lib\\javafx-sdk-25\\lib\\jfx.incubator.richtext.jar"
   ],
   "java.project.sourcePaths": [
-    "src"
+    "workspaceFolder/src"
   ]
 }

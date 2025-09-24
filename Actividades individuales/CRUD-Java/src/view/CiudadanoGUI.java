@@ -1,6 +1,5 @@
 package view;
 
-import controller.CiudadanoController;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
@@ -8,11 +7,34 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import controller.CiudadanoController;
 import model.Ciudadano;
 
-public class FormularioVentana extends Application {
+public class CiudadanoGUI extends Application {
 
     private static CiudadanoController controller;
+
+    private static final Map<String,String> FEEDBACK_MAP = crearFeedbackMap();
+
+        private static Map<String,String> crearFeedbackMap() {
+        Map<String,String> m = new HashMap<>();
+        m.put("OK_REGISTRO",        "Ciudadano registrado correctamente.");
+        m.put("ERR_CURP_DUP",       "La CURP ya existe.");
+        m.put("ERR_CURP_FORMAT",    "CURP inválida.");
+        m.put("ERR_CURP_LENGTH",    "CURP debe tener 18 digitos.");
+        m.put("ERR_EDAD",           "El ciudadano debe ser mayor de edad.");
+        m.put("ERR_TEL_FORMAT",     "Teléfono inválido (10 dígitos).");
+        m.put("ERR_MAIL_FORMAT",    "Correo con formato inválido.");
+        m.put("ERR_DIST_FORMAT",    "Distrito inválido (1-9).");
+        m.put("ERR_DIST_OUT_OF_RANGE", "Distrito fuera de rango (1-9).");
+        m.put("ERR_IO",             "Error al guardar datos.");
+        return m;
+    }
+
     public static void launchUI(CiudadanoController ctrl, String[] args) {
         controller = ctrl;
         launch(args);
@@ -44,28 +66,31 @@ public class FormularioVentana extends Application {
         Button botonEnviar = new Button("Enviar");
 
         botonEnviar.setOnAction(e -> {
+            String nombresStr = nombres.getText();
+            String primerApellidoStr = apellidoPaterno.getText();
+            String segundoapellidoStr = apellidoMaterno.getText();
+            String curpStr = curp.getText();
+            String emailStr = email.getText();
+            String telStr = telefono.getText();
+            String distStr = distrito.getText();
             try {
-                Ciudadano ciudadano = controller.procesarCiudadano(
-                    nombres.getText(),
-                    "",
-                    "",
-                    apellidoPaterno.getText(),
-                    apellidoMaterno.getText(),
-                    curp.getText(),
-                    email.getText(),
-                    telefono.getText(),
-                    distrito.getText(),
-                    0,
-                    0
+                controller.procesarCiudadano(new CiudadanoFormulario(
+                    nombresStr,
+                    primerApellidoStr,
+                    segundoapellidoStr,
+                    curpStr,
+                    emailStr,
+                    telStr,
+                    distStr)
                 );
-                showInfo("Registrado","Se registró: " + ciudadano.getCurp());
+                showInfo("OK_REGISTRO");
                 clearFields(nombres, apellidoPaterno, apellidoMaterno, curp, email, telefono, distrito);
             } catch (Exception ex) {
-                showAlert("Error", ex.getMessage());
+                showAlert(ex.getMessage());
             }
         });
 
-        dinamicButton(botonEnviar, nombres, apellidoPaterno, apellidoMaterno, curp, email, telefono, distrito);
+        dynamicButton(botonEnviar, nombres, apellidoPaterno, apellidoMaterno, curp, email, telefono, distrito);
         gp.add(botonEnviar, 1, 7);
         gp.add(requiredNote, 0, 7);
         stage.setScene(new Scene(root, 450, 380));
@@ -94,12 +119,12 @@ public class FormularioVentana extends Application {
         return campo;
     }
 
-    private void dinamicButton(Button boton, TextField... campos) {
+    private void dynamicButton(Button boton, TextField... campos) {
         ChangeListener<String> listener = (obs, oldVal, newVal) -> {
             boolean todosLlenos = true;
             for (TextField campo : campos) {
                 if (campo.getText().trim().isEmpty()) {
-                    todosLlenos = false;
+                    todosLlenos = false; // Si algún campo está vacío, no todos están llenos
                     break;
                 }
             }
@@ -107,28 +132,39 @@ public class FormularioVentana extends Application {
         };
 
         for (TextField campo : campos) {
-            campo.textProperty().addListener(listener);
+            campo.textProperty().addListener(listener); // Agrega el listener a cada campo
         }
 
         boton.setDisable(true); // Inicialmente desactivado
-    }
-
-
-
-    private void showInfo(String titulo, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
-        alert.setTitle(titulo);
-        alert.showAndWait();
-    }
-    private void showAlert(String titulo, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-        alert.setTitle(titulo);
-        alert.showAndWait();
     }
 
     private void clearFields(TextField... fields) {
         for (TextField field : fields) {
             field.clear();
         }
+    }
+
+    private void showSuccessConCurp(Ciudadano c) {
+        mostrarFeedback("OK_REGISTRO", Alert.AlertType.INFORMATION,  );
+    }
+
+    public void showInfo(String code) {
+        String uiMsg = FEEDBACK_MAP.getOrDefault(code, code);
+        System.out.println(code); // imprime código (feedback) en consola
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Información");
+        alert.setHeaderText(null);
+        alert.setContentText(uiMsg);
+        alert.showAndWait();
+    }
+
+    public void showAlert(String code) {
+        String uiMsg = FEEDBACK_MAP.getOrDefault(code, code);
+        System.err.println(code); // imprime código de error en consola
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(uiMsg);
+        alert.showAndWait();
     }
 }
