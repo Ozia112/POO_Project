@@ -1,9 +1,8 @@
-Clasificación
-    
+Clasificación  
+
 High: Requerimiento esencial
 Medium: Requerimiento deseable
-Low: Requerimiento de lujo (esta pero no afecta realmente a la ejecución)
-    
+Low: Requerimiento de lujo (esta pero no afecta realmente a la ejecución)  
     
 - **[High]** RF1. Registrar la renta de un locker con datos del cliente, hora de inicio y duración  
 - **[High]** RF2. Calcular automáticamente el tiempo restante de la renta
@@ -13,14 +12,14 @@ Low: Requerimiento de lujo (esta pero no afecta realmente a la ejecución)
 - **[High]** RF9. Registrar ventas de productos desde una pestaña separada  
 - **[High]** RF12. Registrar historial de rentas y ventas diarias
 - **[High]** RF15. Editar tarifas y precios desde panel de administración  
-- **[High]** RF16. Registrar nuevos productos para la venta
+- **[High]** RF16. Registrar nuevos productos para la venta  
     
 - **[Medium]** RF3. Permitir extenderse del tiempo de renta (máximo 15 minutos sin cargo)    
 - **[Medium]** RF5. Aplicar descuentos a una renta
 - **[Medium]** RF7. Mostrar visualmente el estado de cada locker  
 - **[Medium]** RF10. Aplicar descuentos a productos
 - **[Medium]** RF13. Consultar reportes diarios pasados de ingresos
-- **[Medium]** RF11. Asociar venta con cliente que haya rentado un locker    
+- **[Medium]** RF11. Asociar venta con cliente que haya rentado un locker  
     
 - **[Low]** RF14. Generar tablas en formatos PDF, Excel, .txt (por definir)  
     
