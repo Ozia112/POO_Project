@@ -1,9 +1,20 @@
-# POO REPO
+# POO_Project
 
-Rama pesonal de ``TM-02`` para subir actividades personales
+Poo project repository aiming to save all project progress
 
-- [CRUD en C](../POO_Project/Actividades%20individuales/CRUD%20en%20C/ "Carpeta de codigo en c")
-- [CRUD en java](../POO_Project/Actividades%20individuales/CRUD%20en%20java/ "Carpeta de codigo en java")
-- [Tabla de codigos postales](../POO_Project/misc/Colonias-codigospostales.xlsx "Codigos postales")
+## ID Team Members
 
-> Wtrie by `TM-02`
+- `TM-01`: Isaac Alejandro Ortiz Zaldivar
+- `TM-02`: Fabio Leonardo Gonzalez Alcocer
+- `TM-03`: Nicolás Israel Canul Durán
+- `TM-04`: Jesús Israel León Chay
+- `TM-05`: Maximiliano Carrillo Alvarado
+
+## Team roles
+
+- **Record keeper**: `TM-04`
+- **Proyect Manager**: `TM-01`
+- **Github Manager**: `TM-01`
+- **Documentation Keeper**: `TM-03`
+
+> Written By: `TM-02`
