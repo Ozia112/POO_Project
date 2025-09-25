@@ -5,7 +5,7 @@
 ### 1. Gestión de Renta de Lockers
 - RF1. El sistema debe permitir registrar la renta de un locker con los datos del cliente, hora de inicio y duración
 - RF2. El sistema debe calcular automáticamente el tiempo restante de la renta en base a la hora de inicio y la duración
-- RF3. El sistema debe permitir extender el tiempo de renta de un locker (se calculará hasta un máximo de 15 minutos sin cargo extra)
+- RF3. El sistema debe permitir extenderse del tiempo de renta de un locker (se calculará hasta un máximo de 15 minutos sin cargo extra)
 - RF4. El sistema debe permitir cancelar una renta activa
 - RF5. El sistema debe permitir aplicar descuentos a una renta
 - RF6. El sistema debe permitir finalizar la renta de un locker y marcar el locker como disponible
