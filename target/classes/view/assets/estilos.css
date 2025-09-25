@@ -1,0 +1,32 @@
+.text-field {
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-padding: 6 10;
+    -fx-font-size: 13px;
+    
+    border-radius: 6;
+    border-color: #cccccc;
+    border-width: 1;
+    padding: 6 10;
+    font-size: 13px;
+}
+
+.button {
+    -fx-background-color: #3A0B1F;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+
+    background-color: #3A0B1F;
+    font-weight: bold;
+}
+
+.label {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+
+    font-weight: bold;
+    font-size: 13px;
+}

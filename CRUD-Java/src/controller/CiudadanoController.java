@@ -13,7 +13,7 @@ public class CiudadanoController {
         this.fileManager = fileManager;
     }
 
-    public Ciudadano procesarCiudadano(CiudadanoFormulario form) throws Exception {
+    public void procesarCiudadano(CiudadanoFormulario form) throws Exception {
 
         // Naturalizar entradas
         String nombres = safe(form.getNombres());
@@ -25,7 +25,11 @@ public class CiudadanoController {
         String distritoStr = safe(form.getDistrito());
 
         // Validar obligatoriedad y formatos
+        esVacio(nombres, apellidoPaterno, apellidoMaterno, curp, email, telefono, distritoStr);
         validarFormatoCurp(curp);
+        if (fileManager.ciudadanoExiste(curp)) {
+            throw new IllegalArgumentException("ERR_CURP_DUP");
+        }
         validarEmail(email);
         validarTelefono(telefono);
 
@@ -39,11 +43,6 @@ public class CiudadanoController {
         validarDistrito(distrito);
         validarEdad(edad);
 
-        // Validar unicidad de CURP y edad
-        if (fileManager.ciudadanoExiste(curp)) {
-            throw new IllegalArgumentException("ERR_CURP_DUP");
-        }
-
         // Crear y guardar ciudadano
         Ciudadano ciudadano = new Ciudadano(primerNombre, 
                                             segundoNombre,
@@ -55,12 +54,18 @@ public class CiudadanoController {
                                             distrito,
                                             edad);
         
-        fileManager.guardarCiudadano(curp);
-
-        return ciudadano;
+        fileManager.guardarCiudadano(ciudadano.getCurp());
     }
 
     private String safe(String str) { return str == null ? "" : str.trim(); }
+
+    private void esVacio(String ... campos) { 
+        for (String campo : campos) {
+            if (campo == null || campo.trim().isEmpty()) {
+                throw new IllegalArgumentException("ERR_EMPTY_FIELDS");
+            }
+        }
+    }
 
     private void validarFormatoCurp(String curp) {
 
@@ -81,9 +86,9 @@ public class CiudadanoController {
                             REGEX_HOMOCLAVE +
                             REGEX_VERIF_DGT +
                             "$";
-
+        
         if (curp == null || curp.length() != 18) throw new IllegalArgumentException("ERR_CURP_LENGTH");
-        if (curp.matches(REGEX_CURP)) throw new IllegalArgumentException("ERR_CURP_FORMAT");
+        if (!curp.matches(REGEX_CURP)) throw new IllegalArgumentException("ERR_CURP_FORMAT");
     }
     
     private void validarEmail(String email) {
@@ -120,14 +125,6 @@ public class CiudadanoController {
         }
     }
 
-    /**
-     * Calcula la edad a partir de la CURP.
-     * Regla oficial (DOF): El carácter 17 (índice 16) de la CURP ayuda a distinguir 
-     * siglo de nacimiento. Si es dígito => nacido 1900-1999; si es letra siglo XXI en adelante.
-     * 'A' = siglo XXI
-     * '0' = siglo XX
-     * @see https://www.dof.gob.mx/nota_detalle_popup.php?codigo=5526717
-    */
     private int calcularEdadDesdeCurp(String curp) {
         if (curp == null || curp.length() != 18) return 0;
         try {

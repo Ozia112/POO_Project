@@ -1,0 +1,19 @@
+{
+  "java.project.referencedLibraries": [
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.controls.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx-swt.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\jfx.incubator.richtext.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.base.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\jdk.jsobject.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.swing.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.fxml.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.web.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\jfx.incubator.input.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.graphics.jar",
+    "c:\\Users\\HP\\OneDrive - Universidad Autonoma de Yucatan\\Semestre 3\\Programacion orientada a objetos\\Repositorios\\POO_Project\\CRUD-Java\\lib\\javafx-sdk-25\\lib\\javafx.media.jar"
+  ],
+  "java.project.sourcePaths": [
+    "src",
+    "CRUD-Java\\src"
+  ]
+}

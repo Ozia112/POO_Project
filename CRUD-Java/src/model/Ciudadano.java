@@ -4,8 +4,8 @@ public class Ciudadano {
 
     private String primerNombre;
     private String segundoNombre;
-    private String apellidoPaterno;
-    private String apellidoMaterno;
+    private String primerApellido;
+    private String segundoApellido;
     private String curp;
     private String email;
     private String telefono;
@@ -14,8 +14,8 @@ public class Ciudadano {
 
     public Ciudadano(String primerNombre,
                      String segundoNombre,
-                     String apellidoPaterno,
-                     String apellidoMaterno,
+                     String primerApellido,
+                     String segundoApellido,
                      String curp,
                      String email,
                      String telefono,
@@ -23,8 +23,8 @@ public class Ciudadano {
                      int edad) {
         this.primerNombre    = primerNombre;
         this.segundoNombre   = segundoNombre;
-        this.apellidoPaterno = apellidoPaterno;
-        this.apellidoMaterno = apellidoMaterno;
+        this.primerApellido = primerApellido;
+        this.segundoApellido = segundoApellido;
         this.curp            = curp;
         this.email           = email;
         this.telefono        = telefono;
@@ -36,8 +36,8 @@ public class Ciudadano {
 
     public String getPrimerNombre() { return primerNombre; }
     public String getSegundoNombre() { return segundoNombre; }
-    public String getApellidoPaterno() { return apellidoPaterno; }
-    public String getApellidoMaterno() { return apellidoMaterno; }
+    public String getPrimerApellido() { return primerApellido; }
+    public String getSegundoApellido() { return segundoApellido; }
     public String getCurp() { return curp; }
     public String getEmail() { return email; }
     public String getTelefono() { return telefono; }

@@ -24,9 +24,6 @@ public class FileManager {
     }
 
     public boolean ciudadanoExiste(String curp) throws IOException {
-        // Lógica para verificar si el ciudadano ya existe en el archivo
-        // Si existe, lanzar una excepción o manejar el caso según sea necesario
-        // Si no existe, agregar el nuevo ciudadano al archivo
         if (!Files.exists(filePath)) return false;
         try (Stream<String> lines = Files.lines(filePath)) {
             return lines.anyMatch(line -> line.equalsIgnoreCase(curp));
@@ -36,7 +33,6 @@ public class FileManager {
     }
 
     public void guardarCiudadano(String curp) throws IOException {
-        // Lógica para guardar los datos del ciudadano en el archivo
         Files.writeString(
             filePath,
             curp + System.lineSeparator(),

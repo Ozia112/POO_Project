@@ -156,6 +156,7 @@ Entidad Ciudadano: nombres, apellidoP, apellidoM, curp, correo, telefono, distri
 | Código                | Mensaje                                  |
 | --------------------- | ---------------------------------------- |
 | OK_REGISTRO           | Ciudadano registrado correctamente.      |
+| ERR_EMPTY_FIELDS      | Alguno de los campos esta vacio          |
 | ERR_CURP_DUP          | La CURP ya existe.                       |
 | ERR_CURP_FORMAT       | CURP inválida.                           |
 | ERR_CURP_LENGTH       | CURP debe tener 18 digitos.              |

@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import controller.CiudadanoController;
-import model.Ciudadano;
 
 public class CiudadanoGUI extends Application {
 
@@ -142,10 +141,6 @@ public class CiudadanoGUI extends Application {
         for (TextField field : fields) {
             field.clear();
         }
-    }
-
-    private void showSuccessConCurp(Ciudadano c) {
-        mostrarFeedback("OK_REGISTRO", Alert.AlertType.INFORMATION,  );
     }
 
     public void showInfo(String code) {
