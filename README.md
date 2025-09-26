@@ -1,21 +1,10 @@
-# POO_Project
+# Product
 
-Poo project repository aiming to save all project progress
+### Product branch glossary
 
-## ID Team Members
+- [Product description](./(B)Product/Product%20description.md)
 
-- `TM-01`: Isaac Alejandro Ortiz Zaldivar
-- `TM-02`: Fabio Leonardo Gonzalez Alcocer
-- `TM-03`: Nicolás Israel Canul Durán
-- `TM-04`: Jesús Israel León Chay
-- `TM-05`: Maximiliano Carrillo Alvarado
+- [User Definition](./(B)Product/User%20Definition.md)
 
-## Team roles
-
-- **Record keeper**: `TM-04`
-- **Proyect Manager**: `TM-01`
-- **Github Manager**: `TM-01`
-- **Documentation Keeper**: `TM-03`
-
-Written By: `TM-01`
+- [Value proposition](./(B)Product/Value%20proposition.md)
 
