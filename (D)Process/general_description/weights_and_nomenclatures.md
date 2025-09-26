@@ -9,14 +9,17 @@ This document standardizes **activity IDs**, **branch names**, **abbreviations**
 | Code | Department name         | Department branch                  |
 | ----:|-------------------------|------------------------------------|
 | A    | Project (umbrella)      | *(implicit, no dedicated branch)*  |
-| B    | Product                 | dep.producto                       |
-| C    | Requirements            | dep.requisitos                     |
-| D    | Process                 | dep.proceso                        |
-| E    | Presentation            | dep.presentacion                   |
-| F    | Competencies            | dep.competencias                   |
+| B    | Product                 | dep.Product                        |
+| C    | Requirements            | dep.Requirements                   |
+| D    | Process                 | dep.Process                        |
+| E    | Presentation            | dep.Presentation                   |
+| F    | Competencies            | dep.Competencies                   |
 
 **Delivery branch (academic):** `entrega`  
 > All inter-department integrations approved in the **Internal Sprint Review** are merged into `entrega`.
+
+### 1.1) Individual branches
+Each team member can create personal branches for individual activities, following the naming conventions outlined
 
 ---
 
@@ -43,8 +46,10 @@ This document standardizes **activity IDs**, **branch names**, **abbreviations**
 ## 3) Activity Weights
 
 - **1 to 3** → Regular tasks.  
-- **4** → Responsibilities of the **Department Lead** (only within their department).  
-- **Epic** → Activities that correspond to the overall project (**level A**).  
+- **Chief Department** → Responsibilities of the **Department Lead** (only within their department). Value: 4 points, not acumulative.
+- **Epic** → Activities that correspond to the overall project (**level A**).
+
+If the activity needs a collaboration from multiple team members, it can be marked with the weight, and specify in the description the collaboration value of each member and how the collaboration will be done.
 
 > If a task has weight **4**, it is **assumed** to belong to the lead of the same department.
 
@@ -88,8 +93,12 @@ Format: `TM-XX` (two digits)
 ### Branches
 
 - Department: `dep.[department]` (e.g., `dep.requisitos`, `dep.producto`).  
-- Feature/activity: `feat/[ID]/[short-slug]`  
-  - Example: `feat/B.1.1/market-research`, `feat/D.1.2/nomenclature-weights`.  
+- Feature/activity: `feat.[ID].[short-slug]`  
+  - Example: `feat.B.1.1.market-research`.  
+- Temporal (individual work): `temp.[Team ID].[short-slug]`  
+  - Example: `temp.TM-01.initial-research`.
+- Individual branches: `user.[Team ID].individual`  
+  - Example: `user.TM-02.individual`.
 
 ### PBI Titles
 
@@ -115,12 +124,14 @@ Examples:
 
 Each PBI must contain (in the issue description or related .md doc):  
 
-- **Description** (clear and brief).  
+- **Description** (clear and concise).  
 - **Acceptance criteria** (verifiable).  
 - **Deliverable** (file(s) or concrete output).  
 - **Dependency** (if applicable).  
 - **Expected value** (impact).  
 - **Weight** (1–3, 4, or Epic).  
+- **Sprint** (number of the sprint within the stage).
+- **Stage** (number of the stage the activity belongs to).
 
 > **Sub-activities** inherit the context of their main activity and are numbered `x.1`, `x.2`, etc. Each sub-activity must have its own acceptance criteria and deliverable.  
 
