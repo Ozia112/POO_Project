@@ -19,6 +19,7 @@ This document standardizes **activity IDs**, **branch names**, **abbreviations**
 > All inter-department integrations approved in the **Internal Sprint Review** are merged into `entrega`.
 
 ### 1.1) Individual branches
+
 Each team member can create personal branches for individual activities, following the naming conventions outlined
 
 ---
