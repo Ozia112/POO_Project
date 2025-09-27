@@ -26,6 +26,6 @@
 **Description:** The presenter returns to camera to explain future goals and final conclusions.
 
 ## Image 6
-![Image 4 — Wrap-up and next steps](./Assets/StoryBoard5..png)
+![Image 4 — Wrap-up and next steps](./Assets/StoryBoard8..png)
 
 **Description:** The presenter says goodbye to the audience and gives the final conclusions.
