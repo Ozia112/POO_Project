@@ -10,4 +10,4 @@
 - [requerimientos_no_funcionales.md](requerimientos_no_funcionales.md)
 
 
-<> written by TM-05
+> written by TM-05
