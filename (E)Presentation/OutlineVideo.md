@@ -1,41 +1,41 @@
-# Outline del video (basado en el guion)
+# Video Outline (based on the script)
 
-## 1) Introducción (0:00–0:40)
-- **Propósito**: situar a Don David (tramitan visas → gente llega con prisa a imprimir) y mencionar lockers.
-- **Idea clave**: “no es tan simple como parece”.
-- **Visual**: Nico a cámara 
+## 1) Introduction (0:00–0:40)
+- **Purpose**: introduce Don David’s context (visa processing → people arrive in a hurry to print) and mention lockers.
+- **Key idea**: “it’s not as simple as it seems.”
+- **Visual**: Nico on camera.
 
-## 2) Transición visual breve (0:40–0:50)
-- **Pizarra**: aparece “**dos toques y listo**”.
-- **Puente** a “¿Qué hicimos?”.
+## 2) Brief visual transition (0:40–0:50)
+- **Whiteboard**: shows “**two taps and done**.”
+- **Bridge** to “What we did.”
 
-## 3) ¿Qué hicimos? (0:50–2:10)
-- Observación del **proceso manual**: disponibilidad/estado, datos, tiempo, cobro, **excepciones** (locker reportado, cambio de tiempo, cancelación).
-- **Motivo de la simplificación**: quien usa el sistema solo quiere que funcione.
-- **Visual**: notas en cuaderno; close-ups.
+## 3) What we did (0:50–2:10)
+- Observation of the **manual process**: availability/status, data, time, payment, **exceptions** (reported locker, time change, cancellation).
+- **Reason for simplification**: the person using the system just wants it to work.
+- **Visual**: notebook notes; close-ups.
 
-## 4) Solución a alto nivel (2:10–3:10)
-- **LockerEasy = plantilla configurable**: Don David activa impresiones/lockers/ventas rápidas.
-- **Flujos simples**:
-  - Impresiones: **seleccionar → confirmar → pagar**.
-  - Lockers: **elegir → tiempo → confirmar → ticket**.
+## 4) High-level solution (2:10–3:10)
+- **LockerEasy = configurable template**: Don David enables printing/lockers/quick sales as needed.
+- **Simple flows**:
+  - Printing: **select → confirm → pay**.
+  - Lockers: **choose → time → confirm → ticket**.
 
-## 5) ¿Cómo lo hicimos? (3:10–4:20) — *voz en off*
-- **Producto**: visión/experiencia del usuario.
-- **Requisitos**: descripciones simples que guían el trabajo.
-- **Proceso**: pasos claros y recogida de datos para mejorar.
-- **Presentación**: guion claro sin tecnicismos.
-- **Competencias**: reflexión honesta de aprendizajes.
-- **Visual**: equipo trabajando; checklist; pizarra.
+## 5) How we did it (3:10–4:20) — *voice-over*
+- **Product**: user vision/experience.
+- **Requirements**: simple descriptions that guide the work.
+- **Process**: clear steps and collecting data to improve.
+- **Presentation**: clear script with no jargon.
+- **Competencies**: honest reflection on learnings.
+- **Visual**: team working; checklist; whiteboard.
 
-## 6) ¿Qué sigue? (4:20–5:00)
-- **Medición de tiempos reales** y ajustes.
-- **Vista futura para el proyecto**
-- **Analizis y proxima elaboracion de la plantilla**
+## 6) What’s next (4:20–5:00)
+- **Measure real times** and adjust.
+- **Future outlook for the project.**
+- **Analysis and next iteration of the template.**
 
-## 7) Conclusión (5:00–6:00)
-- Estado actual: **documentación y diseño** alineados al negocio de Don David.
-- Meta: que sus clientes resuelvan en **dos toques y listo**.
+## 7) Conclusion (5:00–6:00)
+- Current state: **documentation and design** aligned with Don David’s business.
+- Goal: customers resolve everything in **two taps and done**.
 
-## 8) Créditos (opcional, 5–10 s)
-- Nombres y roles del equipo con música ligera.
+## 8) Credits (optional, 5–10 s)
+- Team names and roles with light background music.
