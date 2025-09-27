@@ -1,6 +1,7 @@
 # **Product Description**
 
 ## **Objective**
+
 An efficient locker rental and product sales manager designed to optimize registration and simplify the accounting process. The platform is intended to be intuitive, allowing users to register sales and manage services efficiently, with a clear focus on automating repetitive tasks and providing adequate visual support for ease of use.
 
 ---
@@ -37,4 +38,3 @@ An efficient locker rental and product sales manager designed to optimize regist
 - **Simplified Interface:** Limited functionality to avoid overwhelming the user.
 
 ---
-

@@ -3,11 +3,13 @@
 ## **User Profile**
 
 ### **Business Owner**
+
 - **Age**: Senior
 - **Technological Knowledge**: Basic
 - **Needs**: They are looking for a simple system, with a clear and easy-to-use interface, allowing them to manage locker rentals and sales without complications.
 
 ### **Employees**
+
 - **Age**: Between 18 and 40 years old
 - **Technological Knowledge**: Ranges from basic to advanced, with some being familiar with Excel and administrative systems.
 - **Needs**: They require a flexible system that adapts to different skill levels, with features that are easy to use but also provide options for more advanced users who want to optimize their work.
