@@ -26,6 +26,6 @@
 **Description:** The presenter returns to camera to explain future goals and final conclusions.
 
 ## Image 6
-![Image 5](./Assets/StoryBoard7..png)
+![Image 5](https://github.com/Ozia112/POO_Project/blob/dep.presentation/(E)Presentation/Assets/StoryBorad7.png)
 
 **Description:** The presenter says goodbye to the audience and gives the final conclusions.
