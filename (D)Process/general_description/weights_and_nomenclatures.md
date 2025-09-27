@@ -6,14 +6,14 @@ This document standardizes **activity IDs**, **branch names**, **abbreviations**
 
 ## 1) Departments and Branches
 
-| Code | Department name         | Department branch                  |
-| ----:|-------------------------|------------------------------------|
-| A    | Project (umbrella)      | *(implicit, no dedicated branch)*  |
-| B    | Product                 | dep.Product                        |
-| C    | Requirements            | dep.Requirements                   |
-| D    | Process                 | dep.Process                        |
-| E    | Presentation            | dep.Presentation                   |
-| F    | Competencies            | dep.Competencies                   |
+| Code | Department name    | Department branch                 |
+| ---: | ------------------ | --------------------------------- |
+|    A | Project (umbrella) | *(implicit, no dedicated branch)* |
+|    B | Product            | dep.Product                       |
+|    C | Requirements       | dep.Requirements                  |
+|    D | Process            | dep.Process                       |
+|    E | Presentation       | dep.Presentation                  |
+|    F | Competencies       | dep.Competencies                  |
 
 **Delivery branch (academic):** `entrega`  
 > All inter-department integrations approved in the **Internal Sprint Review** are merged into `entrega`.
@@ -65,13 +65,13 @@ Format: `TM-XX` (two digits)
 
 **Assignment table (to be filled):**
 
-| ID    | Name/GitHub user |
-|-------|------------------|
-| TM-01 |                  |
-| TM-02 |                  |
-| TM-03 |                  |
-| TM-04 |                  |
-| TM-05 |                  |
+| ID    | Name/GitHub user     |
+| ----- | -------------------- |
+| TM-01 | Isaac Ortiz          |
+| TM-02 | Fabio Gonzalez       |
+| TM-03 | Nicolas Canul        |
+| TM-04 | Jesus Leon           |
+| TM-05 | Maximiliano Carrillo |
 
 ---
 
@@ -93,11 +93,10 @@ Format: `TM-XX` (two digits)
 
 ### Branches
 
+- Stage branches: `stage[stage_number]` (e.g., `stage1`).
 - Department: `dep.[department]` (e.g., `dep.requisitos`, `dep.producto`).  
-- Feature/activity: `feat.[ID].[short-slug]`  
-  - Example: `feat.B.1.1.market-research`.  
-- Temporal (individual work): `temp.[Team ID].[short-slug]`  
-  - Example: `temp.TM-01.initial-research`.
+- Temporal (individual work): `temp.[Team ID].[Department]`  
+  - Example: `temp.TM-01.Product`.
 - Individual branches: `user.[Team ID].individual`  
   - Example: `user.TM-02.individual`.
 
