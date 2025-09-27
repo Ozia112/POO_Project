@@ -4,7 +4,7 @@
 
 (C)Requeriments/
 - [Outline.md](OutlineVideo.md)
-- [PrepatraionGuidelines.md](PreparationGuideLines.md)
+- [PrepatraionGuidelines.md](PreparationGuidelines.md)
 - [Storyboard.md](StoryBoard.md)
 - [Guion](VideoGuion.md)
 
