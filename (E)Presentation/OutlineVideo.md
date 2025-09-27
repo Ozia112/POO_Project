@@ -3,7 +3,7 @@
 ## 1) Introducción (0:00–0:40)
 - **Propósito**: situar a Don David (tramitan visas → gente llega con prisa a imprimir) y mencionar lockers.
 - **Idea clave**: “no es tan simple como parece”.
-- **Visual**: Nico a cámara + B-roll de papeles/reloj.
+- **Visual**: Nico a cámara 
 
 ## 2) Transición visual breve (0:40–0:50)
 - **Pizarra**: aparece “**dos toques y listo**”.
@@ -19,7 +19,6 @@
 - **Flujos simples**:
   - Impresiones: **seleccionar → confirmar → pagar**.
   - Lockers: **elegir → tiempo → confirmar → ticket**.
-- **Visual**: pizarra con flechas grandes; ticket/llave dummy.
 
 ## 5) ¿Cómo lo hicimos? (3:10–4:20) — *voz en off*
 - **Producto**: visión/experiencia del usuario.
@@ -30,13 +29,13 @@
 - **Visual**: equipo trabajando; checklist; pizarra.
 
 ## 6) ¿Qué sigue? (4:20–5:00)
-- **Prototipo de baja fidelidad** con Don David.
 - **Medición de tiempos reales** y ajustes.
+- **Vista futura para el proyecto**
+- **Analizis y proxima elaboracion de la plantilla**
 
 ## 7) Conclusión (5:00–6:00)
 - Estado actual: **documentación y diseño** alineados al negocio de Don David.
 - Meta: que sus clientes resuelvan en **dos toques y listo**.
-- **Visual**: Nico a cámara + logo de LockerEasy.
 
 ## 8) Créditos (opcional, 5–10 s)
 - Nombres y roles del equipo con música ligera.
