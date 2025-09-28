@@ -52,7 +52,7 @@ Tú y tu equipo trabajando juntos en un entorno más in formal, haciendo brainst
 usando la computadora ."
 
 “Esto lo hicimos en equipo.  Nos organizamos por  departamentos  para avanzar sin 
-enredos. El  equipo de Producto  se enfocó en la experiencia: qué queremos que viva la 
+enredos. El  equipo de Producto  se enfocó en la experiencia: El como queremos que viva la 
 persona que llega con prisa, cómo se  siente el flujo, qué cosas estorban y cuáles ayudan. A 
 partir de esa visión,  Requisitos  entró en juego,  sin prometer definiciones exhaustivas 
 todavía ; estamos en una etapa de descripciones simples que  nos dan la dirección  por 
