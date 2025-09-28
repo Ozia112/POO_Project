@@ -100,7 +100,7 @@ estamos en la etapa de documentación y diseño: entendimos el problema, definim
 simples, una plantilla configurable y criterios para saber cuándo algo está bien. Todo 
 ajust ado al negocio de Don David y a cómo trabaja día a día en su local.  
  
-Gracias por ver este video y por acompañarnos en el proceso. En el siguiente Sprint llevaremos entraremos de lleno a lo que busca Don David para medir tiempos reales y afinar 
+Gracias por ver este video y por acompañarnos en el proceso. En el siguiente Sprint entraremos de lleno a lo que busca Don David para medir tiempos reales y afinar 
 detalles . La meta se mantiene: que sus clientes resuelvan en dos toques y listo.”  
  
 Corte final con música ligera y logo de LockerEasy.
