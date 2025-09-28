@@ -22,10 +22,10 @@ No te cuento todo todavía; mejor acompáñame y veamos cómo llegamos hasta aqu
 ## 2. ¿Qué hicimos?
 
 Tú sentado frente a una mesa con algunos papeles, mirando hacia  la cámara mientras hablas “ 
-Lo primero  fue entender el problema real. No v amos a fingir que ya habíamos hecho un 
-software de renta de lockers; lo que hicimos fue  observar  el proceso  manual  que hoy vive 
+Lo primero  fue entender el problema real. No vamos a fingir que ya habíamos hecho un 
+software de renta de lockers; lo que hicimos fue observar  el proceso  manual  que hoy vive 
 Don David con sus clientes. Ahí detectamos dónde se atora todo: confirmar si un locker está 
-disponible o reportado, anotar los d atos, elegir el tiempo, cobrar y entregar llave o código. Y 
+disponible o reportado, anotar los datos, elegir el tiempo, cobrar y entregar llave o código. Y 
 cuando aparece una  excepción  —un locker dañado, un cambio de tiempo, una 
 cancelación — el flujo se vuelve lento y hay más margen de error.” ." 
  
@@ -95,13 +95,12 @@ tiempo."
 ## 5. Conclusión
 
 Corte final, tú mirando a la cámara con el logo de LockerEasy.  
-“En re sumen, dimos un paso claro en la dirección correcta. Como equipo académico, 
+“En resumen, dimos un paso claro en la dirección correcta. Como equipo académico, 
 estamos en la etapa de documentación y diseño: entendimos el problema, definimos flujos 
 simples, una plantilla configurable y criterios para saber cuándo algo está bien. Todo 
 ajust ado al negocio de Don David y a cómo trabaja día a día en su local.  
  
-Gracias por ver este video y por acompañarnos en el proceso. En el siguiente Sprint vamos a 
-llevar un prototipo de baja fidelidad con Don David para medir tiempos reales y afinar 
+Gracias por ver este video y por acompañarnos en el proceso. En el siguiente Sprint llevaremos entraremos de lleno a lo que busca Don David para medir tiempos reales y afinar 
 detalles . La meta se mantiene: que sus clientes resuelvan en dos toques y listo.”  
  
 Corte final con música ligera y logo de LockerEasy.
