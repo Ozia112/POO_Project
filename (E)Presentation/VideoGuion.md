@@ -3,7 +3,7 @@
 ## 1. Presentación
 
 Tú frente a la cámara, mirando directamente al espectador, tono relajado,  pero con energía.  
-"¡Hola! Soy Nico , y bueno... ¿alguna vez te has preguntado cómo se  cual es el proceso de  
+"¡Hola! Soy Nico , y bueno... ¿alguna vez te has preguntado cómo  es el proceso de  
 rentar un locker? ¿Te has detenido a pensar si realmente es tan fácil como parece o si hay 
 algo más detrás de todo eso?"  
  
