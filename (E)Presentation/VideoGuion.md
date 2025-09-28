@@ -49,7 +49,8 @@ no... por ahora. Con eso,  nuestro objetivo quedó resumido en una frase:  dos t
 ## 3. ¿Cómo lo hicimos?  –(TODA ESTA PARTE SERA VOZ EN OFF MIA)  
 
 Tú y tu equipo trabajando juntos en un entorno más in formal, haciendo brainstorming o 
-usando la computadora ." 
+usando la computadora ."
+
 “Esto lo hicimos en equipo.  Nos organizamos por  departamentos  para avanzar sin 
 enredos. El  equipo de Producto  se enfocó en la experiencia: qué queremos que viva la 
 persona que llega con prisa, cómo se  siente el flujo, qué cosas estorban y cuáles ayudan. A 
@@ -59,6 +60,7 @@ donde jalar los hilos.”
  
 Cambio de toma, mostrando a los miembros del equipo trabajando juntos, con algunos papeles 
 sobre la mesa  
+
 “Mientras tanto, el  equipo  de Presentación  —sí, aquí estoy yo — traduce todo ese trabajo a 
 un guion claro, directo y sin tecnicismos: lo que ve el usuario, lo que necesita y cómo lo 
 resolvemos  sin complicarlo . 
