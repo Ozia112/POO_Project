@@ -72,7 +72,7 @@ honesta  entre lo que esperábamos aprender y  lo que realmente alcanzamos  cada
 Nada de adornos; sirve para ver dónde estamos parados y qué sigue puliendo ." 
 Tú con un clic en tu c omputadora, mostrando un proyecto en GitHub en tu pantalla, mientras 
 hablas  
-"Este pro ceso fue ágil, no solo en nombre. Cada paso lo documentamos, y cada tarea se 
+"Este proceso fue ágil, no solo en nombre. Cada paso lo documentamos, y cada tarea se 
 completó de forma ordenada y revisada , igual de  asegurarnos de que lo que hicimos tuviera 
 sentido en cada parte del sistema."  
 
