@@ -1,0 +1,37 @@
+# Storyboards
+
+## Scene 1
+
+![Scene 1 — Presenter at desk](./Assets/StoryBoard1..png)
+
+**Description:** Opening scene: the presenter is seated in front of the laptop, welcoming the audience.
+
+## Scene 2
+
+![Scene 2 — On-screen graphic](./Assets/StoryBoard3..png)
+
+**Description:** The presenter, facing the camera with the laptop on the table, displays supporting graphics while explaining the topic; a small video/Scene frame appears in the top-right corner to accompany the explanation.
+
+## Scene 3
+
+![Scene 3 — Team with whiteboard](./Assets/StoryBoard6.png)
+
+**Description:** The team’s departments are shown along with a few quick sessions (planning/daily/review) using the whiteboard.
+
+## Scene 4
+
+![Scene 3 — Collaborative work](./Assets/StoryBoard4..png)
+
+**Description:** Collaborative work among the departments and team members is shown.
+
+## Scene 5
+
+![Scene 5 — Wrap-up and next steps](./Assets/StoryBoard5..png)
+
+**Description:** The presenter returns to camera to explain future goals and final conclusions.
+
+## Scene 6
+
+![Scene 6](./Assets/StoryBoard7.png)
+
+**Description:** The presenter says goodbye to the audience and gives the final conclusions.
