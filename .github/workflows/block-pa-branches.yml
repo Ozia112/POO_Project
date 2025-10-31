@@ -1,24 +1,61 @@
-name: Block merges from personal branches
+name: PR flow validation
 
 on:
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
-    branches:
-      - main
-      - 'Stage*'
-      - 'dep.*'
 
 jobs:
-  block:
-    name: Block PA heads
+  validate-flow:
+    name: validate PR flow
     runs-on: ubuntu-latest
     steps:
-      - name: Enforce policy
+      - name: Enforce branch flow policy
         shell: bash
         run: |
-          echo "Head: $GITHUB_HEAD_REF | Base: $GITHUB_BASE_REF"
-          if [[ "${GITHUB_HEAD_REF}" == PA.* ]]; then
-            echo "::error title=Blocked::Pull requests from personal activities branches are not allowed."
+          HEAD="${GITHUB_HEAD_REF}"
+          BASE="${GITHUB_BASE_REF}"
+
+          echo "=== PR flow validation ==="
+          echo "source branch(HEAD): $HEAD"
+          echo "target branch(BASE): $BASE"
+          echo ""
+
+          # Block PA.* branches as source branches
+          if [[ "$HEAD" == PA.* ]]; then
+            echo "::error title=Blocked::Pull resquest from personal activities branches (PA.*) are not allowed."
             exit 1
           fi
-          echo "All checks passed."
+
+          # Validate temp.* -> dep.* flow
+          if [[ "$HEAD" == temp.*]]; then
+            if [[ "$BASE" != dep.* ]]; then
+              echo "::error title=Invalid Flow::Branches with prefix 'temp.*' can only merge into 'dep.*' branches."
+              echo "Expected: temp.* -> dep.*"
+              exit 1
+            fi
+            echo "✓ Valid flow: temp.* -> dep.*"
+            exit 0
+          fi
+
+          #Validate dep.* -> Stage* flow
+          if [[ "$HEAD" == dep.* ]]; then
+            if [[ "$BASE" != Stage* ]]; then
+              echo "::error title=Invalid Flow::Branches with prefix 'dep.*' can only merge into 'Stage*' branches."
+              echo "Expected: dep.* -> Stage*"
+              exit 1
+            fi
+            echo "✓ Valid flow: dep.* -> Stage*"
+            exit 0
+          fi
+
+          # Validate Stage* -> main flow(Blocked above, but documented here)
+          if [[ "$HEAD" == Stage* ]]; then
+            echo "::error title=Invalid Flow::Branches with prefix 'Stage*' cannot be used as source branches."
+            exit 1
+          fi
+
+          # Block any other branch
+          echo "::error title=Invalid Flow::The source branch '$HEAD' is not allowed for pull requests."
+          echo "Allowed patterns: temp.*, dep.*, Stage* (as target only)"
+          echo "Blocked patterns: PA.*, any other patterns"
+          exit 1
