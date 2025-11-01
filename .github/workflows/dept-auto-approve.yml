@@ -3,6 +3,7 @@ name: Auto Approve PRs for Department Leads
 on:
   pull_request:
     types: [opened, synchronize]
+    
   workflow_dispatch:
 
 jobs:
