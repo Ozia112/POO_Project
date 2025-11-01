@@ -1,109 +1,156 @@
-# Video script for LockerEasy presentation
+# Guion – LockerEasy
 
 ## Presentación
 
->**[ACOTACIÓN]**  
-You are in front of the camera, looking directly at the viewer, relaxed tone but full of energy.
+> [ACOTACIÓN]
+> 
+> 
+> Frente a la cámara, tono sincero, relajado.
+> 
+> (Se mantiene pequeña mención a Don David y el contexto del negocio.)
+> 
 
-**[DIALOGO]**  
-Presentador:  
-"¡Hola! Soy Nico, y bueno... ¿alguna vez te has preguntado cómo es el proceso de rentar un locker? ¿Te has detenido a pensar si realmente es tan fácil como parece o si hay algo más detrás de todo eso?"
+**[DIALOGO]**
 
->**[ACOTACIÓN]**  
-You adjust a little, and with a more serious but accessible tone.
+Presentador:
 
-**[DIALOGO]**  
-Presentador:  
-"Para ubicarnos rápido: nuestro cliente, Don David, atiende un local en la Gran Plaza donde tramitan visas. Mucha gente llega a imprimir con prisa y estrés, y además está la renta de lockers para estudiantes de la universidad cercana. Hoy el proceso suele ser manual: confirmar disponibilidad, anotar datos, definir tiempo, cobrar y entregar llave. Cuando hay filas o algún locker falla, todo se vuelve lento y hay margen de error."
+"¡Hola! Soy Nico. Para los que no conocen el proyecto, LockerEasy nació para ayudar a negocios como el de Don David, quien renta lockers e imprime documentos en la Gran Plaza, a organizarse mejor y atender más fácil a sus clientes. Pero en esta etapa, más que avanzar en nuevas funciones, nos tocó enfrentar un montón de retos, adaptarnos… y aprender."
 
->**[ACOTACIÓN]**  
-You pause for a moment and continue with a more direct tone.
+---
 
-**[DIALOGO]**  
-Presentador:  
-"Cuando lo analizamos, vimos que… no, no es tan simple. Por eso empezamos EasyLocker: una plantilla configurable para que Don David active lo que necesita (impresiones, lockers e incluso ventas rápidas) y que la gente resuelva todo en dos toques y listo. No te cuento todo todavía; mejor acompáñame y veamos cómo llegamos hasta aquí."
+## Principales retos y problemas
 
-## What we did?
+> [ACOTACIÓN]
+> 
+> 
+> Aquí empiezan a entrar breves clips o audios de miembros del equipo respondiendo preguntas. (Tú puedes meter después las respuestas reales).
+> 
+> Ejemplo:
+> 
+- ¿Qué fue lo más complicado de esta etapa?
+- ¿Cómo les afectó el cambio de scope en los departamentos de cada uno?
+- ¿Qué sintieron cuando un integrante se fue del equipo?
+- -¿Cuál crees que sera mayor reto al entrar al proyecto?
+- ¿Cómo fue integrarte a un equipo que ya tenía camino recorrido con su proyecto?
+- -¿Qué tu crees que podrías aportar al equipo?
 
->**[ACOTACIÓN]**  
-You are sitting at a table with some papers, looking towards the camera while you talk.
+**[DIALOGO]**
 
-**[DIALOGO]**  
-Presentador:  
-"Lo primero fue entender el problema real. No vamos a fingir que ya habíamos hecho un software de renta de lockers; lo que hicimos fue observar el proceso manual que hoy vive Don David con sus clientes. Ahí detectamos dónde se atora todo: confirmar si un locker está disponible o reportado, anotar los datos, elegir el tiempo, cobrar y entregar llave o código. Y cuando aparece una excepción —un locker dañado, un cambio de tiempo, una cancelación— el flujo se vuelve lento y hay más margen de error."
+Presentador:
 
->**[ACOTACIÓN]**  
-Cut to a whiteboard or paper showing a simple diagram that you draw in real-time.
+"Esta vez, los problemas fueron los protagonistas. Por eso, mejor que te lo cuenten algunos de mis compañeros…"
 
-**[DIALOGO]**  
-Presentador:  
-"Con eso claro, decidimos hacerlo sencillo. ¿Por qué? Porque Don David necesita operar rápido y, mientras más opciones vea el usuario al mismo tiempo, mayores son las probabilidades de error o de frenar la decisión. Porque al final, quien usa el sistema, sólo quiere que funcione."
+> [ACOTACIÓN]
+> 
+> 
+> [Se intercalan respuestas del equipo, cada quien contando brevemente su experiencia: problemas para definir qué quería el cliente, reorganización interna, dificultad para organizar el trabajo, etc.]
+> 
 
->**[ACOTACIÓN]**  
-You are drawing on the whiteboard or writing on a notebook with a pen while explaining each step you define.
+---
 
-**[DIALOGO]**  
-Presentador:  
-"De ahí nace EasyLocker como plantilla configurable: Don David activa lo que necesita y apaga lo que no. La idea es que el flujo se sienta natural. Para impresiones, que baste con seleccionar, confirmar y pagar. Para lockers, elegir el locker, definir el tiempo y confirmar para recibir el ticket. Antes de construir nada, dejamos por escrito las funciones principales del producto, los objetivos del usuario (resolver su trámite rápido), los criterios de aceptación de cada flujo y las limitaciones: qué sí cubre EasyLocker y qué no... por ahora. Con eso, nuestro objetivo quedó resumido en una frase: dos toques y listo."
+## Replanteamiento: lo que hicimos para seguir avanzando
 
-## How we did it?
+> [ACOTACIÓN]
+> 
+> 
+> Vuelve la cámara al presentador. Tono de reflexión y honestidad.
+> 
 
->**[ACOTACIÓN]**  
-This part will be voice-over as you and your team work together in a more informal setting, brainstorming or using the computer.
+**[DIALOGO]**
 
-**[DIALOGO]**  
-Presentador (voz en off):  
-"Esto lo hicimos en equipo. Nos organizamos por departamentos para avanzar sin enredos. El equipo de Producto se enfocó en la experiencia: cómo queremos que viva la persona que llega con prisa, cómo se siente el flujo, qué cosas estorban y cuáles ayudan. A partir de esa visión, Requisitos entró en juego, sin prometer definiciones exhaustivas todavía; estamos en una etapa de descripciones simples que nos dan la dirección por donde jalar los hilos."
+Presentador:
 
->**[ACOTACIÓN]**  
-Cut to team members working together, with papers on the table.
+"Ante todo esto, tuvimos que reagruparnos. Juntamos y depuramos los requerimientos, analizamos lo que sí podíamos hacer para esta entrega, y adaptamos el proyecto según lo que pidió el cliente. Ya no solo era un tema de sumar funciones, sino de entender hasta dónde podíamos llegar realmente."
 
-**[DIALOGO]**  
-Presentador (voz en off):  
-"Mientras tanto, el equipo de Presentación —sí, aquí estoy yo— traduce todo ese trabajo a un guion claro, directo y sin tecnicismos: lo que ve el usuario, lo que necesita y cómo lo resolvemos sin complicarlo."
+---
 
->**[ACOTACIÓN]**  
-You are pointing at a whiteboard with a work diagram, perhaps with some arrows or lists that you've written previously.
+## Cambios en el equipo
 
-**[DIALOGO]**  
-Presentador (voz en off):  
-"Y el departamento de Competencias funciona como nuestro espejo: una reflexión honesta entre lo que esperábamos aprender y lo que realmente alcanzamos cada quien. Nada de adornos; sirve para ver dónde estamos parados y qué sigue puliendo."
+> [ACOTACIÓN]
+> 
+> 
+> Puedes meter aquí otra intervención breve de algún miembro, comentando sobre la salida/entrada del nuevo integrante.
+> 
 
->**[ACOTACIÓN]**  
-You are clicking on your computer, showing a GitHub project on the screen as you speak.
+**[DIALOGO]**
 
-**[DIALOGO]**  
-Presentador (voz en off):  
-"Este proceso fue ágil, no solo en nombre. Cada paso lo documentamos, y cada tarea se completó de forma ordenada y revisada, igual de asegurarnos de que lo que hicimos tuviera sentido en cada parte del sistema."
+Presentador:
 
-## What's next?
+"También nos tocó vivir cambios en el equipo: uno de nuestros compañeros se fue y decidimos sumar a alguien nuevo. No fue fácil adaptarse, pero al final lo importante fue no detenernos."
 
->**[ACOTACIÓN]**  
-You are sitting again, with a notebook or a sheet of paper in your hands, looking directly at the camera.
+---
 
-**[DIALOGO]**  
-Presentador:  
-"Ahora, lo que sigue es... seguir trabajando. Cada Sprint es una nueva oportunidad para mejorar, ajustar y agregar nuevas funciones según las necesidades del cliente y los usuarios. El objetivo es seguir mejorando el sistema, y por supuesto, que no queden dudas sobre qué hace cada parte del proceso."
+## Proceso para determinar los modelos UML
 
->**[ACOTACIÓN]**  
-Change of shot, you are walking through the workspace, pointing at a whiteboard where the next tasks are written.
+> [ACOTACIÓN]
+> 
+> 
+> El presentador explica cómo fue el proceso de selección y diseño de los modelos UML, sin entrar en detalles técnicos de cada clase.
+> 
 
-**[DIALOGO]**  
-Presentador:  
-"Lo más importante es que, aunque hemos avanzado bastante, no estamos aún en la meta. Pero ya tenemos la base, y ahora solo tenemos que seguir ajustando y mejorando lo que tenemos. Este no es un proyecto que se acaba en un solo Sprint, sino que evoluciona con el tiempo."
+**[DIALOGO]**
 
-## Conclusion
+Presentador:
 
->**[ACOTACIÓN]**  
-Final cut, you are looking at the camera with the LockerEasy logo on screen.
+"En esta etapa del proyecto, nos enfrentamos a un nuevo reto: definir los modelos y relaciones para construir el sistema de LockerEasy.
 
-**[DIALOGO]**  
-Presentador:  
-"En resumen, dimos un paso claro en la dirección correcta. Como equipo académico, estamos en la etapa de documentación y diseño: entendimos el problema, definimos flujos simples, una plantilla configurable y criterios para saber cuándo algo está bien. Todo ajustado al negocio de Don David y a cómo trabaja día a día en su local."
+Lo más importante aquí no era tanto el contenido específico de cada clase, sino **cómo llegamos a decidir qué modelos realmente necesitábamos**.
 
->**[ACOTACIÓN]**  
-End with light music and the LockerEasy logo on screen.
+Para lograrlo, hicimos lo siguiente:
 
-**[DIALOGO]**  
-Presentador:  
-"Gracias por ver este video y por acompañarnos en el proceso. En el siguiente Sprint entraremos de lleno a lo que busca Don David para medir tiempos reales y afinar detalles. La meta se mantiene: que sus clientes resuelvan en dos toques y listo."
+1. **Analizamos los requerimientos reales del cliente**.
+    
+    Antes de dibujar cualquier diagrama, nos sentamos como equipo a entender exactamente qué procesos y servicios quería Don David que cubriéramos en el sistema: la renta de lockers, las ventas rápidas, y la emisión de tickets para cada servicio.
+    
+2. **Priorizamos lo esencial y lo que sí podíamos implementar**.
+    
+    Hubo muchas ideas al principio, pero tuvimos que ser realistas y elegir solo lo que el tiempo y el equipo nos permitían desarrollar. Decidimos enfocarnos en los flujos principales:
+    
+    - Gestión de lockers físicos
+    - Registro de ventas y rentas
+    - Control de servicios y descuentos
+    - Generación de tickets claros para el cliente
+3. **Iteramos los modelos en equipo**.
+    
+    Cada integrante propuso su visión y, con base en ejemplos reales y retroalimentación, fuimos ajustando las clases y sus relaciones. Fue importante siempre preguntarnos:
+    
+    - ¿Este modelo realmente representa algo necesario para Don David?
+    - ¿Está claro cómo se conecta con los otros procesos?
+
+---
+
+## Lo que aprendimos y lo que sigue
+
+> [ACOTACIÓN]
+> 
+> 
+> Cierra el bloque de entrevistas y regresa el foco al presentador.
+> 
+
+**[DIALOGO]**
+
+Presentador:
+
+"¿Y qué aprendimos? Que los proyectos van de personas, comunicación y de adaptarse a los cambios. Ahora sí, con los requerimientos claros y el equipo completo, lo que sigue es pasar de la planeación a la programación. En la próxima entrega, nuestro enfoque va a estar en convertir todo lo planeado en un sistema real que funcione para Don David y sus clientes."
+
+---
+
+## Cierre
+
+> [ACOTACIÓN]
+> 
+> 
+> Toma final, tono honesto pero positivo. Logo LockerEasy en pantalla.
+> 
+
+**[DIALOGO]**
+
+Presentador:
+
+"Gracias por acompañarnos en esta etapa, que más que de resultados visibles, fue de aprendizaje real. Nos vemos en la próxima, donde ahora sí: a programar en serio."
+
+> [ACOTACIÓN]
+> 
+> 
+> Música ligera, logo LockerEasy para cerrar.
+>
