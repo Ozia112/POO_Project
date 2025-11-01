@@ -2,7 +2,7 @@
 
 ## Scene 1
 
-![StoryBoard1..png](StoryBoard1..png)
+![StoryBoard1..png](StoryBoard1.png)
 
 **Description:** Opening scene: the presenter is seated at the desk, working on the laptop and welcoming the audience. Sets the context for LockerEasy and mentions Don David’s business.
 
@@ -18,7 +18,7 @@
 
 ## Scene 3
 
-![StoryBoard5..png](StoryBoard5..png)
+![StoryBoard5..png](StoryBoard5.png)
 
 **Description:** The presenter returns to camera, now more reflective. Here, they wrap up the story, explaining the actions taken after facing so many problems, what the team learned from the experience, and how these lessons will guide the next stage. The message is honest and motivating..
 
