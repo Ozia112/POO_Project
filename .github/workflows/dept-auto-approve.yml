@@ -8,107 +8,105 @@ jobs:
   auto-approve:
     runs-on: ubuntu-latest
     steps:
-      - name: Get the branch name and PR author
+      - name: Extract branch info and determine code owner
         id: get_info
         run: |
-          echo "Branch name: ${{ github.head_ref }}"
-          echo "PR author: ${{ github.actor }}"
           BRANCH="${{ github.head_ref }}"
+          BASE="${{ github.base_ref }}"
           AUTHOR="${{ github.actor }}"
           
-          # Extract the department from the branch name
-          DEPARTMENT=$(echo "$BRANCH" | cut -d'.' -f2)  # Get department from branch name
-          echo "Department: $DEPARTMENT"
+          echo "Branch: $BRANCH"
+          echo "Base: $BASE"
+          echo "Author: $AUTHOR"
           
-          # Set department code owners based on the branch
-          if [[ "$BRANCH" == temp.TM-01.* ]]; then
-            CODE_OWNER="Ozia112"
-          elif [[ "$BRANCH" == temp.TM-02.* ]]; then
-            CODE_OWNER="Fabio0302"
-          elif [[ "$BRANCH" == temp.TM-03.* ]]; then
-            CODE_OWNER="LicNico"
-          elif [[ "$BRANCH" == temp.TM-05.* ]]; then
-            CODE_OWNER="MaximilianoCarrilloAlvarado"
-          elif [[ "$BRANCH" == temp.TM-06.* ]]; then
-            CODE_OWNER="Wimon77"
+          # Solo procesar PRs temp.* -> dep.*
+          if [[ ! "$BRANCH" == temp.* ]] || [[ ! "$BASE" == dep.* ]]; then
+            echo "This workflow only applies to temp.* -> dep.* PRs"
+            echo "should_approve=false" >> $GITHUB_OUTPUT
+            exit 0
           fi
           
-          echo "Code owner for temp branch: $CODE_OWNER"
-          echo "::set-output name=code_owner::$CODE_OWNER"
-          echo "::set-output name=department::$DEPARTMENT"
-
-      - name: Validate if PR author is the code owner of temp branch
-        id: validate_owner
-        run: |
-          if [[ "${{ steps.get_info.outputs.code_owner }}" != "${{ github.actor }}" ]]; then
-            echo "❌ El autor del PR no es el propietario del código de la rama temporal."
-            exit 1
-          fi
-          echo "✔️ El autor es el propietario del código de la rama temporal."
-
-      - name: Check if PR author is department lead
-        id: check_lead
-        run: |
-          DEPARTMENT="${{ steps.get_info.outputs.department }}"
-          AUTHOR="${{ github.actor }}"
+          # Extraer departamento de la rama BASE (destino)
+          BASE_DEPARTMENT=$(echo "$BASE" | sed 's/dep\.//')
+          echo "Base Department: $BASE_DEPARTMENT"
           
-          # Check if the PR author is the department lead for the respective department
-          if [[ "$DEPARTMENT" == "Process" && "$AUTHOR" == "Ozia112" ]]; then
-            echo "Lead is Process lead. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          elif [[ "$DEPARTMENT" == "Product" && "$AUTHOR" == "Fabio0302" ]]; then
-            echo "Lead is Product lead. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          elif [[ "$DEPARTMENT" == "Design" && "$AUTHOR" == "Wimon77" ]]; then
-            echo "Lead is Design lead. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          elif [[ "$DEPARTMENT" == "Presentation" && "$AUTHOR" == "LicNico" ]]; then
-            echo "Lead is Presentation lead. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          elif [[ "$DEPARTMENT" == "Requirements" && "$AUTHOR" == "MaximilianoCarrilloAlvarado" ]]; then
-            echo "Lead is Requirements lead. Auto-approving PR."
-            echo "::set-output name=approved::true"
+          # Extraer TM-ID de la rama temporal (source)
+          TM_ID=$(echo "$BRANCH" | cut -d'.' -f2)
+          echo "TM-ID from temp branch: $TM_ID"
+          
+          # Mapear el propietario del departamento BASE
+          case "$BASE_DEPARTMENT" in
+            Process)
+              BASE_OWNER="Ozia112"
+              BASE_TM_ID="TM-01"
+              ;;
+            Product)
+              BASE_OWNER="Fabio0302"
+              BASE_TM_ID="TM-02"
+              ;;
+            Presentation)
+              BASE_OWNER="LicNico"
+              BASE_TM_ID="TM-03"
+              ;;
+            Requirements)
+              BASE_OWNER="MaximilianoCarrilloAlvarado"
+              BASE_TM_ID="TM-05"
+              ;;
+            Design)
+              BASE_OWNER="Wimon77"
+              BASE_TM_ID="TM-06"
+              ;;
+            *)
+              echo "Unknown base department: $BASE_DEPARTMENT"
+              echo "should_approve=false" >> $GITHUB_OUTPUT
+              exit 0
+              ;;
+          esac
+          
+          echo "base_owner=$BASE_OWNER" >> $GITHUB_OUTPUT
+          echo "base_department=$BASE_DEPARTMENT" >> $GITHUB_OUTPUT
+          echo "base_tm_id=$BASE_TM_ID" >> $GITHUB_OUTPUT
+          
+          # Verificar si:
+          # 1. El autor del PR es el dueño del departamento BASE
+          # 2. El TM-ID de la rama temporal coincide con el TM-ID del departamento BASE
+          if [[ "$AUTHOR" == "$BASE_OWNER" ]] && [[ "$TM_ID" == "$BASE_TM_ID" ]]; then
+            echo "✅ AUTO-APPROVE CONDITIONS MET:"
+            echo "   - PR author ($AUTHOR) is the owner of $BASE_DEPARTMENT department ($BASE_OWNER)"
+            echo "   - TM-ID ($TM_ID) matches the department's TM-ID ($BASE_TM_ID)"
+            echo "should_approve=true" >> $GITHUB_OUTPUT
           else
-            echo "No approval for PR."
-            echo "::set-output name=approved::false"
+            echo "ℹ️ MANUAL APPROVAL REQUIRED:"
+            if [[ "$AUTHOR" != "$BASE_OWNER" ]]; then
+              echo "   - PR author ($AUTHOR) is NOT the owner of $BASE_DEPARTMENT department ($BASE_OWNER)"
+            fi
+            if [[ "$TM_ID" != "$BASE_TM_ID" ]]; then
+              echo "   - TM-ID ($TM_ID) does NOT match the department's TM-ID ($BASE_TM_ID)"
+            fi
+            echo "should_approve=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Check if department code owner matches
-        id: check_department_owner
-        run: |
-          DEPARTMENT="${{ steps.get_info.outputs.department }}"
-          CODE_OWNER="${{ steps.get_info.outputs.code_owner }}"
-
-          # Assign department code owners
-          if [[ "$DEPARTMENT" == "Process" && "$CODE_OWNER" == "Ozia112" ]]; then
-            echo "Department code owner matches. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          elif [[ "$DEPARTMENT" == "Product" && "$CODE_OWNER" == "Fabio0302" ]]; then
-            echo "Department code owner matches. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          elif [[ "$DEPARTMENT" == "Design" && "$CODE_OWNER" == "Wimon77" ]]; then
-            echo "Department code owner matches. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          elif [[ "$DEPARTMENT" == "Presentation" && "$CODE_OWNER" == "LicNico" ]]; then
-            echo "Department code owner matches. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          elif [[ "$DEPARTMENT" == "Requirements" && "$CODE_OWNER" == "MaximilianoCarrilloAlvarado" ]]; then
-            echo "Department code owner matches. Auto-approving PR."
-            echo "::set-output name=approved::true"
-          else
-            echo "Department code owner does not match. Approval required."
-            echo "::set-output name=approved::false"
-          fi
-
-      - name: Auto-approve if department code owner matches
-        if: steps.check_department_owner.outputs.approved == 'true'
+      - name: Auto-approve PR
+        if: steps.get_info.outputs.should_approve == 'true'
         uses: hmarr/auto-approve-action@v3
         with:
           github-token: ${{ secrets.BOT_TOKEN }}
 
-      - name: Fail if department code owner does not match
-        if: steps.check_department_owner.outputs.approved == 'false'
-        run: |
-          echo "❌ El propietario del código de la rama no coincide con el propietario del departamento."
-          echo "Se requiere aprobación adicional."
-          exit 1
+      - name: Add comment if manual approval needed
+        if: steps.get_info.outputs.should_approve == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const author = '${{ github.actor }}';
+            const baseOwner = '${{ steps.get_info.outputs.base_owner }}';
+            const baseDepartment = '${{ steps.get_info.outputs.base_department }}';
+            
+            if (baseOwner) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `ℹ️ **Manual approval required**\n\nThe PR author (@${author}) is not authorized for auto-approval to the **${baseDepartment}** department.\n\nA review from @${baseOwner} (${baseDepartment} department owner) or another team member is needed.`
+              });
+            }
