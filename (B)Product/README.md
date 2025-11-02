@@ -1,6 +1,6 @@
 # Table of Contents
 
-## Department: Process (D)
+## Department: Product (B)
 
 ## Index
 
