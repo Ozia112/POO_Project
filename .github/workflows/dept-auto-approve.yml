@@ -1,0 +1,114 @@
+name: Auto Approve PRs for Department Leads
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    
+  workflow_dispatch:
+
+jobs:
+  auto-approve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract branch info and determine code owner
+        id: get_info
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          BASE="${{ github.base_ref }}"
+          AUTHOR="${{ github.actor }}"
+          
+          echo "Branch: $BRANCH"
+          echo "Base: $BASE"
+          echo "Author: $AUTHOR"
+          
+          # Solo procesar PRs temp.* -> dep.*
+          if [[ ! "$BRANCH" == temp.* ]] || [[ ! "$BASE" == dep.* ]]; then
+            echo "This workflow only applies to temp.* -> dep.* PRs"
+            echo "should_approve=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Extraer departamento de la rama BASE (destino)
+          BASE_DEPARTMENT=$(echo "$BASE" | sed 's/dep\.//')
+          echo "Base Department: $BASE_DEPARTMENT"
+          
+          # Extraer TM-ID de la rama temporal (source)
+          TM_ID=$(echo "$BRANCH" | cut -d'.' -f2)
+          echo "TM-ID from temp branch: $TM_ID"
+          
+          # Mapear el propietario del departamento BASE
+          case "$BASE_DEPARTMENT" in
+            Process)
+              BASE_OWNER="Ozia112"
+              BASE_TM_ID="TM-01"
+              ;;
+            Product)
+              BASE_OWNER="Fabio0302"
+              BASE_TM_ID="TM-02"
+              ;;
+            Presentation)
+              BASE_OWNER="LicNico"
+              BASE_TM_ID="TM-03"
+              ;;
+            Requirements)
+              BASE_OWNER="MaximilianoCarrilloAlvarado"
+              BASE_TM_ID="TM-05"
+              ;;
+            Design)
+              BASE_OWNER="Wimon77"
+              BASE_TM_ID="TM-06"
+              ;;
+            *)
+              echo "Unknown base department: $BASE_DEPARTMENT"
+              echo "should_approve=false" >> $GITHUB_OUTPUT
+              exit 0
+              ;;
+          esac
+          
+          echo "base_owner=$BASE_OWNER" >> $GITHUB_OUTPUT
+          echo "base_department=$BASE_DEPARTMENT" >> $GITHUB_OUTPUT
+          echo "base_tm_id=$BASE_TM_ID" >> $GITHUB_OUTPUT
+          
+          # Verificar si:
+          # 1. El autor del PR es el dueño del departamento BASE
+          # 2. El TM-ID de la rama temporal coincide con el TM-ID del departamento BASE
+          if [[ "$AUTHOR" == "$BASE_OWNER" ]] && [[ "$TM_ID" == "$BASE_TM_ID" ]]; then
+            echo "✅ AUTO-APPROVE CONDITIONS MET:"
+            echo "   - PR author ($AUTHOR) is the owner of $BASE_DEPARTMENT department ($BASE_OWNER)"
+            echo "   - TM-ID ($TM_ID) matches the department's TM-ID ($BASE_TM_ID)"
+            echo "should_approve=true" >> $GITHUB_OUTPUT
+          else
+            echo "ℹ️ MANUAL APPROVAL REQUIRED:"
+            if [[ "$AUTHOR" != "$BASE_OWNER" ]]; then
+              echo "   - PR author ($AUTHOR) is NOT the owner of $BASE_DEPARTMENT department ($BASE_OWNER)"
+            fi
+            if [[ "$TM_ID" != "$BASE_TM_ID" ]]; then
+              echo "   - TM-ID ($TM_ID) does NOT match the department's TM-ID ($BASE_TM_ID)"
+            fi
+            echo "should_approve=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Auto-approve PR
+        if: steps.get_info.outputs.should_approve == 'true'
+        uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.BOT_TOKEN }}
+
+      - name: Add comment if manual approval needed
+        if: steps.get_info.outputs.should_approve == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const author = '${{ github.actor }}';
+            const baseOwner = '${{ steps.get_info.outputs.base_owner }}';
+            const baseDepartment = '${{ steps.get_info.outputs.base_department }}';
+            
+            if (baseOwner) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `ℹ️ **Manual approval required**\n\nThe PR author (@${author}) is not authorized for auto-approval to the **${baseDepartment}** department.\n\nA review from @${baseOwner} (${baseDepartment} department owner) or another team member is needed.`
+              });
+            }
