@@ -1,115 +1,283 @@
-# Use Cases
+# System Use Case Specification
 
-## Use Case 1 - Manage Prices and Rental Rates and Products
+## Use Case 1 – Manage Locker Rentals
 
-**Primary Actor**: Administrator
+**Primary Actor:** Employee / Administrator  
+**Goal:** Register, manage, end, or cancel locker rentals including customer data, duration, and cost.  
 
-- **Description**: The administrator manages the rental rates and product prices within the system.
-- **Flow of Events**:
-  1. The **administrator** logs into the system and accesses the "Manage Prices" section.
-  2. The **administrator** adjusts the rental rates and product prices.
-  3. The system updates the rates and prices in real-time.
-- **Preconditions**: The administrator is authenticated in the system.
-- **Postconditions**: The rental rates and product prices are updated in the system.
+### Preconditions
 
-## Use Case 2 - Generate and View Sales and Revenue Reports
+- Active session (Employee or Administrator)
+- Available lockers in the system
 
-**Primary Actor**: Administrator
+### Main Flow
 
-- **Description**: The administrator can generate and view reports related to sales and revenue.
-- **Flow of Events**:
-  1. The **administrator** selects the "Generate Reports" option.
-  2. The **administrator** chooses the type of report (sales, revenue).
-  3. The system generates the report in Excel or PDF format.
-- **Preconditions**: The administrator has access to the reporting system.
-- **Postconditions**: The report is generated and available for download.
+1. User selects **"New Rental"**.  
+2. System displays a form and a map of available lockers.  
+3. User enters customer data, rental duration, and locker selection.  
+4. System calculates the total cost.  
+5. User confirms registration.  
+6. System marks the locker as occupied and creates a financial transaction record.
 
-## Use Case 3 - Manage Product Catalog
+### Alternative Flows
 
-**Primary Actor**: Administrator
+- **Returning Customer:** System auto-fills customer information.  
+- **Invalid Data:** System displays specific validation errors.  
+- **End Rental:**  
+  1. User selects an active rental and chooses **"End Rental"**.  
+  2. System marks the locker as available, records end time, and optionally requests customer feedback.  
+- **Cancel Rental:**  
+  1. User selects **"Cancel Rental"** for an active rental.  
+  2. System verifies and processes the cancellation, freeing the locker.
 
-- **Description**: The administrator manages the product catalog, adding or removing products for sale.
-- **Flow of Events**:
-  1. The **administrator** accesses the "Product Catalog" section.
-  2. The **administrator** adds new products or removes existing products.
-  3. The system updates the product catalog accordingly.
-- **Preconditions**: The administrator is authenticated and has access to the catalog.
-- **Postconditions**: The product catalog is updated.
+### Postconditions
 
-## Use Case 4 - Register Locker Rentals with Details (Customer, Duration, Cost)
+- Rental registered, ended, or canceled successfully  
+- Locker status updated  
+- Financial transaction logged  
 
-**Primary Actor**: Administrator
+---
 
-- **Description**: The administrator registers a locker rental, associating it with customer details, rental duration, and cost.
-- **Flow of Events**:
-  1. The **administrator** selects the "Register Locker Rental" option.
-  2. The **administrator** enters the customer's details, rental duration, and cost.
-  3. The system calculates the total cost and confirms the rental.
-- **Preconditions**: The administrator is logged in.
-- **Postconditions**: A rental record is created with customer details, rental duration, and cost.
+## Use Case 2 – Manage Products and Sales
 
-## Use Case 5 - End Rental and Mark Locker as Available
+**Primary Actor:** Employee / Administrator  
+**Goal:** Manage the product catalog and record product sales, optionally linked to active locker rentals.  
 
-**Primary Actor**: Administrator
+### Preconditions
 
-- **Description**: The administrator ends a rental and marks the locker as available for the next customer.
-- **Flow of Events**:
-  1. The **administrator** selects the option to "End Rental".
-  2. The system confirms the rental end and updates the locker status as available.
-- **Preconditions**: The rental must be active.
-- **Postconditions**: The rental is ended, and the locker is marked as available.
+- Authenticated session  
+- Available products in inventory
 
-## Use Case 6 - Cancel Rental
+### Main Flow
 
-**Primary Actor**: Administrator
+1. User opens **"Product Catalog"** or **"Product Sales"** section.  
+2. System displays available products and their stock levels.  
+3. User selects products to add, update, or remove, or records a sale.  
+4. For sales, system suggests linking to an active locker rental.  
+5. User confirms action.  
+6. System updates the catalog, inventory, and financial transaction records.
 
-- **Description**: The administrator can cancel an active rental and free the locker for another customer.
-- **Flow of Events**:
-  1. The **administrator** selects the "Cancel Rental" option.
-  2. The system verifies that the rental is active and processes the cancellation.
-- **Preconditions**: The rental must be active.
-- **Postconditions**: The rental is canceled, and the locker is freed.
+### Alternative Flows
 
-## Use Case 7 - Apply Promotional Discount to Rental
+- **No Active Rental:** Sale is recorded independently.  
+- **Low Stock:** System alerts user and restricts quantities.  
+- **Invalid Product Data:** System rejects and shows validation errors.
 
-**Primary Actor**: Administrator
+### Postconditions
 
-- **Description**: The administrator applies a promotional discount to a rental.
-- **Flow of Events**:
-  1. The **administrator** selects the rental and applies a discount.
-  2. The system updates the rental cost with the discount applied.
-- **Preconditions**: The administrator has access to apply discounts.
-- **Postconditions**: The rental cost is updated with the discount.
+- Product catalog and inventory updated  
+- Sales recorded and transactions created  
 
-## Use Case 8 - Record Product Sales
+---
 
-**Primary Actor**: Administrator
+## Use Case 3 – Manage Prices and Discounts
 
-- **Description**: The administrator records the sale of products, linking them to customers with locker rentals.
-- **Flow of Events**:
-  1. The **administrator** registers the sale of products.
-  2. The system links the sale to the customer's locker rental.
-- **Preconditions**: The product is available in the catalog.
-- **Postconditions**: The sale is recorded, and the inventory is updated.
+**Primary Actor:** Administrator / Employee  
+**Goal:** Modify product prices, rental rates, and apply discounts or promotions during transactions.  
 
-## Use Case 9 - Link Product Sales to Customers with Locker Rentals
+### Preconditions
 
-**Primary Actor**: Administrator
+- Authenticated administrator (for price changes)  
+- Ongoing rental or sale (for discounts)
 
-- **Description**: The administrator links product sales to customers who have rented a locker.
-- **Flow of Events**:
-  1. The **administrator** selects a product sale and links it to a customer.
-  2. The system ensures the customer has an active locker rental before linking the sale.
-- **Preconditions**: The product sale is recorded.
-- **Postconditions**: The sale is linked to the customer with a locker rental.
+### Main Flow
 
-## Use Case 10 - Apply Discount to Product Sales
+1. User accesses **"Manage Prices"** or **"Apply Discount"** section.  
+2. System displays current prices and promotions.  
+3. User modifies rates or applies a discount/promo code.  
+4. System validates and recalculates totals automatically.  
+5. User confirms and system updates the records.
 
-**Primary Actor**: Administrator
+### Alternative Flows
 
-- **Description**: The administrator applies a discount to a product sale.
-- **Flow of Events**:
-  1. The **administrator** applies a discount to the selected products.
-  2. The system updates the total price with the discount.
-- **Preconditions**: The administrator has access to apply discounts.
-- **Postconditions**: The total price of the product sale is updated with the discount applied.
+- **Invalid Price/Discount:** System rejects the input and provides feedback.  
+- **Bulk Update:** Administrator modifies multiple prices at once.
+
+### Postconditions
+
+- Updated prices and discounts applied  
+- Totals recalculated and confirmed  
+
+---
+
+## Use Case 4 – Generate and Export Reports
+
+**Primary Actor:** Administrator / Employee  
+**Goal:** Generate, view, and export daily or periodic reports of sales, rentals, and revenue.  
+
+### Preconditions
+
+- Active session  
+- Access to reporting module  
+
+### Main Flow
+
+1. User selects **"Reports"** from the main menu.  
+2. System displays date range and filter options.  
+3. User chooses report type (e.g., rentals, sales, revenue).  
+4. System generates the report and displays it on screen.  
+5. User exports report to Excel (.xlsx) or PDF if desired.
+
+### Alternative Flows
+
+- **No Data:** System displays message “No transactions available.”  
+- **Large Dataset:** System splits data into multiple files.  
+- **Export Error:** System notifies user and suggests retry.
+
+### Postconditions
+
+- Report generated and optionally downloaded  
+
+---
+
+## Use Case 5 – Record Financial Transactions
+
+**Primary Actor:** System  
+**Goal:** Automatically log every financial operation for audit and traceability.  
+
+### Preconditions
+
+- A financial operation (rental, sale, or payment) is in process  
+
+### Main Flow
+
+1. System detects a transaction event.  
+2. Captures details: type, amount, timestamp, user, and location.  
+3. Validates data integrity.  
+4. Saves the record securely in the database.  
+5. Confirms successful registration.
+
+### Alternative Flows
+
+- **Incomplete Data:** System rejects transaction and requests correction.  
+- **Storage Error:** System retries saving until successful.
+
+### Postconditions
+
+- Financial transaction securely recorded with unique ID  
+
+---
+
+## Use Case 6 – View Real-Time Dashboard
+
+**Primary Actor:** Employee / Administrator  
+**Goal:** Display live business data including locker status, sales summary, and performance metrics.  
+
+### Preconditions
+
+- Active user session  
+
+### Main Flow
+
+1. User opens **"Dashboard"**.  
+2. System loads and displays:  
+   - Locker map (color-coded by availability)  
+   - Daily sales and rental summary  
+   - Top-selling products  
+   - Key performance metrics  
+3. Dashboard refreshes automatically in real time.
+
+### Alternative Flows
+
+- **First Access:** System displays a short tutorial.  
+- **Offline Mode:** System shows last synchronized data.
+
+### Postconditions
+
+- Dashboard information displayed and updated in real time  
+
+---
+
+## Use Case 7 – Offline Operation
+
+**Primary Actor:** System  
+**Goal:** Maintain full system functionality without internet connectivity.  
+
+### Preconditions
+
+- System installed and configured  
+
+### Main Flow
+
+1. System detects loss of network connection.  
+2. Switches automatically to **offline mode**.  
+3. Stores transactions locally.  
+4. Maintains responsive interface and real-time features locally.  
+5. Synchronizes all pending data when connection is restored.
+
+### Postconditions
+
+- Operations continue without interruption  
+- Data synchronized automatically after reconnection  
+
+---
+
+## Use Case 8 – Administrative Authorization
+
+**Primary Actor:** System  
+**Goal:** Protect critical operations by requiring administrator confirmation.  
+
+### Preconditions
+
+- User attempts a critical modification or deletion  
+
+### Main Flow
+
+1. User initiates a sensitive action.  
+2. System requests administrator credentials.  
+3. Administrator enters username and password.  
+4. System validates permissions.  
+5. If authorized, system proceeds and logs the event.
+
+### Alternative Flows
+
+- **Invalid Credentials:** Operation denied and recorded.  
+
+### Postconditions
+
+- Authorized actions logged securely  
+- Unauthorized attempts blocked  
+
+---
+
+## Use Case 9 – Transaction Audit Trail
+
+**Primary Actor:** System  
+**Goal:** Record a complete trace of all financial and operational activities.  
+
+### Preconditions
+
+- Transaction or system event occurs  
+
+### Main Flow
+
+1. System logs event with details: timestamp, user, type, location, and amount.  
+2. Generates a unique transaction ID.  
+3. Stores data securely in audit database.  
+
+### Postconditions
+
+- Complete and traceable transaction history available  
+
+---
+
+## Use Case 10 – Adaptive and Cross-Platform Interface
+
+**Primary Actor:** System  
+**Goal:** Ensure optimal user experience across devices and platforms (Windows and Android).  
+
+### Preconditions
+
+- System running on supported platform  
+
+### Main Flow
+
+1. System detects device type and screen resolution.  
+2. Loads appropriate configuration and layout.  
+3. Adapts UI for readability and accessibility.  
+4. Ensures consistent performance and responsiveness.  
+
+### Postconditions
+
+- Interface adapts correctly to device  
+- User experience consistent across platforms  

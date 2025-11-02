@@ -4,13 +4,11 @@
 
 ## Indice
 
-(C)Requeriments/
+- [Priorization](prioritization.md)
+- [Functional Requirements](functional_requirement.md)
+- [Non-functional Requirements](non_functional_requirement.md)
+- [Use Cases](use_cases.md)
+- [User Stories](user_stories.md)
+- [Use Case Diagram](use_case_diagram.png)
 
-- [priorizacion.md](prioritization.md)
-- [requerimientos_funcionales.md](functional_requirement.md)
-- [requerimientos_no_funcionales.md](non_functional_requirement.md)
-- [user_stories.md](user_stories.md)
-- [use_cases.md](use_cases.md)
-- [use_case_diagram.png](Use_case_diagram.png)
-
-> written by TM-05 and TM-02
+> written by TM-05
