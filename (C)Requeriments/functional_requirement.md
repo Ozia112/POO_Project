@@ -1,43 +1,13 @@
-System Requirements: Locker Rental and Product Sales Manager
-Functional Requirements (RF)
-1. Locker Rental Management
+# System Requirements: Locker Rental and Product Sales Manager
 
-FR1. The system must allow registering a locker rental with customer details, start time, and duration.
+## Functional Requirements (FR)
 
-FR2. The system must automatically calculate the remaining rental time based on the start time and duration.
-
-FR3. The system must allow extending the rental time of a locker (up to a maximum of 15 minutes without extra charge).
-
-FR4. The system must allow canceling an active rental.
-
-FR5. The system must allow applying discounts to a rental.
-
-FR6. The system must allow finishing a locker rental and marking the locker as available.
-
-2. Locker Availability Management
-
-FR7. The system must visually display the status of each locker (available, rented, in cleaning/maintenance).
-
-FR8. The system must prevent double booking of the same locker.
-
-3. Product Sales Management
-
-FR9. The system must allow registering product sales from a separate tab.
-
-FR10. The system must allow applying discounts to products.
-
-FR11. The system must be able to link a sale to a customer who has rented a locker.
-
-4. History and Reports
-
-FR12. The system must record a history of daily rentals and sales.
-
-FR13. The system must allow consulting past daily income reports from rentals and sales.
-
-FR14. The system must be able to generate tables in formats (to be defined: PDF, Excel, .txt).
-
-5. Settings and Administration
-
-FR15. The system must allow editing rental rates and product prices from an administration panel.
-
-FR16. The system must allow registering new products for sale.
+**FR1.** Register and manage locker rentals including customer data, start time, duration, and status  
+**FR2.** End or cancel (feedback request) a rental and mark the locker as available (prevent double booking)  
+**FR3.** Apply discounts or promotions to services  
+**FR4.** Saves record product sales and link them to customers with active rentals  
+**FR5.** Manage pricing: edit rental rates and product prices from the admin panel  
+**FR6.** Register all financial transactions (rentals, sales, payments)  
+**FR7.** Generate and view daily income and transaction history  
+**FR8.** Export reports or accounting data to Excel format  
+**FR9.** Provide a visual interface showing locker status and sales summary
