@@ -88,11 +88,19 @@ jobs:
             echo "should_approve=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Auto-approve PR
+      - name: Auto-approve PR (primary token)
         if: steps.get_info.outputs.should_approve == 'true'
+        id: primary_approve
         uses: hmarr/auto-approve-action@v3
+        continue-on-error: true
         with:
           github-token: ${{ secrets.BOT_TOKEN }}
+
+      - name: Auto-approve PR (fallback to alternative token)
+        if: steps.get_info.outputs.should_approve == 'true' && steps.primary_approve.outcome == 'failure'
+        uses: hmarr/auto-approve-action@v3
+        with:
+          github-token: ${{ secrets.ALT_BOT_TOKEN }}
 
       - name: Add comment if manual approval needed
         if: steps.get_info.outputs.should_approve == 'false'
