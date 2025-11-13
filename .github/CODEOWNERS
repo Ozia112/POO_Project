@@ -5,11 +5,11 @@ main/*               @Ozia112
 Stage[0-9]*          @Ozia112  # Las ramas Stage (Stage1, Stage2, ...) tendrán a @Ozia112 como propietario
 
 # Asignar a los jefes de departamento para las ramas de cada departamento
-/dep.Product/*       @Fabio0302
+/dep.Product/*       @Wimon77
 /dep.Process/*       @Ozia112
-/dep.Design/*        @Wimon77
+/dep.Design/*        @MaximilianoCarrilloAlvarado
 /dep.Presentation/*  @LicNico
-/dep.Requirements/*  @MaximilianoCarrilloAlvarado
+/dep.Requirements/*  @Fabio0302
 
 # Ramas temporales (temp.*) para cada miembro del equipo, basadas en su ID y tarea
 temp.TM-01.*/       @Ozia112  # TM-01 (Isaac) aprueba sus ramas temporales
