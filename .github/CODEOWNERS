@@ -12,8 +12,8 @@ Stage[0-9]*          @Ozia112  # Las ramas Stage (Stage1, Stage2, ...) tendrán 
 /dep.Requirements/*  @Fabio0302
 
 # Ramas temporales (temp.*) para cada miembro del equipo, basadas en su ID y tarea
-temp.TM-01.*/       @Ozia112  # TM-01 (Isaac) aprueba sus ramas temporales
-temp.TM-02.*/       @Fabio0302  # TM-02 (Fabio) aprueba sus ramas temporales
-temp.TM-03.*/       @LicNico  # TM-03 (Nicolas) aprueba sus ramas temporales
+temp.TM-01.*/       @Ozia112                      # TM-01 (Isaac) aprueba sus ramas temporales
+temp.TM-02.*/       @Fabio0302                    # TM-02 (Fabio) aprueba sus ramas temporales
+temp.TM-03.*/       @LicNico                      # TM-03 (Nicolas) aprueba sus ramas temporales
 temp.TM-05.*/       @MaximilianoCarrilloAlvarado  # TM-05 (Maximiliano) aprueba sus ramas temporales
-temp.TM-06.*/       @Wimon77  # TM-06 (Wimon) aprueba sus ramas temporales
+temp.TM-06.*/       @Wimon77                      # TM-06 (Wimon) aprueba sus ramas temporales

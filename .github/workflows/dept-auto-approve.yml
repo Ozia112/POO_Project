@@ -43,20 +43,20 @@ jobs:
               BASE_TM_ID="TM-01"
               ;;
             Product)
-              BASE_OWNER="Fabio0302"
-              BASE_TM_ID="TM-02"
+              BASE_OWNER="Wimon77"
+              BASE_TM_ID="TM-06"
               ;;
             Presentation)
               BASE_OWNER="LicNico"
               BASE_TM_ID="TM-03"
               ;;
             Requirements)
-              BASE_OWNER="MaximilianoCarrilloAlvarado"
-              BASE_TM_ID="TM-05"
+              BASE_OWNER="Fabio0302"
+              BASE_TM_ID="TM-02"
               ;;
             Design)
-              BASE_OWNER="Wimon77"
-              BASE_TM_ID="TM-06"
+              BASE_OWNER="MaximilianoCarrilloAlvarado"
+              BASE_TM_ID="TM-05"
               ;;
             *)
               echo "Unknown base department: $BASE_DEPARTMENT"
