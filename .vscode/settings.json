@@ -2,5 +2,13 @@
     "java.project.sourcePaths": [
         "LockerEasy"
     ],
-    "java.project.referencedLibraries": []
+    "java.project.referencedLibraries": [],
+    "files.exclude": {
+        "(B)Product/": true,
+        "(C)Requeriments/": true,
+        "(E)Design/": true,
+        "(E)Presentation/": true,
+        "Competences/": true,
+        "LockerEasy/": true
+    }
 }
