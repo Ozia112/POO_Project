@@ -4,3 +4,12 @@
     ],
     "java.project.referencedLibraries": []
 }
+
+"files.exclude": {
+        "(B)Product/": false,
+        "(C)Requeriments/": false,
+        "(E)Design/": false,
+        "(E)Presentation/": true,
+        "Competences/": true,
+        "LockerEasy/": true
+    }
