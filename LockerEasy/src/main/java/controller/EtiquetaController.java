@@ -14,15 +14,19 @@ import java.nio.file.Paths;
 
 public class EtiquetaController {
     private static final String ETIQUETAS_FILE = "LockerEasy/src/main/resources/data/catalogo/etiquetas.json";
-    private Map<Integer, Etiqueta> etiquetas;
+    private final Map<Integer, Etiqueta> etiquetas;
     private int contadorIds;
 
     public EtiquetaController() {
         this.etiquetas = new HashMap<>();
+        this.cargarEtiquetasInternas();
+    }
+
+    private void cargarEtiquetasInternas() {
         cargarEtiquetas();
     }
 
-    public void cargarEtiquetas() {
+    public final void cargarEtiquetas() {
         etiquetas.clear();
         int maxId = 0;
         try {
@@ -49,9 +53,8 @@ public class EtiquetaController {
             contadorIds = maxId + 1;
             System.out.println("Etiquetas cargadas: " + etiquetas.size());
 
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException e) {
             System.err.println("Error al cargar etiquetas: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -180,9 +183,8 @@ public class EtiquetaController {
 
             Files.write(Paths.get(ETIQUETAS_FILE), arr.toString(2).getBytes());
             System.out.println("Etiquetas guardadas correctamente.");
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException e) {
             System.err.println("Error al guardar etiquetas: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -192,9 +194,8 @@ public class EtiquetaController {
             JSONArray arr = new JSONArray();
             Files.write(Paths.get(ETIQUETAS_FILE), arr.toString(2).getBytes());
             System.out.println("Archivo de etiquetas creado.");
-        } catch (Exception e) {
+        } catch (java.io.IOException e) {
             System.err.println("Error al crear archivo de etiquetas: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 }

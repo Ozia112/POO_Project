@@ -16,8 +16,8 @@ import java.nio.file.Paths;
 public class VentaController {
     private static final String PRODUCTOS_FILE = "LockerEasy/src/main/resources/data/catalogo/productos.json";
     
-    private Map<Integer, Venta> catalogo;
-    private EtiquetaController etiquetaController;
+    private final Map<Integer, Venta> catalogo;
+    private final EtiquetaController etiquetaController;
     private int contadorIds;
 
     public VentaController() {
@@ -54,13 +54,16 @@ public class VentaController {
                 List<String> etiquetas = new ArrayList<>();
                 if (obj.has("etiquetas")) {
                     Object etiquetasObj = obj.get("etiquetas");
-                    if (etiquetasObj instanceof JSONArray) {
-                        JSONArray etiquetasArr = (JSONArray) etiquetasObj;
-                        for (int j = 0; j < etiquetasArr.length(); j++) {
-                            etiquetas.add(etiquetasArr.getString(j));
+                    switch (etiquetasObj) {
+                        case JSONArray etiquetasArr -> {
+                            for (int j = 0; j < etiquetasArr.length(); j++) {
+                                etiquetas.add(etiquetasArr.getString(j));
+                            }
                         }
-                    } else if (etiquetasObj instanceof String) {
-                        etiquetas.add((String) etiquetasObj);
+                        case String etiquetaStr -> etiquetas.add(etiquetaStr);
+                        default -> {
+                            // Tipo no soportado
+                        }
                     }
                 }
 
@@ -73,9 +76,8 @@ public class VentaController {
             contadorIds = maxId + 1;
             System.out.println("Productos cargados: " + catalogo.size());
 
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException e) {
             System.err.println("Error al cargar productos: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -261,9 +263,8 @@ public class VentaController {
             Files.write(Paths.get(PRODUCTOS_FILE), arr.toString(2).getBytes());
             System.out.println("Productos guardados correctamente.");
 
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException e) {
             System.err.println("Error al guardar productos: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -273,7 +274,7 @@ public class VentaController {
             JSONArray arr = new JSONArray();
             Files.write(Paths.get(PRODUCTOS_FILE), arr.toString(2).getBytes());
             System.out.println("Archivo de productos creado.");
-        } catch (Exception e) {
+        } catch (java.io.IOException e) {
             System.err.println("Error al crear archivo de productos: " + e.getMessage());
         }
     }

@@ -12,9 +12,9 @@ import java.util.HashMap;
 
 public class RentaController {
     private ReporteController reporteController;
-    private Map<Ubicacion, Renta> rentasActivas;
+    private final Map<Ubicacion, Renta> rentasActivas;
 
-    private final int MINUTOS_EN_HORA = 60;
+    private static final int MINUTOS_EN_HORA = 60;
     private final int MINUTOS_CANCELACION = Config.getMinutosCancelacion();
     private final int MINUTOS_TOLERANCIA = Config.getMinutosTolerancia();
     private final int LIMITE_MINUTOS_PRIMERA_HORA = MINUTOS_EN_HORA + MINUTOS_TOLERANCIA;
@@ -69,9 +69,8 @@ public class RentaController {
             System.out.println("Renta iniciada en " + ubicacion + " con ticket ID: " + ticket.getTicketId());
             return true;
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.err.println("Error al iniciar renta: " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }
@@ -116,9 +115,8 @@ public class RentaController {
                                 " Cierre: " + cierre.toString());
             return true;
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.err.println("Error al finalizar renta: " + e.getMessage());
-            e.printStackTrace();
             return false;
         }
     }  

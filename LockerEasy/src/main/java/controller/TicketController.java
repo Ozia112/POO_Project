@@ -1,21 +1,21 @@
 package controller;
 
-import model.Ticket;
-import model.Servicio;
-import model.TipoServicio;
-import model.Renta;
-import model.Ubicacion;
-import model.Venta;
-
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import model.Renta;
+import model.Servicio;
+import model.Ticket;
+import model.TipoServicio;
+import model.Ubicacion;
+import model.Venta;
 
 public class TicketController {
     private static final String TICKETS_FOLDER = "LockerEasy/src/main/resources/data/tickets/";
@@ -71,11 +71,11 @@ public class TicketController {
                         try {
                             String nombre = path.getFileName().toString();
                             String idStr = nombre.substring("ticket_".length(), nombre.indexOf(fechaStr));
+                            @SuppressWarnings("unused")
                             int id = Integer.parseInt(idStr);
                             // No se actualiza maxId aqui, se hace se hace en el metodo que llama
-                        } catch (Exception e) {
+                        } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                             System.err.println("Error al parsear nombre del archivo: " + path.getFileName().toString());
-                            e.printStackTrace();
                         }
                     });
                 // Leer los Ids del contenido de los archivos
@@ -90,15 +90,14 @@ public class TicketController {
                             if (id > maxIdArray[0]) {
                                 maxIdArray[0] = id;
                             }
-                        } catch (Exception e) {
+                        } catch (java.io.IOException | org.json.JSONException e) {
                             System.err.println("error leyendo ticket: " + path.getFileName().toString());
-                            e.printStackTrace();
                         }
                     });
                 maxId = maxIdArray[0];
             }
             return maxId;
-       } catch (Exception e) {
+       } catch (java.io.IOException e) {
             System.err.println("Error al obtener max ID de tickets: " + e.getMessage());
             return 0;
         }
@@ -137,7 +136,7 @@ public class TicketController {
             }
 
             return ticket;
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException | java.time.format.DateTimeParseException e) {
             System.err.println("Error al cargar el ticket " + ticket_id + ": " + e.getMessage());
             return null;
         }
@@ -178,9 +177,8 @@ public class TicketController {
                     servicios.add(servicio);
                 }
             }
-        } catch (Exception e) {
+        } catch (org.json.JSONException e) {
             System.err.println("Error al cargar servicios: " + e.getMessage());
-            e.printStackTrace();
         }
         return servicios;
     }
@@ -208,7 +206,7 @@ public class TicketController {
             renta.setUbicacion(Ubicacion.valueOf(rentaProps.getString("ubicacion")));
 
             return renta;
-        } catch (Exception e) {
+        } catch (org.json.JSONException | java.time.format.DateTimeParseException | IllegalArgumentException e) {
             System.err.println("Error al cargar renta: " + e.getMessage());
             return null;
         }
@@ -232,7 +230,7 @@ public class TicketController {
                 venta.setEtiquetas(etiquetas);
             }
             return venta;
-        } catch (Exception e) {
+        } catch (org.json.JSONException e) {
             System.err.println("Error al cargar venta: " + e.getMessage());
             return null;
         }
@@ -272,13 +270,19 @@ public class TicketController {
 
                     TipoServicio tipo = servicio.getTipoServicio();
                     
-                    // Determinar el tipo de servicio
-                    if (tipo instanceof Renta) {
-                        servicioObj.put("tipo_servicio", "Renta");
-                        servicioObj.put("renta_properties", crearRentaJSON((Renta) tipo));
-                    } else if (tipo instanceof Venta) {
-                        servicioObj.put("tipo_servicio", "Venta");
-                        servicioObj.put("venta_properties", crearVentaJSON((Venta) tipo));
+                    // Determinar el tipo de servicio usando switch pattern matching (Java 21)
+                    switch (tipo) {
+                        case Renta renta -> {
+                            servicioObj.put("tipo_servicio", "Renta");
+                            servicioObj.put("renta_properties", crearRentaJSON(renta));
+                        }
+                        case Venta venta -> {
+                            servicioObj.put("tipo_servicio", "Venta");
+                            servicioObj.put("venta_properties", crearVentaJSON(venta));
+                        }
+                        default -> {
+                            // Tipo de servicio desconocido
+                        }
                     }
 
                     servicioArray.put(servicioObj);
@@ -290,9 +294,8 @@ public class TicketController {
             Files.write(Paths.get(nombreArchivo), obj.toString(2).getBytes());
             System.out.println("Ticket guardado en: " + nombreArchivo);
 
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException e) {
             System.err.println("Error al guardar el ticket: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -390,7 +393,7 @@ public class TicketController {
             }
 
             return eliminado;
-        } catch (Exception e) {
+        } catch (java.io.IOException e) {
             System.err.println("Error al eliminar el ticket " + ticket_id + ": " + e.getMessage());
             return false;
         }

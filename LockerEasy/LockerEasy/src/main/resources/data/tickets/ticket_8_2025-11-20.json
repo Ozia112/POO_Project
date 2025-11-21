@@ -1,0 +1,23 @@
+{
+  "tiempo_emision": "2025-11-21T05:03:27.831390229Z",
+  "servicios": [{
+    "descuento": false,
+    "renta_properties": {
+      "precio": 50,
+      "ubicacion": "PA_T1_L2",
+      "inicio_renta": "2025-11-21T05:03:27.831390229Z",
+      "cantidad": 0,
+      "isActive": false,
+      "nombre": "Locker",
+      "cierre_renta": "2025-11-21T05:03:27.933768766Z"
+    },
+    "total_servicio": 0,
+    "id": 1,
+    "tipo_servicio": "Renta"
+  }],
+  "fecha_reporte": "2025-11-20",
+  "total_ticket": 0,
+  "correo_cliente": "test@example.com",
+  "id": 8,
+  "nombre_cliente": "Test Cliente"
+}

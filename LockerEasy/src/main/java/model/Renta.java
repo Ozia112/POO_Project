@@ -19,9 +19,11 @@ public class Renta extends TipoServicio {
         super();
     }
 
+    @Override
     public float getPrecio() { return precio; }
     public Instant getInicioRenta() { return inicio_renta; }
     public Instant getCierreRenta() { return cierre_renta; }
+    @Override
     public int getCantidad() { return cantidad; }
     public boolean getStateOcupado() { return stateOcupado; }
     public Ubicacion getUbicacion() { return ubicacion; }
@@ -29,6 +31,7 @@ public class Renta extends TipoServicio {
     public void setInicioRenta(Instant inicio_renta) { this.inicio_renta = inicio_renta; }
     public void setPrecioRenta(float precio) { this.precio = precio; }
     public void setCierreRenta(Instant cierre_renta) { this.cierre_renta = cierre_renta; }
+    @Override
     public void setCantidad(int cantidad) { this.cantidad = cantidad; }
     public void setStateOcupado(boolean stateOcupado) { this.stateOcupado = stateOcupado; }
     public void setUbicacion(Ubicacion ubicacion) { this.ubicacion = ubicacion; }

@@ -1,0 +1,16 @@
+model/Ubicacion.class
+model/Servicio.class
+App.class
+model/Ticket.class
+model/TipoServicio.class
+model/Etiqueta.class
+controller/RentaController.class
+controller/VentaController.class
+controller/ReporteController.class
+controller/Config.class
+model/Renta.class
+controller/EtiquetaController.class
+model/Reporte.class
+controller/TicketController.class
+view/TicketGUI.class
+model/Venta.class

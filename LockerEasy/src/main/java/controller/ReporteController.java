@@ -3,9 +3,7 @@ package controller;
 import model.Reporte;
 import model.Ticket;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -17,7 +15,7 @@ import java.nio.file.Paths;
 public class ReporteController {
     private static final String REPORTES_FOLDER = "LockerEasy/src/main/resources/data/reportes/";
 
-    private TicketController ticketController = new TicketController();
+    private final TicketController ticketController;
 
     public ReporteController() {
         this.ticketController = new TicketController();
@@ -28,7 +26,7 @@ public class ReporteController {
      * Cargar el reporte actual desde un archivo JSON basado en la fecha actual.
     
      */
-    public void cargarReporteActual() {
+    private void cargarReporteActual() {
         try {
             LocalDate hoy = LocalDate.now();
             String nombre_archivo = REPORTES_FOLDER + "reporte_" + hoy.toString() + ".json";
@@ -54,9 +52,8 @@ public class ReporteController {
                 crearReporteActual();
                 System.out.println("Nuevo reporte creado: " + hoy);
             }
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException | java.time.format.DateTimeParseException e) {
             System.err.println("Error al cargar reporte: " + e.getMessage());
-            e.printStackTrace();
             crearReporteActual();
         }
     }
@@ -80,7 +77,7 @@ public class ReporteController {
                 } else {
                     System.err.println("Ticket no encontrado: ID " + ticketId);
                 }
-            } catch (Exception e) {
+            } catch (org.json.JSONException e) {
                 int ticketId = ticketsIdsArray.getInt(i);
                 System.err.println("Error al cargar ticket con ID " + ticketId + ": " + e.getMessage());
             }
@@ -188,9 +185,8 @@ public class ReporteController {
             Files.write(Paths.get(nombre_archivo), obj.toString(2).getBytes());
             System.out.println("Reporte guardado:" + nombre_archivo);
 
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException e) {
             System.err.println("Error al guardar reporte: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -218,9 +214,8 @@ public class ReporteController {
             }
             return reporte;
 
-        } catch (Exception e) {
+        } catch (java.io.IOException | org.json.JSONException | java.time.format.DateTimeParseException e) {
             System.err.println("Error al generar reporte por fecha: " + e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }

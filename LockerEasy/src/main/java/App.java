@@ -1,12 +1,9 @@
-import java.time.Instant;
-
+import controller.EtiquetaController;
+import controller.RentaController;
 import controller.ReporteController;
 import controller.TicketController;
 import controller.VentaController;
-import controller.EtiquetaController;
-import controller.RentaController;
 import model.Ticket;
-import model.Reporte;
 import model.Ubicacion;
 
 public class App {
@@ -19,6 +16,7 @@ public class App {
         TicketController ticketController = new TicketController();
         RentaController rentaController = new RentaController();
         VentaController ventaController = new VentaController();
+        @SuppressWarnings("unused")
         EtiquetaController etiquetaController = new EtiquetaController();
 
         // Configurar dependencias necesarias
@@ -66,7 +64,8 @@ public class App {
         try {
             Thread.sleep(2000); // Simular 2 segundos
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
+            System.err.println("Error al esperar: " + e.getMessage());
         }
 
         boolean rentaFinalizada = rentaController.finalizarRenta(
