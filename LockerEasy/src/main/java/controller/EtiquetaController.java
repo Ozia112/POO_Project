@@ -2,14 +2,15 @@ package controller;
 
 import model.Etiqueta;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class EtiquetaController {
     private static final String ETIQUETAS_FILE = "LockerEasy/src/main/resources/data/catalogo/etiquetas.json";

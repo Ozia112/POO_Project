@@ -9,13 +9,13 @@ import model.Venta;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class TicketController {
     private static final String TICKETS_FOLDER = "LockerEasy/src/main/resources/data/tickets/";

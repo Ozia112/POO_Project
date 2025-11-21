@@ -2,8 +2,8 @@ package model;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Ticket {
     private LocalDate fecha_reporte;
