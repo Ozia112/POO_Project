@@ -10,5 +10,6 @@
     },
     "java.maven.downloadSources": true,
     "liveshare.languages.allowGuestCommandControl": true,
-    "liveshare.allowGuestDebugControl": true
+    "liveshare.allowGuestDebugControl": true,
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

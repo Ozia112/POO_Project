@@ -1,86 +1,137 @@
 package controller;
 
+import model.Renta;
+import model.Servicio;
+import model.Ticket;
+import model.Ubicacion;
+
 import java.time.Instant;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.Renta;
-import model.Ticket;
-import model.Ubicacion;
-
 public class RentaController {
-    final int MINUTOS_EN_HORA = 60;
-    final int MINUTOS_CANCELACION = Config.getMinutosCancelacion();
-    final int MINUTOS_TOLERANCIA = Config.getMinutosTolerancia();
-    final int LIMITE_MINUTOS_PRIMERA_HORA = MINUTOS_EN_HORA + MINUTOS_TOLERANCIA;
-    private Map<Ubicacion, Renta> lockers;
+    private ReporteController reporteController;
+    private Map<Ubicacion, Renta> rentasActivas;
+
+    private final int MINUTOS_EN_HORA = 60;
+    private final int MINUTOS_CANCELACION = Config.getMinutosCancelacion();
+    private final int MINUTOS_TOLERANCIA = Config.getMinutosTolerancia();
+    private final int LIMITE_MINUTOS_PRIMERA_HORA = MINUTOS_EN_HORA + MINUTOS_TOLERANCIA;
+    
 
     public RentaController() {
-        this.lockers = new HashMap<>();
-        inicializarLockers();
+        this.rentasActivas = new HashMap<>();
     }
 
-    private void inicializarLockers() {
-        // Crear los lockers en todas las ubicaciones
-        for (Ubicacion ubicacion : Ubicacion.values()) {
-            Renta locker = new Renta("Locker", Config.getPrecioHoraLocker(), null, ubicacion);
-            locker.setStateOcupado(false); // Inicialmente todos los lockers están libres
-            lockers.put(ubicacion, locker);
+    public void setReporteController(ReporteController reporteController) {
+        this.reporteController = reporteController;
+    }
+
+    public boolean iniciarRenta(Ubicacion ubicacion, Ticket ticket, TicketController ticketController) {
+        if (ubicacion == null || ticket == null) {
+            System.err.println("Ubicación o ticket no pueden ser nulos");
+            return false;
+        }
+        
+        if (rentasActivas.containsKey(ubicacion)) {
+            System.err.println("La ubicación " + ubicacion + " ya está ocupada");
+            return false;
+        }
+
+        try {
+            Renta renta = new Renta();
+            renta.setNombre("Locker");
+            renta.setPrecio(Config.getPrecioHoraLocker());
+            renta.setCantidad(1); // Se calcula al cerrar
+            renta.setInicioRenta(ticket.getTiempoEmision()); 
+            renta.setStateOcupado(true);
+            renta.setUbicacion(ubicacion);
+
+            int servicioId = ticketController.generarIdServicio(ticket);
+            Servicio servicio = new Servicio();
+            servicio.setServicioId(servicioId);
+            servicio.setTipoServicio(renta);
+            servicio.setAplicarDescuento(false);
+
+            ticket.getServicios().add(servicio);
+
+            float total = ticketController.calcularTotalTicket(ticket);
+            ticket.setTotalTicket(total);
+
+            if (reporteController != null) {
+                reporteController.agregarTicket(ticket);
+            }
+
+            // Guardar en cache
+            rentasActivas.put(ubicacion, renta);
+
+            System.out.println("Renta iniciada en " + ubicacion + " con ticket ID: " + ticket.getTicketId());
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Error al iniciar renta: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
 
-    public void iniciarRenta(Ubicacion ubicacion, Ticket ticket) throws Exception {
-        Renta locker = lockers.get(ubicacion);
-        
-        if (locker.getStateOcupado()) {
-            throw new Exception("El locker ya está ocupado");
-        }
-        
-        // Sobreescribir el locker con una nueva renta
-        locker.setInicio_renta(ticket.getFecha_emision());
-        locker.setStateOcupado(true);
-        locker.setCierre_renta(null);
-        locker.setCantidad(0); // La cantidad se calculará al cerrar la renta
-    }
-
-    public Renta cerrarRenta(Ubicacion ubicacion) throws Exception {
-        Renta renta = lockers.get(ubicacion);
-
-        if (!renta.getStateOcupado()) {
-            throw new Exception("El locker ya está libre");
-        }
-        
-        Instant inicio = renta.getInicio_renta();
-        Instant cierre = Instant.now();
-
-        renta.setCierre_renta(cierre);
-        
-        // Calcular la cantidad de horas rentadas
-        long diferenciaMinutos = Duration.between(inicio, cierre).toMinutes();
-        int horasRentadas;
-
-        if (diferenciaMinutos <= MINUTOS_CANCELACION) {
-            horasRentadas = 0; // Se puede cancelar sin costo antes de este límite
-        } else if (diferenciaMinutos <= LIMITE_MINUTOS_PRIMERA_HORA) {
-            horasRentadas = 1; // Dentro del tiempo de tolerancia, se cobra solo la primera hora
-        } else {
-            long minutosRestantes = diferenciaMinutos - LIMITE_MINUTOS_PRIMERA_HORA;
-            int horasAdicionales = (int) ((minutosRestantes + MINUTOS_EN_HORA - 1) / MINUTOS_EN_HORA);
-            horasRentadas = 1 + horasAdicionales;
+    public boolean finalizarRenta(Ubicacion ubicacion, Ticket ticket, TicketController ticketController) {
+        if (!rentasActivas.containsKey(ubicacion)) {
+            System.err.println("No hay una renta activa en la ubicación " + ubicacion);
+            return false;
         }
 
-        renta.setCantidad(horasRentadas);
-        renta.setStateOcupado(false);
+        try {
+            Renta renta = rentasActivas.get(ubicacion);
+            Instant cierre = Instant.now();
+            renta.setCierreRenta(cierre);
+            
+            Instant inicio = renta.getInicioRenta();
+            long diferenciaMinutos = Duration.between(inicio, cierre).toMinutes();
+            int horasRentadas;
 
-        return renta;
-    }
+            if (diferenciaMinutos <= MINUTOS_CANCELACION) {
+                horasRentadas = 0;
+            } else if (diferenciaMinutos <= LIMITE_MINUTOS_PRIMERA_HORA) {
+                horasRentadas = 1;
+            } else {
+                long minutosRestantes = diferenciaMinutos - LIMITE_MINUTOS_PRIMERA_HORA;
+                int horasAdicionales = (int) ((minutosRestantes + MINUTOS_EN_HORA - 1) / MINUTOS_EN_HORA);
+                horasRentadas = 1 + horasAdicionales;
+            }
+
+            renta.setCantidad(horasRentadas);
+            renta.setStateOcupado(false);
+
+            float nuevoTotal = ticketController.calcularTotalTicket(ticket);
+            ticket.setTotalTicket(nuevoTotal);
+
+            ticketController.guardarTicket(ticket);
+
+            rentasActivas.remove(ubicacion);
+
+            System.out.println("Renta finalizada en " + ubicacion + 
+                                " - Horas: " + horasRentadas +
+                                " Cierre: " + cierre.toString());
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Error al finalizar renta: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }  
 
     public boolean estaDisponible(Ubicacion ubicacion) {
-        return !lockers.get(ubicacion).getStateOcupado();
+        return !rentasActivas.get(ubicacion).getStateOcupado();
     }
 
-    public Renta getRenta(Ubicacion ubicacion) {
-        return lockers.get(ubicacion);
+    public Renta getRentaActiva(Ubicacion ubicacion) {
+        return rentasActivas.get(ubicacion);
+    }
+
+    public Ubicacion[] obtenerUbicacionesDisponibles() {
+        return Ubicacion.values();
     }
 }
