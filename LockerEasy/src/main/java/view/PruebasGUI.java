@@ -1,6 +1,5 @@
 package view;
 
-import controller.EtiquetaController;
 import controller.RentaController;
 import controller.ReporteController;
 import controller.TicketController;
@@ -21,11 +20,10 @@ import model.Ubicacion;
 public class PruebasGUI {
 
     // ------------------ CONTROLADORES REALES ------------------
-    private ReporteController reporteController = new ReporteController();
-    private TicketController ticketController = new TicketController();
-    private RentaController rentaController = new RentaController();
-    private VentaController ventaController = new VentaController();
-    private EtiquetaController etiquetaController = new EtiquetaController();
+    private final ReporteController reporteController = new ReporteController();
+    private final TicketController ticketController = new TicketController();
+    private final RentaController rentaController = new RentaController();
+    private final VentaController ventaController = new VentaController();
 
     // Último ticket creado
     private Ticket ticketActual = null;
@@ -86,8 +84,7 @@ public class PruebasGUI {
             String accion = acciones.getValue();
 
             switch (accion) {
-
-                case "Iniciar renta":
+                case "Iniciar renta" -> {
                     consola.appendText("\n--- Iniciando renta ---\n");
 
                     boolean okR = rentaController.iniciarRenta(
@@ -99,10 +96,9 @@ public class PruebasGUI {
                     consola.appendText(okR ?
                             "Renta iniciada.\nTotal: $" + ticketActual.getTotalTicket() + "\n"
                             : "ERROR: No se pudo iniciar la renta.\n");
+                }
 
-                    break;
-
-                case "Finalizar renta":
+                case "Finalizar renta" -> {
                     consola.appendText("\n--- Finalizando renta ---\n");
 
                     boolean okF = rentaController.finalizarRenta(
@@ -112,10 +108,9 @@ public class PruebasGUI {
                     consola.appendText(okF ?
                             "Renta finalizada.\nTotal final: $" + ticketActual.getTotalTicket() + "\n"
                             : "ERROR: No se pudo finalizar la renta.\n");
+                }
 
-                    break;
-
-                case "Registrar venta":
+                case "Registrar venta" -> {
                     consola.appendText("\n--- Registrando venta ---\n");
 
                     boolean okV = ventaController.registrarVenta(
@@ -128,8 +123,10 @@ public class PruebasGUI {
                     consola.appendText(okV ?
                             "Venta registrada.\nTotal ahora: $" + ticketActual.getTotalTicket() + "\n"
                             : "ERROR: No se pudo hacer la venta.\n");
-
-                    break;
+                }
+                default -> {
+                    // No hacer nada
+                }
             }
         });
 

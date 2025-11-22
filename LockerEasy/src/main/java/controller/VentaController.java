@@ -1,17 +1,17 @@
 package controller;
 
-import model.Venta;
-import model.Ticket;
-
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import model.Ticket;
+import model.Venta;
 
 public class VentaController {
     private static final String PRODUCTOS_FILE = "LockerEasy/src/main/resources/data/catalogo/productos.json";

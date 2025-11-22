@@ -1,16 +1,16 @@
 package controller;
 
-import model.Reporte;
-import model.Ticket;
-
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
+import model.Reporte;
+import model.Ticket;
 
 public class ReporteController {
     private static final String REPORTES_FOLDER = "LockerEasy/src/main/resources/data/reportes/";

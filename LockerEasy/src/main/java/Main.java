@@ -1,4 +1,3 @@
-package view;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -7,7 +6,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        PruebasGUI gui = new PruebasGUI();
+        view.PruebasGUI gui = new view.PruebasGUI();
         gui.mostrar(stage);
     }
 

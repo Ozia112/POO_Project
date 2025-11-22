@@ -1,14 +1,14 @@
 package controller;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+
 import model.Renta;
 import model.Servicio;
 import model.Ticket;
 import model.Ubicacion;
-
-import java.time.Instant;
-import java.time.Duration;
-import java.util.Map;
-import java.util.HashMap;
 
 public class RentaController {
     private ReporteController reporteController;

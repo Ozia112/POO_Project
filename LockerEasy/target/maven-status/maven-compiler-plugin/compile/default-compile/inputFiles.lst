@@ -1,4 +1,5 @@
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/App.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/Main.java
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/Config.java
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/EtiquetaController.java
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/RentaController.java
@@ -13,6 +14,6 @@
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/TipoServicio.java
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Ubicacion.java
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Venta.java
-/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/Styles/Main.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/PruebasGUI.java
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/Styles/PruebasGUI.java
 /home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/TicketGUI.java

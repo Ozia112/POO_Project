@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run Main (JavaFX)",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "LockerEasy",
+            "cwd": "${workspaceFolder}/LockerEasy",
+            "vmArgs": "--module-path ${env:HOME}/.m2/repository/org/openjfx/javafx-controls/20.0.2/javafx-controls-20.0.2-linux.jar:${env:HOME}/.m2/repository/org/openjfx/javafx-graphics/20.0.2/javafx-graphics-20.0.2-linux.jar:${env:HOME}/.m2/repository/org/openjfx/javafx-base/20.0.2/javafx-base-20.0.2-linux.jar --add-modules javafx.controls,javafx.graphics,javafx.base"
+        }
+    ]
+}
