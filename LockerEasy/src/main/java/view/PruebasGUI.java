@@ -1,14 +1,12 @@
 package view;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 import controller.RentaController;
 import controller.ReporteController;
 import controller.TicketController;
 import controller.VentaController;
-
-import model.Renta;
-import model.Venta;
-import model.Servicio;
-
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -19,11 +17,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import model.Renta;
+import model.Servicio;
 import model.Ticket;
 import model.Ubicacion;
-
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 public class PruebasGUI {
 
@@ -111,21 +108,22 @@ public class PruebasGUI {
                     if (okR) {
                         Renta rentaActual = rentaController.getRentaActiva(Ubicacion.PA_T1_L1);
                         Servicio servicioRenta = ticketController.getServicioRenta(ticketActual, Ubicacion.PA_T1_L1);
-                        float totalServicio = 0f;
-                        String time_formated = "";
                         String ubicacionName = Ubicacion.PA_T1_L1.name();
+                        
+                        String timeFormatted = "";
+                        float totalServicio = 0f;
                         if (rentaActual != null && servicioRenta != null) {
                             totalServicio = ticketController.getTotalServicio(servicioRenta);
-                            time_formated = rentaActual.getInicioRenta()
+                            timeFormatted = rentaActual.getInicioRenta()
                                     .atZone(ZoneId.systemDefault())
                                     .format(TIME_FORMATTER);
                         }
-                        consola.appendText(String.format(
-                                "Renta iniciada en %s.\n" +
-                                "Hora de inicio: %s\n" +
-                                "Total actual: $%.2f",
+                        consola.appendText("""
+                                Renta iniciada en %s.
+                                Hora de inicio: %s
+                                Total actual: $%.2f""".formatted(
                                 ubicacionName,
-                                time_formated,
+                                timeFormatted,
                                 totalServicio));
                     } else {
                         consola.appendText("ERROR: No se pudo iniciar la renta.\n");
@@ -143,24 +141,21 @@ public class PruebasGUI {
                     if (okF) {
                         Renta rentaActual = rentaController.getRentaActiva(Ubicacion.PA_T1_L1);
                         Servicio servicioRenta = ticketController.getServicioRenta(ticketActual, Ubicacion.PA_T1_L1);
-                        float totalServicio = 0f;
-                        int cantidadHoras = 0;
-                        String time_formated = "";
                         String ubicacionName = Ubicacion.PA_T1_L1.name();
 
                         if (rentaActual != null && servicioRenta != null) {
-                            totalServicio = ticketController.getTotalServicio(servicioRenta);
-                            cantidadHoras = rentaActual.getCantidad();
-                            time_formated = rentaActual.getCierreRenta()
+                            float totalServicio = ticketController.getTotalServicio(servicioRenta);
+                            int cantidadHoras = rentaActual.getCantidad();
+                            String timeFormatted = rentaActual.getCierreRenta()
                                     .atZone(ZoneId.systemDefault())
                                     .format(TIME_FORMATTER);
-                            consola.appendText(String.format(
-                                    "Renta finalizada en %s.\n" +
-                                    "Hora de cierre: %s\n" +
-                                    "Horas rentadas: %d\n" +
-                                    "Total servicio: $%.2f",
+                            consola.appendText("""
+                                    Renta finalizada en %s.
+                                    Hora de cierre: %s
+                                    Horas rentadas: %d
+                                    Total servicio: $%.2f""".formatted(
                                     ubicacionName,
-                                    time_formated,
+                                    timeFormatted,
                                     cantidadHoras,
                                     totalServicio
                             ));
