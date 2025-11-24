@@ -14,7 +14,7 @@ import model.Ticket;
 import model.Venta;
 
 public class VentaController {
-    private static final String PRODUCTOS_FILE = "LockerEasy/src/main/resources/data/catalogo/productos.json";
+    private static final String PRODUCTOS_FILE = "src/main/resources/data/catalogo/productos.json";
     
     private final Map<Integer, Venta> catalogo;
     private final EtiquetaController etiquetaController;

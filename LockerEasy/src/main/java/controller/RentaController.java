@@ -108,8 +108,6 @@ public class RentaController {
 
             ticketController.guardarTicket(ticket);
 
-            rentasActivas.remove(ubicacion);
-
             System.out.println("Renta finalizada en " + ubicacion + 
                                 " - Horas: " + horasRentadas +
                                 " Cierre: " + cierre.toString());
@@ -119,7 +117,12 @@ public class RentaController {
             System.err.println("Error al finalizar renta: " + e.getMessage());
             return false;
         }
-    }  
+    }
+
+    public void liberarUbicacion(Ubicacion ubicacion) {
+        rentasActivas.remove(ubicacion);
+        System.out.println("Ubicación " + ubicacion + " liberada.");
+    }
 
     public boolean estaDisponible(Ubicacion ubicacion) {
         return !rentasActivas.get(ubicacion).getStateOcupado();
@@ -131,5 +134,21 @@ public class RentaController {
 
     public Ubicacion[] obtenerUbicacionesDisponibles() {
         return Ubicacion.values();
+    }
+
+    public Instant obtenerTiempoInicio(Ubicacion ubicacion) {
+        Renta renta = rentasActivas.get(ubicacion);
+        if (renta != null) {
+            return renta.getInicioRenta();
+        }
+        return null;
+    }
+
+    public Instant obtenerTiempoCierre(Ubicacion ubicacion) {
+        Renta renta = rentasActivas.get(ubicacion);
+        if (renta != null) {
+            return renta.getCierreRenta();
+        }
+        return null;
     }
 }

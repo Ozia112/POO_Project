@@ -1,21 +1,5 @@
 {
-    "java.project.sourcePaths": [
-        "LockerEasy/src/main/java"
-    ],
-    "files.exclude": {
-        "(E)Presentation": true,
-        "(B)Product": true,
-        "(D)Process": true,
-        "Competencies": true
-    },
-    "java.maven.downloadSources": true,
-    "liveshare.languages.allowGuestCommandControl": true,
-    "liveshare.allowGuestDebugControl": true,
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "${env:HOME}/.m2/repository/org/openjfx/javafx-controls/20.0.2/javafx-controls-20.0.2-linux.jar",
-        "${env:HOME}/.m2/repository/org/openjfx/javafx-graphics/20.0.2/javafx-graphics-20.0.2-linux.jar",
-        "${env:HOME}/.m2/repository/org/openjfx/javafx-base/20.0.2/javafx-base-20.0.2-linux.jar"
-    ]
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.import.maven.enabled": true,
+    "java.compile.nullAnalysis.mode": "automatic"
 }

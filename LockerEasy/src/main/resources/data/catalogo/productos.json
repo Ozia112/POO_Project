@@ -2,7 +2,7 @@
   {
     "precio": 50,
     "etiquetas": ["Bebidas"],
-    "existentes": 90,
+    "existentes": 53,
     "id": 1,
     "nombre": "Producto A",
     "disponible": true

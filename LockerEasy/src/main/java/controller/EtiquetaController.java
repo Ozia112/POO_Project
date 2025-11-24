@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import model.Etiqueta;
 
 public class EtiquetaController {
-    private static final String ETIQUETAS_FILE = "LockerEasy/src/main/resources/data/catalogo/etiquetas.json";
+    private static final String ETIQUETAS_FILE = "src/main/resources/data/catalogo/etiquetas.json";
     private final Map<Integer, Etiqueta> etiquetas;
     private int contadorIds;
 
@@ -37,7 +37,6 @@ public class EtiquetaController {
             
             String content = new String(Files.readAllBytes(Paths.get(ETIQUETAS_FILE)));
             JSONArray arr = new JSONArray(content);
-
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
                 int id = obj.has("id") ? obj.getInt("id") : (i + 1);
@@ -193,7 +192,7 @@ public class EtiquetaController {
             Files.createDirectories(Paths.get(ETIQUETAS_FILE).getParent());
             JSONArray arr = new JSONArray();
             Files.write(Paths.get(ETIQUETAS_FILE), arr.toString(2).getBytes());
-            System.out.println("Archivo de etiquetas creado.");
+            System.out.println("Archivo de etiquetas creado en" + ETIQUETAS_FILE);
         } catch (java.io.IOException e) {
             System.err.println("Error al crear archivo de etiquetas: " + e.getMessage());
         }

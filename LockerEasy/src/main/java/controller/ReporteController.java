@@ -1,19 +1,22 @@
 package controller;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import model.Reporte;
 import model.Ticket;
 
 public class ReporteController {
-    private static final String REPORTES_FOLDER = "LockerEasy/src/main/resources/data/reportes/";
+    private static final String REPORTES_FOLDER = "src/main/resources/data/reportes/";
 
     private final TicketController ticketController;
 
@@ -32,17 +35,17 @@ public class ReporteController {
             String nombre_archivo = REPORTES_FOLDER + "reporte_" + hoy.toString() + ".json";
 
             if (Files.exists(Paths.get(nombre_archivo))) {
-                String content = new String(Files.readAllBytes(Paths.get(nombre_archivo)));
-                JSONObject obj = new JSONObject(content);
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode rootNode = mapper.readTree(new File(nombre_archivo));
 
                 Reporte reporte = Reporte.crearNuevaInstancia();
-                reporte.setFechaReporte(LocalDate.parse(obj.getString("fecha")));
-                reporte.setTotal(obj.getFloat("total"));
+                reporte.setFechaReporte(LocalDate.parse(rootNode.get("fecha").asText()));
+                reporte.setTotal((float) rootNode.get("total").asDouble());
 
                 // Cargar tickets asociados por ID
-                if (obj.has("tickets_ids")) {
-                    JSONArray ticketsIdsArray = obj.getJSONArray("tickets_ids");
-                    List<Ticket> tickets = cargarTicketsDesdeIds(ticketsIdsArray, hoy);
+                if (rootNode.has("tickets_ids")) {
+                    JsonNode ticketsIdsNode = rootNode.get("tickets_ids");
+                    List<Ticket> tickets = cargarTicketsDesdeIds(ticketsIdsNode, hoy);
                     reporte.setTickets(tickets);
                 }
 
@@ -52,7 +55,7 @@ public class ReporteController {
                 crearReporteActual();
                 System.out.println("Nuevo reporte creado: " + hoy);
             }
-        } catch (java.io.IOException | org.json.JSONException | java.time.format.DateTimeParseException e) {
+        } catch (java.io.IOException | java.time.format.DateTimeParseException e) {
             System.err.println("Error al cargar reporte: " + e.getMessage());
             crearReporteActual();
         }
@@ -64,22 +67,23 @@ public class ReporteController {
      * @param fecha_reporte
      * @return Lista de tickets cargados
      */
-    private List<Ticket> cargarTicketsDesdeIds(JSONArray ticketsIdsArray, LocalDate fecha_reporte) {
+    private List<Ticket> cargarTicketsDesdeIds(JsonNode ticketsIdsNode, LocalDate fecha_reporte) {
         List<Ticket> tickets = new ArrayList<>();
-
-        for (int i = 0; i < ticketsIdsArray.length(); i++) {
-            try {
-                int ticketId = ticketsIdsArray.getInt(i);
-                Ticket ticket = ticketController.cargarTicket(ticketId, fecha_reporte);
-            
-                if (ticket != null) {
-                    tickets.add(ticket);
-                } else {
-                    System.err.println("Ticket no encontrado: ID " + ticketId);
+        if (ticketsIdsNode.isArray()) {
+            for (JsonNode ticketINode : ticketsIdsNode) {
+                try {
+                    int ticketId = ticketINode.asInt();
+                    Ticket ticket = ticketController.cargarTicket(ticketId, fecha_reporte);
+                
+                    if (ticket != null) {
+                        tickets.add(ticket);
+                    } else {
+                        System.err.println("Ticket no encontrado: ID " + ticketId);
+                    }
+                } catch (org.json.JSONException e) {
+                    int ticketId = ticketINode.asInt();
+                    System.err.println("Error al cargar ticket con ID " + ticketId + ": " + e.getMessage());
                 }
-            } catch (org.json.JSONException e) {
-                int ticketId = ticketsIdsArray.getInt(i);
-                System.err.println("Error al cargar ticket con ID " + ticketId + ": " + e.getMessage());
             }
         }
         return tickets;
@@ -161,7 +165,7 @@ public class ReporteController {
         reporte.setTotal(total);
     }
 
-    private void guardarReporte() {
+    public void guardarReporte() {
         try {
             Reporte reporte = Reporte.getInstancia();
             if (reporte == null) return;
@@ -169,20 +173,25 @@ public class ReporteController {
             Files.createDirectories(Paths.get(REPORTES_FOLDER));
             String nombre_archivo = REPORTES_FOLDER + "reporte_" + reporte.getFechaReporte().toString() + ".json";
 
-            JSONObject obj = new JSONObject();
-            obj.put("fecha", reporte.getFechaReporte().toString());
-            obj.put("total", reporte.getTotal());
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            map.put("fecha", reporte.getFechaReporte().toString());
+            recalcularTotal();
+            map.put("total", reporte.getTotal());
             
             // Guardar solo los IDs de los tickets (no los objetos completos)
-            JSONArray ticketsIdsArray = new JSONArray();
+            List<Integer> ticketsIds = new ArrayList<>();
             if (reporte.getTickets() != null) {
                 for (Ticket ticket : reporte.getTickets()) {
-                    ticketsIdsArray.put(ticket.getTicketId());
+                    ticketsIds.add(ticket.getTicketId());
                 }
             }
-            obj.put("tickets_ids", ticketsIdsArray);
+            map.put("tickets_ids", ticketsIds);
 
-            Files.write(Paths.get(nombre_archivo), obj.toString(2).getBytes());
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            
+            String json = mapper.writeValueAsString(map);
+            Files.write(Paths.get(nombre_archivo), json.getBytes());
             System.out.println("Reporte guardado:" + nombre_archivo);
 
         } catch (java.io.IOException | org.json.JSONException e) {
@@ -199,17 +208,17 @@ public class ReporteController {
                 return null;
             }
 
-            String content = new String(Files.readAllBytes(Paths.get(nombre_archivo)));
-            JSONObject obj = new JSONObject(content);
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(new File(nombre_archivo));
 
             Reporte reporte = new Reporte();
-            reporte.setFechaReporte(LocalDate.parse(obj.getString("fecha")));
-            reporte.setTotal(obj.getFloat("total"));
+            reporte.setFechaReporte(LocalDate.parse(rootNode.get("fecha").asText()));
+            reporte.setTotal((float) rootNode.get("total").asDouble());
 
             // Cargar tickets asociados por ID
-            if (obj.has("tickets_ids")) {
-                JSONArray ticketsIdsArray = obj.getJSONArray("tickets_ids");
-                List<Ticket> tickets = cargarTicketsDesdeIds(ticketsIdsArray, fecha);
+            if (rootNode.has("tickets_ids")) {
+                JsonNode ticketsIdsNode = rootNode.get("tickets_ids");
+                List<Ticket> tickets = cargarTicketsDesdeIds(ticketsIdsNode, fecha);
                 reporte.setTickets(tickets);
             }
             return reporte;

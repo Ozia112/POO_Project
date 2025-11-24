@@ -1,12 +1,13 @@
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import view.PruebasGUI;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        view.PruebasGUI gui = new view.PruebasGUI();
+        PruebasGUI gui = new PruebasGUI();
         gui.mostrar(stage);
     }
 

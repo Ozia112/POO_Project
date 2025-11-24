@@ -4,6 +4,11 @@ import controller.RentaController;
 import controller.ReporteController;
 import controller.TicketController;
 import controller.VentaController;
+
+import model.Renta;
+import model.Venta;
+import model.Servicio;
+
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,11 +22,16 @@ import javafx.stage.Stage;
 import model.Ticket;
 import model.Ubicacion;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 public class PruebasGUI {
+
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     // ------------------ CONTROLADORES REALES ------------------
     private final ReporteController reporteController = new ReporteController();
-    private final TicketController ticketController = new TicketController();
+    private final TicketController ticketController = new TicketController(reporteController);
     private final RentaController rentaController = new RentaController();
     private final VentaController ventaController = new VentaController();
 
@@ -49,8 +59,8 @@ public class PruebasGUI {
             String nombre = txtNombre.getText().trim();
             String correo = txtCorreo.getText().trim();
 
-            if (nombre.isEmpty() || correo.isEmpty()) {
-                consola.appendText("[ERROR] Debes llenar nombre y correo.\n");
+            if (nombre.isEmpty()) {
+                consola.appendText("[ERROR] Debes llenar nombre.\n");
                 return;
             }
 
@@ -59,6 +69,10 @@ public class PruebasGUI {
             consola.appendText("\n=== Ticket creado ===\n");
             consola.appendText("ID: " + ticketActual.getTicketId() + "\n");
             consola.appendText("Cliente: " + ticketActual.getNombreCliente() + "\n");
+            consola.appendText("Correo eletronico: "+ ticketActual.getCorreoCliente() + "\n");
+            consola.appendText("Tiempo de emision: " + ticketActual.getTiempoEmision()
+                                                                   .atZone(ZoneId.systemDefault())
+                                                                   .format(TIME_FORMATTER));
         });
 
         VBox boxCrear = new VBox(5,
@@ -86,6 +100,7 @@ public class PruebasGUI {
             switch (accion) {
                 case "Iniciar renta" -> {
                     consola.appendText("\n--- Iniciando renta ---\n");
+                    rentaController.setReporteController(reporteController);
 
                     boolean okR = rentaController.iniciarRenta(
                             Ubicacion.PA_T1_L1,
@@ -93,21 +108,71 @@ public class PruebasGUI {
                             ticketController
                     );
 
-                    consola.appendText(okR ?
-                            "Renta iniciada.\nTotal: $" + ticketActual.getTotalTicket() + "\n"
-                            : "ERROR: No se pudo iniciar la renta.\n");
+                    if (okR) {
+                        Renta rentaActual = rentaController.getRentaActiva(Ubicacion.PA_T1_L1);
+                        Servicio servicioRenta = ticketController.getServicioRenta(ticketActual, Ubicacion.PA_T1_L1);
+                        float totalServicio = 0f;
+                        String time_formated = "";
+                        String ubicacionName = Ubicacion.PA_T1_L1.name();
+                        if (rentaActual != null && servicioRenta != null) {
+                            totalServicio = ticketController.getTotalServicio(servicioRenta);
+                            time_formated = rentaActual.getInicioRenta()
+                                    .atZone(ZoneId.systemDefault())
+                                    .format(TIME_FORMATTER);
+                        }
+                        consola.appendText(String.format(
+                                "Renta iniciada en %s.\n" +
+                                "Hora de inicio: %s\n" +
+                                "Total actual: $%.2f",
+                                ubicacionName,
+                                time_formated,
+                                totalServicio));
+                    } else {
+                        consola.appendText("ERROR: No se pudo iniciar la renta.\n");
+                    }
                 }
 
                 case "Finalizar renta" -> {
                     consola.appendText("\n--- Finalizando renta ---\n");
 
+                    
                     boolean okF = rentaController.finalizarRenta(
                             Ubicacion.PA_T1_L1, ticketActual, ticketController
                     );
 
-                    consola.appendText(okF ?
-                            "Renta finalizada.\nTotal final: $" + ticketActual.getTotalTicket() + "\n"
-                            : "ERROR: No se pudo finalizar la renta.\n");
+                    if (okF) {
+                        Renta rentaActual = rentaController.getRentaActiva(Ubicacion.PA_T1_L1);
+                        Servicio servicioRenta = ticketController.getServicioRenta(ticketActual, Ubicacion.PA_T1_L1);
+                        float totalServicio = 0f;
+                        int cantidadHoras = 0;
+                        String time_formated = "";
+                        String ubicacionName = Ubicacion.PA_T1_L1.name();
+
+                        if (rentaActual != null && servicioRenta != null) {
+                            totalServicio = ticketController.getTotalServicio(servicioRenta);
+                            cantidadHoras = rentaActual.getCantidad();
+                            time_formated = rentaActual.getCierreRenta()
+                                    .atZone(ZoneId.systemDefault())
+                                    .format(TIME_FORMATTER);
+                            consola.appendText(String.format(
+                                    "Renta finalizada en %s.\n" +
+                                    "Hora de cierre: %s\n" +
+                                    "Horas rentadas: %d\n" +
+                                    "Total servicio: $%.2f",
+                                    ubicacionName,
+                                    time_formated,
+                                    cantidadHoras,
+                                    totalServicio
+                            ));
+                            // Importante: Liberar la ubicación después de finalizar la renta
+                            rentaController.liberarUbicacion(Ubicacion.PA_T1_L1);
+                        } else {
+                            consola.appendText("ERROR: No se pudo obtener la información de la renta finalizada.\n");
+                        }
+                        
+                    } else {
+                        consola.appendText("ERROR: No se pudo finalizar la renta.\n");
+                    }
                 }
 
                 case "Registrar venta" -> {

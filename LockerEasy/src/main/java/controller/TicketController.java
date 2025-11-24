@@ -1,14 +1,18 @@
 package controller;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import model.Renta;
 import model.Servicio;
@@ -18,9 +22,14 @@ import model.Ubicacion;
 import model.Venta;
 
 public class TicketController {
-    private static final String TICKETS_FOLDER = "LockerEasy/src/main/resources/data/tickets/";
+    private static final String TICKETS_FOLDER = "src/main/resources/data/tickets/";
+    private ReporteController reporteController;
 
     public TicketController() { }
+
+    public TicketController(ReporteController reporteController) {
+        this.reporteController = reporteController;
+    }
 
     public Ticket crearNuevoTicket(String nombre_cliente, String correoCliente) {
         LocalDate hoy = LocalDate.now();
@@ -36,6 +45,7 @@ public class TicketController {
         ticket.setTotalTicket(0f);
 
         System.out.println("Ticket creado, ID: " + nuevoId + ", cliente: " + nombre_cliente);
+        guardarTicket(ticket);
         return ticket;
     }
 
@@ -65,39 +75,27 @@ public class TicketController {
             int maxId = 0;
 
             if(Files.exists(Paths.get(TICKETS_FOLDER))) {
-                Files.list(Paths.get(TICKETS_FOLDER))
-                    .filter(path -> path.getFileName().toString().endsWith(fechaStr))
-                    .forEach(path -> {
-                        try {
-                            String nombre = path.getFileName().toString();
-                            String idStr = nombre.substring("ticket_".length(), nombre.indexOf(fechaStr));
-                            @SuppressWarnings("unused")
-                            int id = Integer.parseInt(idStr);
-                            // No se actualiza maxId aqui, se hace se hace en el metodo que llama
-                        } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-                            System.err.println("Error al parsear nombre del archivo: " + path.getFileName().toString());
-                        }
-                    });
-                // Leer los Ids del contenido de los archivos
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+
                 int[] maxIdArray = {0};
                 Files.list(Paths.get(TICKETS_FOLDER))
                     .filter(path -> path.getFileName().toString().endsWith(fechaStr))
                     .forEach(path -> {
                         try {
-                            String content = new String(Files.readAllBytes(path));
-                            JSONObject obj = new JSONObject(content);
-                            int id = obj.getInt("id");
+                            JsonNode node = mapper.readTree(path.toFile());
+                            int id = node.get("id").asInt();
                             if (id > maxIdArray[0]) {
                                 maxIdArray[0] = id;
                             }
-                        } catch (java.io.IOException | org.json.JSONException e) {
+                        } catch (java.io.IOException e) {
                             System.err.println("error leyendo ticket: " + path.getFileName().toString());
                         }
                     });
                 maxId = maxIdArray[0];
             }
             return maxId;
-       } catch (java.io.IOException e) {
+        } catch (java.io.IOException e) {
             System.err.println("Error al obtener max ID de tickets: " + e.getMessage());
             return 0;
         }
@@ -118,20 +116,22 @@ public class TicketController {
                 return null; // El archivo no existe
             }
 
-            String content = new String(Files.readAllBytes(Paths.get(nombreArchivo)));
-            JSONObject obj = new JSONObject(content);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+
+            JsonNode rootNode = mapper.readTree(new File(nombreArchivo));
 
             Ticket ticket = new Ticket();
-            ticket.setFechaReporte(LocalDate.parse(obj.getString("fecha_reporte")));
-            ticket.setTicketId(obj.getInt("id"));
-            ticket.setNombreCliente(obj.getString("nombre_cliente"));
-            ticket.setCorreoCliente(obj.getString("correo_cliente"));
-            ticket.setTiempoEmision(Instant.parse(obj.getString("tiempo_emision")));
-            ticket.setTotalTicket(obj.getFloat("total_ticket"));
+            ticket.setFechaReporte(LocalDate.parse(rootNode.get("fecha_reporte").asText()));
+            ticket.setTicketId(rootNode.get("id").asInt());
+            ticket.setNombreCliente(rootNode.get("nombre_cliente").asText());
+            ticket.setCorreoCliente(rootNode.get("correo_cliente").asText());
+            ticket.setTiempoEmision(Instant.parse(rootNode.get("tiempo_emision").asText()));
+            ticket.setTotalTicket((float) rootNode.get("total_ticket").asDouble());
 
-            if (obj.has("servicios")) {
-                JSONArray serviciosArray = obj.getJSONArray("servicios");
-                List<Servicio> servicios = cargarServicios(serviciosArray);
+            if (rootNode.has("servicios")) {
+                JsonNode serviciosNode = rootNode.get("servicios");
+                List<Servicio> servicios = cargarServicios(serviciosNode);
                 ticket.setServicios(servicios);
             }
 
@@ -149,32 +149,32 @@ public class TicketController {
      * @param fecha
      * @return Lista de servicios cargados
      */
-    private List<Servicio> cargarServicios(JSONArray serviciosArray) {
+    private List<Servicio> cargarServicios(JsonNode serviciosNode) {
         List<Servicio> servicios = new ArrayList<>();
 
         try {
-            for (int i = 0; i < serviciosArray.length(); i++) {
-                JSONObject servicioObj = serviciosArray.getJSONObject(i);
+            if (serviciosNode.isArray()) {
+                for (JsonNode servicioNode : serviciosNode) {
+                    int servicioId = servicioNode.get("id").asInt();
+                    String tipoServicio = servicioNode.get("tipo_servicio").asText();
+                    boolean descuento = servicioNode.get("descuento").asBoolean();
+                    float totalServicio = (float) servicioNode.get("total_servicio").asDouble();
 
-                int servicioId = servicioObj.getInt("id");
-                String tipoServicio = servicioObj.getString("tipo_servicio");
-                boolean descuento = servicioObj.getBoolean("descuento");
-                float totalServicio = servicioObj.getFloat("total_servicio");
+                    TipoServicio tipo = null;
 
-                TipoServicio tipo = null;
-                
-                if ("Renta".equals(tipoServicio)) {
-                    JSONObject rentaProps = servicioObj.getJSONObject("renta_properties");
-                    tipo = cargarRenta(rentaProps);
-                } else if ("Venta".equals(tipoServicio)) {
-                    JSONObject ventaProps = servicioObj.getJSONObject("venta_properties");
-                    tipo = cargarVenta(ventaProps);
-                }
+                    if ("Renta".equals(tipoServicio)) {
+                        JsonNode rentaProps = servicioNode.get("renta_properties");
+                        tipo = cargarRenta(rentaProps);
+                    } else if ("Venta".equals(tipoServicio)) {
+                        JsonNode ventaProps = servicioNode.get("venta_properties");
+                        tipo = cargarVenta(ventaProps);
+                    }
 
-                if (tipo != null) {
-                    Servicio servicio = new Servicio(servicioId, tipo, descuento);
-                    servicio.setTotalServicio(totalServicio);
-                    servicios.add(servicio);
+                    if (tipo != null) {
+                        Servicio servicio = new Servicio(servicioId, tipo, descuento);
+                        servicio.setTotalServicio(totalServicio);
+                        servicios.add(servicio);
+                    }
                 }
             }
         } catch (org.json.JSONException e) {
@@ -189,21 +189,22 @@ public class TicketController {
      * @return Renta
      */
 
-    private Renta cargarRenta(JSONObject rentaProps) {
+    private Renta cargarRenta(JsonNode rentaProps) {
         try {
             Renta renta = new Renta();
-            renta.setNombre(rentaProps.getString("nombre"));
-            renta.setPrecioRenta(rentaProps.getFloat("precio"));
-            renta.setCantidad(rentaProps.getInt("cantidad"));
-            renta.setInicioRenta(Instant.parse(rentaProps.getString("inicio_renta")));
+            renta.setNombre(rentaProps.get("nombre").asText());
+            renta.setPrecioRenta((float) rentaProps.get("precio").asDouble());
+            renta.setCantidad(rentaProps.get("cantidad").asInt());
+            renta.setInicioRenta(Instant.parse(rentaProps.get("inicio_renta").asText()));
 
-            String cierreRenta = rentaProps.optString("cierre_renta", "--:--:--");
+            String cierreRenta = rentaProps.has("cierre_renta") ? 
+                                 rentaProps.get("cierre_renta").asText() : "--:--:--";
             if (!"--:--:--".equals(cierreRenta)) {
                 renta.setCierreRenta(Instant.parse(cierreRenta));
             }
 
-            renta.setStateOcupado(rentaProps.getBoolean("isActive"));
-            renta.setUbicacion(Ubicacion.valueOf(rentaProps.getString("ubicacion")));
+            renta.setStateOcupado(rentaProps.get("isActive").asBoolean());
+            renta.setUbicacion(Ubicacion.valueOf(rentaProps.get("ubicacion").asText()));
 
             return renta;
         } catch (org.json.JSONException | java.time.format.DateTimeParseException | IllegalArgumentException e) {
@@ -212,20 +213,22 @@ public class TicketController {
         }
     }
 
-    private Venta cargarVenta(JSONObject ventaProps) {
+    private Venta cargarVenta(JsonNode ventaProps) {
         try {
             Venta venta = new Venta();
-            venta.setIdProducto(ventaProps.getInt("id_producto"));
-            venta.setNombre(ventaProps.getString("nombre"));
-            venta.setPrecio(ventaProps.getFloat("precio"));
-            venta.setCantidad(ventaProps.getInt("cantidad"));
+            venta.setIdProducto(ventaProps.get("id_producto").asInt());
+            venta.setNombre(ventaProps.get("nombre").asText());
+            venta.setPrecio((float) ventaProps.get("precio").asDouble());
+            venta.setCantidad(ventaProps.get("cantidad").asInt());
 
             // Cargar etiquetas
             if (ventaProps.has("etiquetas")) {
-                JSONArray etiquetasArray = ventaProps.getJSONArray("etiquetas");
+                JsonNode etiquetasNode = ventaProps.get("etiquetas");
                 List<String> etiquetas = new ArrayList<>();
-                for (int i = 0; i < etiquetasArray.length(); i++) {
-                    etiquetas.add(etiquetasArray.getString(i));
+                if (etiquetasNode.isArray()) {
+                    for (JsonNode etiquetaNode : etiquetasNode) {
+                        etiquetas.add(etiquetaNode.asText());
+                    }
                 }
                 venta.setEtiquetas(etiquetas);
             }
@@ -250,90 +253,30 @@ public class TicketController {
 
             LocalDate fecha = ticket.getFechaReporte();
             String nombreArchivo = TICKETS_FOLDER + "ticket_" + ticket.getTicketId() + "_" + fecha.toString() + ".json";
+            
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+            map.put("id", ticket.getTicketId());
+            map.put("fecha_reporte", fecha.toString());
+            map.put("tiempo_emision", ticket.getTiempoEmision().toString());
+            map.put("nombre_cliente", ticket.getNombreCliente());
+            map.put("correo_cliente", ticket.getCorreoCliente());
+            map.put("servicios",Config.convertirAMap(ticket.getServicios()));
+            map.put("total_ticket", ticket.getTotalTicket());
 
-            JSONObject obj = new JSONObject();
-            obj.put("fecha_reporte", fecha.toString());
-            obj.put("id", ticket.getTicketId());
-            obj.put("nombre_cliente", ticket.getNombreCliente());
-            obj.put("correo_cliente", ticket.getCorreoCliente());
-            obj.put("tiempo_emision", ticket.getTiempoEmision().toString());
-            obj.put("total_ticket", ticket.getTotalTicket());
-
-            // Guardar solo IDs de servicios para evitar duplicados
-            JSONArray servicioArray = new JSONArray();
-            if (ticket.getServicios() != null) {
-                for (Servicio servicio : ticket.getServicios()) {
-                    JSONObject servicioObj = new JSONObject();
-                    servicioObj.put("id", servicio.getServicioId());
-                    servicioObj.put("total_servicio", servicio.getTotalServicio());
-                    servicioObj.put("descuento", servicio.isAplicarDescuento());
-
-                    TipoServicio tipo = servicio.getTipoServicio();
-                    
-                    // Determinar el tipo de servicio usando switch pattern matching (Java 21)
-                    switch (tipo) {
-                        case Renta renta -> {
-                            servicioObj.put("tipo_servicio", "Renta");
-                            servicioObj.put("renta_properties", crearRentaJSON(renta));
-                        }
-                        case Venta venta -> {
-                            servicioObj.put("tipo_servicio", "Venta");
-                            servicioObj.put("venta_properties", crearVentaJSON(venta));
-                        }
-                        default -> {
-                            // Tipo de servicio desconocido
-                        }
-                    }
-
-                    servicioArray.put(servicioObj);
-                }
-            }
-
-            obj.put("servicios", servicioArray);
-
-            Files.write(Paths.get(nombreArchivo), obj.toString(2).getBytes());
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            
+            String json = mapper.writeValueAsString(map);
+            Files.write(Paths.get(nombreArchivo), json.getBytes());
             System.out.println("Ticket guardado en: " + nombreArchivo);
+
+            reporteController.guardarReporte();
+
 
         } catch (java.io.IOException | org.json.JSONException e) {
             System.err.println("Error al guardar el ticket: " + e.getMessage());
         }
-    }
-
-    /**
-     * Crea un objeto JOSN con las propiedades de la renta.
-     * @param renta
-     * @return JSONObject con las propiedades de la renta
-     */
-    private JSONObject crearRentaJSON(Renta renta) {
-        JSONObject rentaProps = new JSONObject();
-        rentaProps.put("nombre", renta.getNombre());
-        rentaProps.put("precio", renta.getPrecio());
-        rentaProps.put("cantidad", renta.getCantidad());
-        rentaProps.put("inicio_renta", renta.getInicioRenta().toString());
-        rentaProps.put("cierre_renta", renta.getCierreRenta() != null ? 
-                        renta.getCierreRenta().toString() : "--:--:--");    
-        rentaProps.put("isActive", renta.getStateOcupado());
-        rentaProps.put("ubicacion", renta.getUbicacion().name());
-        return rentaProps;
-    }
-
-    /**
-     * Crea un objeto JSON con las propiedades de la venta.
-     * @param venta
-     * @return JSONObject con las propiedades de la venta
-     */
-    private JSONObject crearVentaJSON(Venta venta) {
-        JSONObject ventaProps = new JSONObject();
-        ventaProps.put("id_producto", venta.getIdProducto());
-        ventaProps.put("nombre", venta.getNombre());
-        ventaProps.put("precio", venta.getPrecio());
-        ventaProps.put("cantidad", venta.getCantidad());
-
-        // Agregar etiquetas
-        if (venta.getEtiquetas() != null) {
-            ventaProps.put("etiquetas", new JSONArray(venta.getEtiquetas()));
-        }
-        return ventaProps;
     }
 
     public void agregarServicio(Ticket ticket, TipoServicio tipo, boolean aplicarDescuento) {
@@ -397,5 +340,24 @@ public class TicketController {
             System.err.println("Error al eliminar el ticket " + ticket_id + ": " + e.getMessage());
             return false;
         }
+    }
+
+    public float getTotalServicio(Servicio servicio) {
+        return servicio.getTotalServicio();
+    }
+
+    public Servicio getServicioRenta(Ticket ticket, Ubicacion ubicacion) {
+        if (ticket == null || ticket.getServicios() == null) {
+            return null;
+        }
+
+        return ticket.getServicios().stream()
+                .filter(s -> s.getTipoServicio() instanceof Renta)
+                .filter(s -> {
+                    Renta renta = (Renta) s.getTipoServicio();
+                    return ubicacion.equals(renta.getUbicacion());
+                })
+                .findFirst()
+                .orElse(null);
     }
 }
