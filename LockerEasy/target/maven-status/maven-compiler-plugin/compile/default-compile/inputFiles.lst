@@ -1,19 +1,19 @@
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\App.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\controller\Config.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\controller\EtiquetaController.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\controller\RentaController.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\controller\ReporteController.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\controller\TicketController.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\controller\VentaController.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\Main.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\model\Etiqueta.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\model\Renta.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\model\Reporte.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\model\Servicio.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\model\Ticket.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\model\TipoServicio.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\model\Ubicacion.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\model\Venta.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\view\PruebasGUI.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\view\Styles\PruebasGUI.java
-C:\Users\HP\OneDrive - Universidad Autonoma de Yucatan\Semestre 3\Programacion orientada a objetos\Repositorios\POO_Project\LockerEasy\src\main\java\view\TicketGUI.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\App.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\controller\Config.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\controller\EtiquetaController.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\controller\RentaController.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\controller\ReporteController.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\controller\TicketController.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\controller\VentaController.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\Main.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\model\Etiqueta.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\model\Renta.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\model\Reporte.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\model\Servicio.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\model\Ticket.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\model\TipoServicio.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\model\Ubicacion.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\model\Venta.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\view\PruebasGUI.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\view\ServiciosGUI.java
+C:\Users\kobaz\OneDrive - Universidad Autonoma de Yucatan\Programacion Orientada a Objeto\POO_Project\LockerEasy\src\main\java\view\TicketGUI.java
