@@ -44,7 +44,7 @@ public class RentaController {
             renta.setNombre("Locker");
             renta.setPrecio(Config.getPrecioHoraLocker());
             renta.setCantidad(1); // Se calcula al cerrar
-            renta.setInicioRenta(ticket.getTiempoEmision()); 
+            renta.setInicioRenta(ticket.getTiempoEmision());
             renta.setStateOcupado(true);
             renta.setUbicacion(ubicacion);
 
@@ -86,19 +86,7 @@ public class RentaController {
             Instant cierre = Instant.now();
             renta.setCierreRenta(cierre);
             
-            Instant inicio = renta.getInicioRenta();
-            long diferenciaMinutos = Duration.between(inicio, cierre).toMinutes();
-            int horasRentadas;
-
-            if (diferenciaMinutos <= MINUTOS_CANCELACION) {
-                horasRentadas = 0;
-            } else if (diferenciaMinutos <= LIMITE_MINUTOS_PRIMERA_HORA) {
-                horasRentadas = 1;
-            } else {
-                long minutosRestantes = diferenciaMinutos - LIMITE_MINUTOS_PRIMERA_HORA;
-                int horasAdicionales = (int) ((minutosRestantes + MINUTOS_EN_HORA - 1) / MINUTOS_EN_HORA);
-                horasRentadas = 1 + horasAdicionales;
-            }
+            int horasRentadas = calcularTiempoTrancurrido(renta, cierre);
 
             renta.setCantidad(horasRentadas);
             renta.setStateOcupado(false);
@@ -119,6 +107,23 @@ public class RentaController {
         }
     }
 
+    public int calcularTiempoTrancurrido(Renta renta, Instant tiempo) {
+        Instant inicio = renta.getInicioRenta();
+        long diferenciaMinutos = Duration.between(inicio, tiempo).toMinutes();
+        int horasRentadas;
+        if (diferenciaMinutos <= MINUTOS_CANCELACION) {
+                horasRentadas = 0;
+        } else if (diferenciaMinutos <= LIMITE_MINUTOS_PRIMERA_HORA) {
+            horasRentadas = 1;
+        } else {
+            long minutosRestantes = diferenciaMinutos - LIMITE_MINUTOS_PRIMERA_HORA;
+            int horasAdicionales = (int) ((minutosRestantes + MINUTOS_EN_HORA - 1) / MINUTOS_EN_HORA);
+            horasRentadas = 1 + horasAdicionales;
+        }
+
+        return horasRentadas;
+    }
+
     public void liberarUbicacion(Ubicacion ubicacion) {
         rentasActivas.remove(ubicacion);
         System.out.println("Ubicación " + ubicacion + " liberada.");
@@ -130,6 +135,27 @@ public class RentaController {
 
     public Renta getRentaActiva(Ubicacion ubicacion) {
         return rentasActivas.get(ubicacion);
+    }
+
+    public Ticket getTicketDeRenta(Ubicacion ubicacion) {
+        Renta renta = rentasActivas.get(ubicacion);
+        if (renta == null) return null;
+        
+        // Buscar en el reporte el ticket que contenga este servicio de renta
+        if (reporteController != null) {
+            var tickets = reporteController.getReporte().getTickets();
+            for (Ticket ticket : tickets) {
+                for (Servicio servicio : ticket.getServicios()) {
+                    if (servicio.getTipoServicio() instanceof Renta) {
+                        Renta r = (Renta) servicio.getTipoServicio();
+                        if (r.getUbicacion().equals(ubicacion)) {
+                            return ticket;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public Ubicacion[] obtenerUbicacionesDisponibles() {
@@ -150,5 +176,12 @@ public class RentaController {
             return renta.getCierreRenta();
         }
         return null;
+    }
+
+    public void setInicioRentaFromTicket(Ubicacion ubicacion, Ticket ticket) {
+        Renta renta = rentasActivas.get(ubicacion);
+        if (renta != null) {
+            renta.setInicioRenta(ticket.getTiempoEmision());
+        }
     }
 }

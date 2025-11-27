@@ -152,7 +152,7 @@ public class ReporteController {
         return Reporte.getInstancia();
     }
 
-    private void recalcularTotal(){
+    public void recalcularTotal(){
         Reporte reporte = Reporte.getInstancia();
         if (reporte == null) return;
 
@@ -165,6 +165,8 @@ public class ReporteController {
         reporte.setTotal(total);
     }
 
+
+
     public void guardarReporte() {
         try {
             Reporte reporte = Reporte.getInstancia();
@@ -175,7 +177,6 @@ public class ReporteController {
 
             LinkedHashMap<String, Object> map = new LinkedHashMap<>();
             map.put("fecha", reporte.getFechaReporte().toString());
-            recalcularTotal();
             map.put("total", reporte.getTotal());
             
             // Guardar solo los IDs de los tickets (no los objetos completos)
@@ -194,7 +195,7 @@ public class ReporteController {
             Files.write(Paths.get(nombre_archivo), json.getBytes());
             System.out.println("Reporte guardado:" + nombre_archivo);
 
-        } catch (java.io.IOException | org.json.JSONException e) {
+        } catch (java.io.IOException e) {
             System.err.println("Error al guardar reporte: " + e.getMessage());
         }
     }

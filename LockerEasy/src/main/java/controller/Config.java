@@ -6,7 +6,6 @@ import java.util.List;
 
 import model.Renta;
 import model.Servicio;
-import model.Ticket;
 import model.TipoServicio;
 import model.Venta;
 

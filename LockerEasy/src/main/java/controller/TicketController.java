@@ -271,7 +271,10 @@ public class TicketController {
             Files.write(Paths.get(nombreArchivo), json.getBytes());
             System.out.println("Ticket guardado en: " + nombreArchivo);
 
-            reporteController.guardarReporte();
+            if (reporteController != null) {
+                reporteController.recalcularTotal();
+                reporteController.guardarReporte();
+            }
 
 
         } catch (java.io.IOException | org.json.JSONException e) {
