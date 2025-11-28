@@ -1,7 +1,12 @@
 
+
+import controller.EtiquetaController;
+import controller.RentaController;
+import controller.ReporteController;
+import controller.TicketController;
+import controller.VentaController;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import view.PruebasGUI;
 import view.ServiciosGUI;
 
 public class Main extends Application {
@@ -9,13 +14,29 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
 
-        // 1) Crear la lógica (PruebasGUI)
-        PruebasGUI logica = new PruebasGUI();
+        // =======================
+        //  CREAR CONTROLADORES
+        // =======================
+        ReporteController reporteController = new ReporteController();
+        TicketController ticketController = new TicketController();
+        RentaController rentaController = new RentaController();
+        VentaController ventaController = new VentaController();
+        EtiquetaController etiquetaController = new EtiquetaController();
 
-        // 2) Crear la interfaz bonita con la lógica inyectada
-        ServiciosGUI ui = new ServiciosGUI(logica);
+        // Enlazar dependencias necesarias
+        rentaController.setReporteController(reporteController);
 
-        // 3) Mostrar la ventana principal
+        // =======================
+        //   INICIAR LA UI
+        // =======================
+        ServiciosGUI ui = new ServiciosGUI(
+                ticketController,
+                ventaController,
+                rentaController,
+                reporteController,
+                etiquetaController
+        );
+
         ui.mostrar(stage);
     }
 

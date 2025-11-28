@@ -1,48 +1,128 @@
 package view;
 
+import controller.EtiquetaController;
+import controller.RentaController;
+import controller.ReporteController;
+import controller.TicketController;
+import controller.VentaController;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import model.Reporte;
+import model.Ticket;
 
 public class ServiciosGUI {
 
-    // referencia a la lógica (controllers envueltos)
-    private final PruebasGUI logica;
+    // ============================================================
+    // 1. CONTROLLERS REALES (inyectados desde Main)
+    // ============================================================
+    private final TicketController ticketController;
+    private final VentaController ventaController;
+    private final RentaController rentaController;
+    private final ReporteController reporteController;
+    private final EtiquetaController etiquetaController;
 
-    public ServiciosGUI(PruebasGUI logica) {
-        this.logica = logica;
+    // Ticket actual que se está armando
+    private Ticket ticketActual;
+
+
+    // ============================================================
+    // 2. CONSTRUCTOR
+    // ============================================================
+    public ServiciosGUI(
+            TicketController ticketController,
+            VentaController ventaController,
+            RentaController rentaController,
+            ReporteController reporteController,
+            EtiquetaController etiquetaController
+    ) {
+        this.ticketController = ticketController;
+        this.ventaController = ventaController;
+        this.rentaController = rentaController;
+        this.reporteController = reporteController;
+        this.etiquetaController = etiquetaController;
     }
 
-    // ---------- helper: mostrar popup del ticket ----------
-    private void mostrarPopupTicket(String nombre, StackPane root) {
-        TicketGUI tg = new TicketGUI();
-        VBox popup = tg.crearTicket(nombre);
+    // ============================================================
+    // 3. LÓGICA BÁSICA (solo lo necesario hoy)
+    // ============================================================
 
-        StackPane.setAlignment(popup, Pos.CENTER);
-        root.getChildren().add(popup);
+    private void crearNuevoTicket(String nombreCliente, String correo) {
 
-        Button cerrar = (Button) popup.lookup("#btnCerrar");
-        if (cerrar != null) {
-            cerrar.setOnAction(e -> root.getChildren().remove(popup));
+        if (correo == null || correo.isBlank()) {
+            correo = "correo@desconocido.com";
+        }
+
+        ticketActual = ticketController.crearNuevoTicket(nombreCliente, correo);
+
+        System.out.println("[LOG] Ticket creado → ID=" + ticketActual.getTicketId());
+    }
+
+
+    private void agregarServicioDummy(String tipo) {
+
+        if (ticketActual == null) {
+            System.out.println("[WARN] No hay ticket actual.");
+            return;
+        }
+
+        // Solo para probar: agregamos un producto con ID 1 y cantidad 1
+        ventaController.registrarVenta(
+                1,              // ID ficticio para probar
+                1,              // cantidad
+                ticketActual,
+                ticketController
+        );
+
+        System.out.println("[LOG] Servicio agregado: " + tipo);
+    }
+
+
+    private void actualizarPreview(VBox box) {
+        box.getChildren().clear();
+
+        if (ticketActual == null) {
+            box.getChildren().add(new Label("Ticket vacío."));
+            return;
+        }
+
+        Label titulo = new Label("Ticket #" + ticketActual.getTicketId());
+        titulo.setStyle("-fx-font-size:18; -fx-font-weight:bold;");
+
+        Label cliente = new Label("Cliente: " + ticketActual.getNombreCliente());
+
+        Label total = new Label("Total: $" + ticketActual.getTotalTicket());
+        total.setStyle("-fx-font-size:14; -fx-font-weight:bold;");
+
+        box.getChildren().addAll(titulo, cliente, total);
+    }
+
+
+    private void actualizarTabla(TableView<String> tabla) {
+        tabla.getItems().clear();
+
+        Reporte reporte = reporteController.getReporte();
+        for (Ticket t : reporte.getTickets()) {
+            tabla.getItems().add(t.getNombreCliente() + "  —  $" + t.getTotalTicket());
         }
     }
 
     // ============================================================
-    //   UI PRINCIPAL
+    // 4. UI PRINCIPAL
     // ============================================================
     public void mostrar(Stage stage) {
 
-        // ---------------- PANEL LATERAL ----------------
+        // PANEL LATERAL
         VBox side = new VBox(25);
         side.getStyleClass().add("sidebar");
 
@@ -50,9 +130,10 @@ public class ServiciosGUI {
         Label op2 = new Label("Renta");
         op1.getStyleClass().add("menu-item");
         op2.getStyleClass().add("menu-item");
+
         side.getChildren().addAll(op1, op2);
 
-        // ---------------- CAJA PRINCIPAL ----------------
+        // CAJA PRINCIPAL
         VBox caja1 = new VBox(20);
         caja1.getStyleClass().add("caja-form");
         caja1.setPrefWidth(460);
@@ -60,127 +141,97 @@ public class ServiciosGUI {
         Label titulo = new Label("Crear ticket de venta");
         titulo.getStyleClass().add("titulo1");
 
-        Label lblCliente = new Label("Cliente");
-        lblCliente.getStyleClass().add("label");
+        TextField txtNombre = new TextField();
+        txtNombre.setPromptText("Nombre del cliente");
+        txtNombre.getStyleClass().add("text-field");
 
-        TextField txtCliente = new TextField();
-        txtCliente.getStyleClass().add("text-field");
-        txtCliente.setPromptText("Nombre cliente");
-
-        Label lblTipo = new Label("Tipo");
-        lblTipo.getStyleClass().add("label");
+        TextField txtCorreo = new TextField();
+        txtCorreo.setPromptText("Correo (opcional)");
+        txtCorreo.getStyleClass().add("text-field");
 
         ComboBox<String> comboTipo = new ComboBox<>();
-        comboTipo.getStyleClass().add("combo-box");
         comboTipo.getItems().addAll(
-                "Renta - Casillero",
-                "Impresión",
-                "Alimentos",
-                "Otro"
+                "Agregar",
+                "Trámite",
+                "Papelería",
+                "Consumible",
+                "Renta"
         );
+        comboTipo.getStyleClass().add("combo-box");
 
-        Button btnAgregarCliente = new Button("Agregar cliente");
-        btnAgregarCliente.getStyleClass().add("btn-green");
-
-        Button btnAgregarServicio = new Button("Agregar servicio");
-        btnAgregarServicio.getStyleClass().add("btn-green");
-
-        HBox contBotonServicio = new HBox(btnAgregarServicio);
-        contBotonServicio.setStyle("-fx-alignment: center-right;");
-
-        HBox contBotonCliente = new HBox(btnAgregarCliente);
-        contBotonCliente.setStyle("-fx-alignment: center-left;");
+        Button btnAgregar = new Button("Agregar");
+        btnAgregar.getStyleClass().add("btn-green");
 
         caja1.getChildren().addAll(
-                titulo,
-                lblCliente,
-                txtCliente,
-                lblTipo,
-                comboTipo,
-                contBotonServicio,
-                contBotonCliente
+                titulo, txtNombre, txtCorreo,
+                new Label("Tipo"), comboTipo,
+                btnAgregar
         );
 
-        // ---------------- GRAFICA FAKE ----------------
-        Label semanaBtn = new Label("Semana");
-        semanaBtn.getStyleClass().add("pill");
+        // TABS — Ticket y gráfica fake
+        VBox previewBox = new VBox(10);
+        previewBox.setPadding(new Insets(15));
+        previewBox.setStyle("-fx-background-color:white; -fx-background-radius:10;");
 
-        Label mesBtn = new Label("Mes");
-        mesBtn.getStyleClass().add("pill");
+        TabPane tabs = new TabPane();
 
-        HBox filtroGrafica = new HBox(10, semanaBtn, mesBtn);
+        Tab tabTicket = new Tab("Ticket");
+        tabTicket.setClosable(false);
+        tabTicket.setContent(previewBox);
 
-        Pane graficaFake = new Pane();
-        graficaFake.getStyleClass().add("graph-placeholder");
+        Tab tabGraf = new Tab("Ganancias de la semana");
+        tabGraf.setClosable(false);
+        VBox graf = new VBox();
+        graf.setPadding(new Insets(20));
+        graf.getChildren().add(new Label("Aquí irá la gráfica semanal :)"));
+        tabGraf.setContent(graf);
 
-        VBox caja2 = new VBox(10, filtroGrafica, graficaFake);
-        caja2.getStyleClass().add("caja-grafica");
+        tabs.getTabs().addAll(tabTicket, tabGraf);
 
-        // ---------------- ZONA CENTRAL ----------------
-        VBox zonaCentral = new VBox(25, caja1, caja2);
+        VBox zonaCentral = new VBox(25, caja1, tabs);
         zonaCentral.setPadding(new Insets(20));
 
-        // ---------------- TABLA DERECHA ----------------
-        Label tituloReporte = new Label("Reporte de servicios prestados");
-        tituloReporte.getStyleClass().add("titulo-reporte");
-
+        // TABLA DERECHA
         TableView<String> tabla = new TableView<>();
         tabla.getItems().add("Ejemplo vacío");
 
-        VBox reporteBox = new VBox(20, tituloReporte, tabla);
+        VBox reporteBox = new VBox(20,
+                new Label("Reporte de servicios prestados"),
+                tabla
+        );
         reporteBox.getStyleClass().add("caja-reporte");
 
-        // ---------------- ROOT PRINCIPAL ----------------
-        StackPane root = new StackPane(
-                new HBox(side, zonaCentral, reporteBox)
-        );
-        root.getStyleClass().add("root");
+        // ROOT
+        HBox rootContent = new HBox(side, zonaCentral, reporteBox);
+        StackPane root = new StackPane(rootContent);
 
-        // ==================== EVENTOS ====================
+        // ============================================================
+        // EVENTOS
+        // ============================================================
 
-        // Agregar cliente → crea ticket + mete nombre a la tabla
-        btnAgregarCliente.setOnAction(e -> {
-            String nombre = txtCliente.getText().trim();
-            if (nombre.isEmpty()) {
-                System.out.println("[UI] Nombre vacío, no creo ticket.");
-                return;
-            }
+        btnAgregar.setOnAction(e -> {
 
-            // 1) lógica (controllers)
-            logica.crearNuevoTicket(nombre);
-
-            // 2) UI (tabla)
-            tabla.getItems().add(nombre);
-
-            txtCliente.clear();
-        });
-
-        // Agregar servicio según tipo seleccionado
-        btnAgregarServicio.setOnAction(e -> {
+            String nombre = txtNombre.getText().trim();
+            String correo = txtCorreo.getText().trim();
             String tipo = comboTipo.getValue();
-            if (tipo == null) {
-                System.out.println("[UI] No hay tipo seleccionado.");
+
+            if (nombre.isEmpty()) {
+                System.out.println("[UI] Nombre vacío.");
                 return;
             }
 
-            if (tipo.startsWith("Renta")) {
-                logica.iniciarRentaDemo();
-            } else {
-                logica.registrarServicioEnTicket(tipo);
+            if (ticketActual == null) {
+                crearNuevoTicket(nombre, correo);
             }
+
+            agregarServicioDummy(tipo);
+            actualizarPreview(previewBox);
+            actualizarTabla(tabla);
+
+            txtNombre.clear();
+            txtCorreo.clear();
         });
 
-        // Click en tabla → mostrar popup de ticket
-        tabla.setOnMouseClicked(event -> {
-            String nombre = tabla.getSelectionModel().getSelectedItem();
-            if (nombre != null) {
-                mostrarPopupTicket(nombre, root);
-            }
-        });
-
-        // -------------------------------------------------
-        // MOSTRAR ESCENA
-        // -------------------------------------------------
         Scene scene = new Scene(root, 1280, 720);
         scene.getStylesheets().add(
                 getClass().getResource("Styles/Styles.css").toExternalForm()
