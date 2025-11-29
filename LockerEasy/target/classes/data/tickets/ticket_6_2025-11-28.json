@@ -1,9 +1,9 @@
 {
   "id" : 6,
   "fecha_reporte" : "2025-11-28",
-  "tiempo_emision" : "2025-11-29T00:37:26.572043900Z",
-  "nombre_cliente" : "Israel",
-  "correo_cliente" : "Hola2@Gmail.com",
+  "tiempo_emision" : "2025-11-29T03:39:19.074127Z",
+  "nombre_cliente" : "aaaa",
+  "correo_cliente" : "correo@desconocido.com",
   "servicios" : [ ],
   "total_ticket" : 0.0
 }

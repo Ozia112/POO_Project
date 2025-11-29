@@ -1,9 +1,9 @@
 {
   "id" : 7,
   "fecha_reporte" : "2025-11-28",
-  "tiempo_emision" : "2025-11-29T00:38:57.429281300Z",
-  "nombre_cliente" : "aaaaaa",
-  "correo_cliente" : "gasgasg@hotmail.com",
+  "tiempo_emision" : "2025-11-29T03:40:16.735493900Z",
+  "nombre_cliente" : "aaaaa",
+  "correo_cliente" : "correo@desconocido.com",
   "servicios" : [ ],
-  "total_ticket" : 0.0
+  "total_ticket" : 50.0
 }
