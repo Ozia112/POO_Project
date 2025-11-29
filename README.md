@@ -11,8 +11,8 @@ Poo project repository aiming to save all project progress
 - `TM-01`: Isaac Alejandro Ortiz Zaldivar
 - `TM-02`: Fabio Leonardo Gonzalez Alcocer
 - `TM-03`: Nicolás Israel Canul Durán
-- `TM-04`: Jesús Israel León Chay
 - `TM-05`: Maximiliano Carrillo Alvarado
+- `TM-06`: Wimon Rafael Solis Chen
 
 ## Chief Departments
 
