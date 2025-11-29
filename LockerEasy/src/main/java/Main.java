@@ -14,22 +14,15 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
 
-        // =======================
-        //  CREAR CONTROLADORES
-        // =======================
+        // ===== Controladores Reales =====
         ReporteController reporteController = new ReporteController();
-        TicketController ticketController = new TicketController();
-        RentaController rentaController = new RentaController();
+        TicketController ticketController = new TicketController(reporteController);
         VentaController ventaController = new VentaController();
+        RentaController rentaController = new RentaController();
         EtiquetaController etiquetaController = new EtiquetaController();
 
-        // Enlazar dependencias necesarias
-        rentaController.setReporteController(reporteController);
-
-        // =======================
-        //   INICIAR LA UI
-        // =======================
-        ServiciosGUI ui = new ServiciosGUI(
+        // ===== UI Bonita =====
+        ServiciosGUI gui = new ServiciosGUI(
                 ticketController,
                 ventaController,
                 rentaController,
@@ -37,7 +30,7 @@ public class Main extends Application {
                 etiquetaController
         );
 
-        ui.mostrar(stage);
+        gui.mostrar(stage);
     }
 
     public static void main(String[] args) {

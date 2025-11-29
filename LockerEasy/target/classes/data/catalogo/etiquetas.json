@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "nombre": "bebidas y alimentos",
+        "afecta_inventario": true
+    },
+    {
+        "id": 2,
+        "nombre": "tramites",
+        "afecta_inventario": false
+    },
+    {
+        "id": 3,
+        "nombre": "papeleria",
+        "afecta_inventario": false
+    }
+]
