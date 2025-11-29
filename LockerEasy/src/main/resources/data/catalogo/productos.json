@@ -1,0 +1,42 @@
+[
+  {
+    "precio": 1,
+    "etiquetas": ["Consumible"],
+    "existentes": 0,
+    "id": 1,
+    "nombre": "a",
+    "disponible": false
+  },
+  {
+    "precio": 1,
+    "etiquetas": ["Consumible"],
+    "existentes": 5,
+    "id": 2,
+    "nombre": "a",
+    "disponible": false
+  },
+  {
+    "precio": 123,
+    "etiquetas": ["Impresión"],
+    "existentes": 0,
+    "id": 3,
+    "nombre": "as",
+    "disponible": false
+  },
+  {
+    "precio": 123,
+    "etiquetas": ["Trámite"],
+    "existentes": 0,
+    "id": 4,
+    "nombre": "as",
+    "disponible": false
+  },
+  {
+    "precio": 123,
+    "etiquetas": ["Impresión"],
+    "existentes": 0,
+    "id": 5,
+    "nombre": "as",
+    "disponible": false
+  }
+]
