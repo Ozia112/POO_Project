@@ -8,6 +8,7 @@ import controller.VentaController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import view.ServiciosGUI;
+import view.VentaGUI;
 
 public class Main extends Application {
 
@@ -22,15 +23,23 @@ public class Main extends Application {
         EtiquetaController etiquetaController = new EtiquetaController();
 
         // ===== UI Bonita =====
+        
+        
         ServiciosGUI gui = new ServiciosGUI(
-                ticketController,
-                ventaController,
-                rentaController,
-                reporteController,
-                etiquetaController
+            ticketController,
+            ventaController,
+            rentaController,
+            reporteController,
+            etiquetaController
         );
 
         gui.mostrar(stage);
+        
+
+        /*  Versión temporal para probar la gestión de productos
+        VentaGUI ventaGui = new VentaGUI(ventaController);
+        ventaGui.mostrar(stage);
+        */
     }
 
     public static void main(String[] args) {
