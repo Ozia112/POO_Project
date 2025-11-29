@@ -18,6 +18,8 @@ import model.Ticket;
 import model.Ubicacion;
 import model.Reporte;
 
+import view.VentaGUI;
+
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -197,7 +199,16 @@ public class ServiciosGUI {
         // ========================= LATERAL =========================
         VBox side = new VBox(25);
         side.getStyleClass().add("sidebar");
-        side.getChildren().addAll(new Label("Servicios"), new Label("Renta"));
+        Label lblServicios = new Label("Servicios");
+        Label lblRenta = new Label("Renta");
+        Button btnVentas = new Button("Ventas");
+        btnVentas.setOnAction(ev -> {
+            // Abrir ventana de gestión de productos en una nueva Stage
+            Stage ventaStage = new Stage();
+            new VentaGUI(ventaController).mostrar(ventaStage);
+        });
+
+        side.getChildren().addAll(lblServicios, lblRenta, btnVentas);
 
         // ========================= FORM =========================
         VBox form = new VBox(20);
