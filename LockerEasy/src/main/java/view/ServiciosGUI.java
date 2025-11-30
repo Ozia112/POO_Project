@@ -1,28 +1,34 @@
 package view;
 
+import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import controller.EtiquetaController;
 import controller.RentaController;
 import controller.ReporteController;
 import controller.TicketController;
 import controller.VentaController;
-
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import model.Renta;
 import model.Servicio;
 import model.Ticket;
 import model.Ubicacion;
-import model.Reporte;
-
-import view.VentaGUI;
-
-import java.io.File;
-import java.util.List;
-import java.util.stream.Collectors;
+import view.Styles.EtiquetasGUI;
 
 public class ServiciosGUI {
 
@@ -92,10 +98,6 @@ public class ServiciosGUI {
 
             case "Impresión":
                 ventaController.registrarVenta(2, 1, ticketActual, ticketController);
-                break;
-
-            case "Agregar":
-                ventaController.registrarVenta(3, 1, ticketActual, ticketController);
                 break;
 
             case "Trámite":
@@ -200,7 +202,14 @@ public class ServiciosGUI {
         VBox side = new VBox(25);
         side.getStyleClass().add("sidebar");
         Label lblServicios = new Label("Servicios");
-        Label lblRenta = new Label("Renta");
+        
+        Button btnRenta = new Button("Renta");
+        btnRenta.setOnAction(ev -> {
+            // Abrir ventana de gestión de rentas en una nueva Stage
+            Stage rentaStage = new Stage();
+            new RentaGUI(rentaController, ticketController, reporteController).mostrar(rentaStage);
+        });
+        
         Button btnVentas = new Button("Ventas");
         btnVentas.setOnAction(ev -> {
             // Abrir ventana de gestión de productos en una nueva Stage
@@ -208,7 +217,14 @@ public class ServiciosGUI {
             new VentaGUI(ventaController).mostrar(ventaStage);
         });
 
-        side.getChildren().addAll(lblServicios, lblRenta, btnVentas);
+        Button btnEtiquetas = new Button("Etiquetas");
+        btnEtiquetas.setOnAction(ev -> {
+            // Abrir ventana de gestión de etiquetas en una nueva Stage
+            Stage etiquetasStage = new Stage();
+            new EtiquetasGUI(etiquetaController).mostrar(etiquetasStage);
+        });
+
+        side.getChildren().addAll(lblServicios, btnRenta, btnVentas, btnEtiquetas);
 
         // ========================= FORM =========================
         VBox form = new VBox(20);
@@ -225,7 +241,7 @@ public class ServiciosGUI {
         txtCorreo.setPromptText("Correo (opcional)");
 
         ComboBox<String> combo = new ComboBox<>();
-        combo.getItems().addAll("Consumible", "Impresión", "Agregar", "Trámite", "Renta");
+        combo.getItems().addAll("Consumible", "Impresión", "Trámite", "Renta");
 
         Button btn = new Button("Agregar");
         btn.getStyleClass().add("btn-green");

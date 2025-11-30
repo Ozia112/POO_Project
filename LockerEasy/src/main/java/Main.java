@@ -8,7 +8,6 @@ import controller.VentaController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import view.ServiciosGUI;
-import view.VentaGUI;
 
 public class Main extends Application {
 
@@ -21,6 +20,9 @@ public class Main extends Application {
         VentaController ventaController = new VentaController();
         RentaController rentaController = new RentaController();
         EtiquetaController etiquetaController = new EtiquetaController();
+
+        // ===== Configurar dependencias =====
+        rentaController.setReporteController(reporteController);
 
         // ===== UI Bonita =====
         
