@@ -40,7 +40,7 @@ public class VentaController {
                 return;
             }
 
-            String content = new String(Files.readAllBytes(Paths.get(PRODUCTOS_FILE)));
+            String content = new String(Files.readAllBytes(Paths.get(PRODUCTOS_FILE)), "UTF-8");
             JSONArray arr = new JSONArray(content);
 
             for (int i = 0; i < arr.length(); i++) {
@@ -55,17 +55,15 @@ public class VentaController {
                 List<String> etiquetas = new ArrayList<>();
                 if (obj.has("etiquetas")) {
                     Object etiquetasObj = obj.get("etiquetas");
-                    switch (etiquetasObj) {
-                        case JSONArray etiquetasArr -> {
-                            for (int j = 0; j < etiquetasArr.length(); j++) {
-                                etiquetas.add(etiquetasArr.getString(j));
-                            }
+                    if (etiquetasObj instanceof JSONArray) {
+                        JSONArray etiquetasArr = (JSONArray) etiquetasObj;
+                        for (int j = 0; j < etiquetasArr.length(); j++) {
+                            etiquetas.add(etiquetasArr.getString(j));
                         }
-                        case String etiquetaStr -> etiquetas.add(etiquetaStr);
-                        default -> {
-                            // Tipo no soportado
-                        }
+                    } else if (etiquetasObj instanceof String) {
+                        etiquetas.add((String) etiquetasObj);
                     }
+                    // Si es otro tipo, simplemente no agregamos etiquetas
                 }
 
                 Venta producto = new Venta(id, nombre, precio, existentes, etiquetas, disponible);

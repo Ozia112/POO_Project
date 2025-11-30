@@ -26,7 +26,7 @@ public class VentaGUI {
 		tabla.setPrefWidth(700);
 
 		TableColumn<Venta, String> colId = new TableColumn<>("ID");
-		colId.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty("#" + c.getValue().getIdProducto()));
+		colId.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(String.valueOf(c.getValue().getIdProducto())));
 
 		TableColumn<Venta, String> colNombre = new TableColumn<>("Nombre");
 		colNombre.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
@@ -41,16 +41,21 @@ public class VentaGUI {
 		colDisponible.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().isDisponible() ? "Sí" : "No"));
 
 		TableColumn<Venta, String> colEtiquetas = new TableColumn<>("Etiquetas");
-		colEtiquetas.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(String.join(", ", c.getValue().getEtiquetas() == null ? List.of() : c.getValue().getEtiquetas())));
+		colEtiquetas.setCellValueFactory(c -> {
+			List<String> etiquetas = c.getValue().getEtiquetas();
+			String etiquetasTexto = (etiquetas == null || etiquetas.isEmpty()) ? "" : String.join(", ", etiquetas);
+			return new javafx.beans.property.SimpleStringProperty(etiquetasTexto);
+		});
 
 		tabla.getColumns().addAll(colId, colNombre, colPrecio, colExistentes, colDisponible, colEtiquetas);
 
 		// Ajustes de ancho de columnas
-		colId.setMaxWidth(80); colId.setPrefWidth(60);
-		colPrecio.setMaxWidth(120); colPrecio.setPrefWidth(120);
-		colExistentes.setMaxWidth(100); colExistentes.setPrefWidth(90);
-		colDisponible.setMaxWidth(120); colDisponible.setPrefWidth(100);
-		colNombre.setMinWidth(220); colNombre.setPrefWidth(300);
+		colId.setPrefWidth(50);
+		colNombre.setPrefWidth(250);
+		colPrecio.setPrefWidth(100);
+		colExistentes.setPrefWidth(100);
+		colDisponible.setPrefWidth(100);
+		colEtiquetas.setPrefWidth(150);
 
 		// Evitar que quede una 'columna' vacía al final: forzar política que distribuye
 		tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -267,7 +272,7 @@ public class VentaGUI {
 		tabla.setPrefWidth(700);
 
 		TableColumn<Venta, String> colId = new TableColumn<>("ID");
-		colId.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty("#" + c.getValue().getIdProducto()));
+		colId.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(String.valueOf(c.getValue().getIdProducto())));
 
 		TableColumn<Venta, String> colNombre = new TableColumn<>("Nombre");
 		colNombre.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
@@ -282,17 +287,21 @@ public class VentaGUI {
 		colDisponible.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().isDisponible() ? "Sí" : "No"));
 
 		TableColumn<Venta, String> colEtiquetas = new TableColumn<>("Etiquetas");
-		colEtiquetas.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
-				String.join(", ", c.getValue().getEtiquetas() == null ? List.of() : c.getValue().getEtiquetas())
-		));
+		colEtiquetas.setCellValueFactory(c -> {
+			List<String> etiquetas = c.getValue().getEtiquetas();
+			String etiquetasTexto = (etiquetas == null || etiquetas.isEmpty()) ? "" : String.join(", ", etiquetas);
+			return new javafx.beans.property.SimpleStringProperty(etiquetasTexto);
+		});
 
 		tabla.getColumns().addAll(colId, colNombre, colPrecio, colExistentes, colDisponible, colEtiquetas);
 
-		colId.setMaxWidth(80); colId.setPrefWidth(60);
-		colPrecio.setMaxWidth(120); colPrecio.setPrefWidth(120);
-		colExistentes.setMaxWidth(100); colExistentes.setPrefWidth(90);
-		colDisponible.setMaxWidth(120); colDisponible.setPrefWidth(100);
-		colNombre.setMinWidth(220); colNombre.setPrefWidth(300);
+		// Ajustes de ancho de columnas
+		colId.setPrefWidth(50);
+		colNombre.setPrefWidth(250);
+		colPrecio.setPrefWidth(100);
+		colExistentes.setPrefWidth(100);
+		colDisponible.setPrefWidth(100);
+		colEtiquetas.setPrefWidth(150);
 
 		tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 

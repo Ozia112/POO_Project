@@ -35,7 +35,7 @@ public class EtiquetaController {
                 return;
             }
             
-            String content = new String(Files.readAllBytes(Paths.get(ETIQUETAS_FILE)));
+            String content = new String(Files.readAllBytes(Paths.get(ETIQUETAS_FILE)), "UTF-8");
             JSONArray arr = new JSONArray(content);
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);

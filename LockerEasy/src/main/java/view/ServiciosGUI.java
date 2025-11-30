@@ -1,35 +1,44 @@
 package view;
 
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-
+import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
 import controller.EtiquetaController;
 import controller.RentaController;
 import controller.ReporteController;
 import controller.TicketController;
 import controller.VentaController;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.stage.Stage;
+import java.time.Instant;
+
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Renta;
 import model.Servicio;
 import model.Ticket;
 import model.Ubicacion;
+
 import model.Venta;
 
 public class ServiciosGUI {
@@ -41,6 +50,7 @@ public class ServiciosGUI {
     private final TicketController ticketController = new TicketController(reporteController);
     private final RentaController rentaController = new RentaController();
     private final VentaController ventaController = new VentaController();
+    private final EtiquetaController etiquetaController = new EtiquetaController();
 
     // ------------------ UI COMPONENTS ------------------
     private Ticket ticketActual = null;
@@ -66,20 +76,18 @@ public class ServiciosGUI {
         // Crear consolas
         crearConsolas();
 
-        // Crear TabPane principal
+        // Crear TabPane
         tabPane = new TabPane();
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         tabPane.setSide(javafx.geometry.Side.LEFT);
 
-        // Pestaña 1: Servicios
         Tab tabServicios = new Tab("Servicios");
         tabServicios.setContent(crearVistaServicios());
 
-        // Pestaña 2: Renta
         Tab tabRenta = new Tab("Renta");
         tabRenta.setContent(crearVistaRenta());
 
-        // Pestaña 3: Config con sub-pestañas
+        // Pestaña Config con sub-pestañas
         Tab tabConfig = new Tab("Config");
         tabConfig.setContent(crearVistaConfig());
 
@@ -93,11 +101,7 @@ public class ServiciosGUI {
         // ============================
         // CSS APLICADO
         // ============================
-        try {
-            scene.getStylesheets().add(getClass().getResource("/view/Styles/Styles.css").toExternalForm());
-        } catch (Exception e) {
-            System.err.println("No se pudo cargar el CSS: " + e.getMessage());
-        }
+        scene.getStylesheets().add("view/Styles/Styles.css");
 
         stage.setScene(scene);
         stage.setTitle("Servicios - LockerEasy");
@@ -144,26 +148,30 @@ public class ServiciosGUI {
         return new VBox(10, topSection, consolasHBox);
     }
 
-    private TabPane crearVistaConfig() {
-        // Crear TabPane secundario para Config
-        TabPane configTabPane = new TabPane();
-        configTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-        configTabPane.setSide(javafx.geometry.Side.TOP);
+    private VBox crearVistaConfig() {
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(10));
 
-        // Sub-pestaña Ventas
-        Tab tabVentas = new Tab("Ventas");
+        // Sub-pestañas dentro de Config
+        TabPane subTabPane = new TabPane();
+        subTabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        // Sub-pestaña Venta
+        Tab tabVenta = new Tab("Venta");
         VentaGUI ventaGUI = new VentaGUI(ventaController);
-        tabVentas.setContent(ventaGUI.getVistaIntegrada());
+        tabVenta.setContent(ventaGUI.getVistaIntegrada());
 
         // Sub-pestaña Etiquetas
         Tab tabEtiquetas = new Tab("Etiquetas");
-        EtiquetaController etiquetaController = new EtiquetaController();
         EtiquetasGUI etiquetasGUI = new EtiquetasGUI(etiquetaController);
         tabEtiquetas.setContent(etiquetasGUI.getVistaIntegrada());
 
-        configTabPane.getTabs().addAll(tabVentas, tabEtiquetas);
+        subTabPane.getTabs().addAll(tabVenta, tabEtiquetas);
 
-        return configTabPane;
+        root.getChildren().add(subTabPane);
+        VBox.setVgrow(subTabPane, Priority.ALWAYS);
+
+        return root;
     }
 
         private HBox crearVistaRenta() {
@@ -891,6 +899,135 @@ private HBox crearBotonesUtilidad() {
         if (rentasEnProgresoBox.getChildren().isEmpty()) {
             rentasEnProgresoBox.getChildren().add(new Label("No hay rentas activas"));
         }
+    }
+
+
+    // =========================================================
+    // CREAR TICKET
+    // =========================================================
+    private void crearNuevoTicket(String nombre, String correo) {
+
+        if (correo == null || correo.isBlank())
+            correo = "correo@desconocido.com";
+
+        ticketActual = ticketController.crearNuevoTicket(nombre, correo);
+
+        // Agregar al reporte del día
+        reporteController.getReporte().getTickets().add(ticketActual);
+
+        ticketController.guardarTicket(ticketActual);
+
+        System.out.println("[LOG] Ticket creado: " + ticketActual.getTicketId());
+    }
+
+
+    // =========================================================
+    // AGREGAR SERVICIO (SOLO lo que YA existe)
+    // =========================================================
+    private void agregarServicio(String tipo) {
+
+        if (ticketActual == null) return;
+
+        switch (tipo) {
+
+            case "Consumible":
+                ventaController.registrarVenta(1, 1, ticketActual, ticketController);
+                break;
+
+            case "Impresión":
+                ventaController.registrarVenta(2, 1, ticketActual, ticketController);
+                break;
+
+            case "Trámite":
+                ventaController.registrarVenta(1, 1, ticketActual, ticketController);
+                break;
+
+            case "Renta":
+                rentaController.iniciarRenta(
+                        Ubicacion.PA_T1_L1,
+                        ticketActual,
+                        ticketController
+                );
+                break;
+        }
+
+        System.out.println("[LOG] Servicio agregado: " + tipo);
+    }
+
+
+    // =========================================================
+    // TABLA REPORTE DEL DÍA
+    // =========================================================
+    private void actualizarTablaDia(TableView<Ticket> tabla) {
+        tabla.getItems().clear();
+        tabla.getItems().addAll(reporteController.getReporte().getTickets());
+    }
+
+
+    // =========================================================
+    // PREVIEW TICKET (COMPLETO)
+    // =========================================================
+    private void mostrarTicket(VBox box, Ticket t) {
+
+        box.getChildren().clear();
+
+        if (t == null) {
+            box.getChildren().add(new Label("Aún no hay ticket seleccionado."));
+            return;
+        }
+
+        Label titulo = new Label("=== Ticket ID: " + t.getTicketId() + " ===");
+        titulo.setStyle("-fx-font-size: 22; -fx-font-weight: bold;");
+
+        box.getChildren().add(titulo);
+        box.getChildren().add(new Label("Cliente: " + t.getNombreCliente()));
+        box.getChildren().add(new Label("Correo: " + t.getCorreoCliente()));
+
+        // Servicios
+        box.getChildren().add(new Label("\nServicios:"));
+
+        VBox lista = new VBox(5);
+
+        if (t.getServicios().isEmpty()) {
+            lista.getChildren().add(new Label("(Sin servicios)"));
+        } else {
+
+            for (Servicio s : t.getServicios()) {
+
+                if (s.getTipoServicio() instanceof model.Venta v) {
+                    lista.getChildren().add(new Label(
+                            "[VENTA] " + v.getNombre() +
+                                    " | Cant: " + v.getCantidad() +
+                                    " | Precio: $" + v.getPrecio() +
+                                    " | Total: $" + s.getTotalServicio()
+                    ));
+                }
+
+                if (s.getTipoServicio() instanceof Renta r) {
+                    lista.getChildren().add(new Label(
+                            "[RENTA] " + r.getUbicacion() +
+                                    " | Inicio: " + r.getInicioRenta() +
+                                    " | Cierre: " + r.getCierreRenta() +
+                                    " | Total: $" + s.getTotalServicio()
+                    ));
+                }
+            }
+        }
+
+        box.getChildren().add(lista);
+
+        Label total = new Label("\nTotal: $" + t.getTotalTicket());
+        total.setStyle("-fx-font-weight: bold; -fx-font-size: 18;");
+        box.getChildren().add(total);
+    }
+
+
+    // =========================================================
+    // HISTORIAL REPORTES
+    // =========================================================
+    private List<File> obtenerReportes() {
+        File carpeta = new File("src/main/resources/data/reportes");
+        return List.of(carpeta.listFiles((d, name) -> name.endsWith(".json")));
     }
 
 }
