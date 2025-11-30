@@ -141,12 +141,103 @@ public class ServiciosGUI {
 
         actualizarRentasEnProgreso();
 
-        HBox contenido = new HBox(10, gridUbicaciones, estadoUbicacionBox, boxRentas);
+       VBox herramientas = crearHerramientasDeLockers();
+
+            HBox contenido = new HBox(10,
+                gridUbicaciones,
+                estadoUbicacionBox,
+                boxRentas,
+                herramientas // NUEVO PANEL
+            );
+
         contenido.setPadding(new Insets(10));
         HBox.setHgrow(rentasEnProgresoBox, Priority.ALWAYS);
+                        
+        
         
         return contenido;
     }
+            private VBox crearHerramientasDeLockers() {
+
+            // -------- CANCELAR RENTA --------
+            Button btnCancelar = new Button("Cancelar renta activa");
+            btnCancelar.setMaxWidth(Double.MAX_VALUE);
+            btnCancelar.setOnAction(e -> {
+
+                if (ubicacionSeleccionada == null) {
+                    consolaTickets.appendText("[ERROR] Selecciona una ubicación.\n");
+                    return;
+                }
+
+                var renta = rentaController.getRentaActiva(ubicacionSeleccionada);
+                if (renta == null) {
+                    consolaTickets.appendText("[ERROR] No hay renta activa en esa ubicación.\n");
+                    return;
+                }
+
+                var ticket = rentaController.getTicketDeRenta(ubicacionSeleccionada);
+
+                rentaController.finalizarRenta(ubicacionSeleccionada, ticket, ticketController);
+                rentaController.liberarUbicacion(ubicacionSeleccionada);
+
+                actualizarGridUbicaciones();
+                actualizarRentasEnProgreso();
+                mostrarEstadoUbicacion(ubicacionSeleccionada);
+
+                consolaTickets.appendText("[OK] Renta cancelada manualmente.\n");
+            });
+
+            // -------- TOLERANCIA --------
+            TextField txtTol = new TextField();
+            txtTol.setPromptText("Minutos de tolerancia");
+
+            Button btnTol = new Button("Guardar tolerancia");
+            btnTol.setOnAction(e -> {
+                try {
+                    int min = Integer.parseInt(txtTol.getText());
+                    rentaController.setTolerancia(min);
+                    consolaTickets.appendText("[OK] Nueva tolerancia: " + min + " minutos.\n");
+                } catch (NumberFormatException ex) {
+                    consolaTickets.appendText("[ERROR] Valor inválido.\n");
+                }
+            });
+
+            // -------- PRECIO POR HORA --------
+            TextField txtPrecio = new TextField();
+            txtPrecio.setPromptText("Precio por hora ($)");
+
+            Button btnPrecio = new Button("Guardar precio");
+            btnPrecio.setOnAction(e -> {
+                try {
+                    float precio = Float.parseFloat(txtPrecio.getText());
+                    rentaController.setPrecioGeneral(precio);
+                    consolaTickets.appendText("[OK] Nuevo precio por hora: $" + precio + "\n");
+                } catch (NumberFormatException ex) {
+                    consolaTickets.appendText("[ERROR] Valor inválido.\n");
+                }
+            });
+
+            VBox box = new VBox(10,
+                new Label("Herramientas de Lockers"),
+                btnCancelar,
+                new Separator(),
+                new Label("Tolerancia"),
+                txtTol,
+                btnTol,
+                new Separator(),
+                new Label("Precio por hora"),
+                txtPrecio,
+                btnPrecio
+            );
+
+            box.setPadding(new Insets(10));
+            box.setStyle("-fx-border-color: #cccccc; -fx-border-width: 1;");
+
+            return box;
+        }
+
+
+
 
     private void crearConsolas() {
         consolaTickets = new TextArea();
@@ -178,11 +269,14 @@ public class ServiciosGUI {
         private VBox crearSeccionAcciones() {
 
             ComboBox<String> combo = new ComboBox<>();
-            combo.getItems().addAll("Renta", "Trámite", "Consumible");
+            combo.getItems().addAll("Renta", "Trámite", "Consumible","Impresión");
             combo.setPromptText("Selecciona servicio");
 
             Button btnAccion = new Button();
             btnAccion.setVisible(false);
+
+            Button btnFinalizarTicket = new Button("Finalizar Ticket");
+            btnFinalizarTicket.setVisible(false);
 
             // === NUEVO: ComboBox para productos ===
             ComboBox<model.Venta> comboProductos = new ComboBox<>();
@@ -191,15 +285,22 @@ public class ServiciosGUI {
 
             Button btnAgregarProducto = new Button("Agregar al Ticket");
             btnAgregarProducto.setVisible(false);
-
+            
             // Cuando selecciona el tipo
-            combo.valueProperty().addListener((obs, oldVal, newVal) -> {
+                combo.valueProperty().addListener((obs, oldVal, newVal) -> {
 
-                btnAccion.setVisible(false);
-                comboProductos.setVisible(false);
-                btnAgregarProducto.setVisible(false);
+                    // Siempre REHABILITAR controles cuando se selecciona un tipo
+                    comboProductos.setDisable(false);
+                    btnAgregarProducto.setDisable(false);
+                    btnFinalizarTicket.setDisable(false);
 
-                if (newVal == null) return;
+                    // Ocultar por defecto
+                    btnAccion.setVisible(false);
+                    comboProductos.setVisible(false);
+                    btnAgregarProducto.setVisible(false);
+                    btnFinalizarTicket.setVisible(false);
+
+                    if (newVal == null) return;
 
                 switch (newVal) {
 
@@ -219,6 +320,7 @@ public class ServiciosGUI {
 
                         comboProductos.setVisible(true);
                         btnAgregarProducto.setVisible(true);
+                        btnFinalizarTicket.setVisible(true);
                     }
 
                     case "Consumible" -> {
@@ -232,7 +334,21 @@ public class ServiciosGUI {
 
                         comboProductos.setVisible(true);
                         btnAgregarProducto.setVisible(true);
+                        btnFinalizarTicket.setVisible(true);
                     }
+
+                   case "Impresión" -> {
+                            comboProductos.getItems().clear();
+                            comboProductos.getItems().addAll(
+                                ventaController.obtenerTodosLosProductos()
+                                        .stream()
+                                        .filter(p -> p.getEtiquetas().contains("Impresión"))
+                                        .toList()
+                            );
+                            comboProductos.setVisible(true);
+                            btnAgregarProducto.setVisible(true);
+                            btnFinalizarTicket.setVisible(true);
+                     }
                 }
             });
 
@@ -254,7 +370,9 @@ public class ServiciosGUI {
             btnAgregarProducto.setOnAction(e -> {
 
                 model.Venta producto = comboProductos.getValue();
+                
 
+                
                 if (producto == null) {
                     consolaTickets.appendText("[ERROR] Selecciona un producto.\n");
                     return;
@@ -287,17 +405,53 @@ public class ServiciosGUI {
                     consolaTickets.appendText("[ERROR] No se pudo registrar la venta.\n");
                 }
             });
+            
+            
+                        // === BOTÓN PARA FINALIZAR TICKET ===
+
+                        // === FINALIZAR TICKET ===
+                 btnFinalizarTicket.setOnAction(e -> {
+
+                        if (ticketActual == null) {
+                            consolaTickets.appendText("[ERROR] No hay ticket activo.\n");
+                            return;
+                        }
+
+                        // Primero agregar al reporte
+                        reporteController.agregarTicket(ticketActual);
+
+                        consolaTickets.appendText("[OK] Ticket finalizado.\n");
+
+                        // Limpieza visual
+                        showCurrentTicket(ticketActual);
+
+                        txtNombre.clear();
+                        txtCorreo.clear();
+
+                        // Reset del ticket actual
+                        ticketActual = null;
+
+                        // REHABILITAR CONTROLES PARA NUEVO TICKET
+                        comboProductos.setDisable(false);
+                        btnAgregarProducto.setDisable(false);
+                        btnFinalizarTicket.setDisable(false);
+                    });
+
+
+
 
             return new VBox(10,
                     new Label("Tipo de Servicio:"),
                     combo,
                     btnAccion,
                     comboProductos,        // nuevo
-                    btnAgregarProducto     // nuevo
+                    btnAgregarProducto,     // nuevo
+                    btnFinalizarTicket      // nuevo
+                    
             );
         }
 
-
+    
 
     private GridPane crearGridUbicaciones() {
         GridPane grid = new GridPane();
@@ -333,6 +487,7 @@ public class ServiciosGUI {
 
         Button btnReporte = new Button("Mostrar reporte del día");
         btnReporte.setOnAction(e -> manejarMostrarReporte());
+
 
         HBox box = new HBox(20, btnActualizarInicio, btnClsTicketConsole, btnReporte);
         box.setAlignment(Pos.CENTER_RIGHT);

@@ -174,61 +174,62 @@ public class VentaController {
             producto.setDisponible(true);
         }
     }
-            public boolean registrarVenta(int idProducto, int cantidad, Ticket ticket, TicketController ticketController) {
+        public boolean registrarVenta(int idProducto, int cantidad, Ticket ticket, TicketController ticketController) {
 
-        Venta producto = catalogo.get(idProducto);
-        if (producto == null) {
-            System.err.println("Producto no encontrado: " + idProducto);
-            return false;
-        }
-
-        if (!producto.isDisponible()) {
-            System.err.println("Producto no disponible: " + producto.getNombre());
-            return false;
-        }
-
-        // Validar inventario si aplica
-        if (etiquetaController.etiquetasAfectanInventario(producto.getEtiquetas())) {
-            if (producto.getExistentes() < cantidad) {
-                System.err.println("Inventario insuficiente. Disponible: " + producto.getExistentes());
+            Venta producto = catalogo.get(idProducto);
+            if (producto == null) {
+                System.err.println("Producto no encontrado: " + idProducto);
                 return false;
             }
 
-            producto.setExistentes(producto.getExistentes() - cantidad);
-            actualizarDisponibilidad(producto);
-            guardarProductos();
+            if (!producto.isDisponible()) {
+                System.err.println("Producto no disponible: " + producto.getNombre());
+                return false;
+            }
+
+            // Inventario si aplica
+            if (etiquetaController.etiquetasAfectanInventario(producto.getEtiquetas())) {
+                if (producto.getExistentes() < cantidad) {
+                    System.err.println("Inventario insuficiente. Disponible: " + producto.getExistentes());
+                    return false;
+                }
+
+                producto.setExistentes(producto.getExistentes() - cantidad);
+                actualizarDisponibilidad(producto);
+                guardarProductos();
+            }
+
+            // ---------------------------------------------
+            // *** CREAR OBJETO SERVICIO ***
+            // ---------------------------------------------
+            Servicio servicio = new Servicio();
+            servicio.setServicioId(ticket.getServicios().size() + 1);
+            servicio.setTipoServicio(producto);       // TipoServicio = Venta
+            producto.setCantidad(cantidad);           // Aplicar cantidad a la venta
+            servicio.setAplicarDescuento(false);
+
+            // ---------------------------------------------
+            // AGREGAR AL TICKET
+            // ---------------------------------------------
+            ticket.getServicios().add(servicio);
+
+            // ---------------------------------------------
+            // RE-CALCULAR TOTAL DEL TICKET
+            // ---------------------------------------------
+            float total = 0f;
+            for (Servicio s : ticket.getServicios()) {
+                total += s.getTotalServicio();
+            }
+            ticket.setTotalTicket(total);
+
+            // ---------------------------------------------
+            // GUARDAR
+            // ---------------------------------------------
+            ticketController.guardarTicket(ticket);
+
+            System.out.println("Venta registrada y agregada al ticket: " + producto.getNombre() + " x" + cantidad);
+            return true;
         }
-
-        // -----------------------------------------------
-        // 🔥 Crear objeto VENTA para el ticket
-        // -----------------------------------------------
-        Venta ventaServicio = new Venta(
-                producto.getIdProducto(),
-                producto.getNombre(),
-                producto.getPrecio(),
-                cantidad,
-                producto.getEtiquetas(),
-                producto.isDisponible()
-        );
-
-        ventaServicio.setCantidad(cantidad);
-
-        // Crear Servicio y agregar al Ticket
-        Servicio servicio = new Servicio();
-        servicio.setServicioId(ticket.getServicios().size() + 1);
-        servicio.setTipoServicio(ventaServicio);
-        servicio.setAplicarDescuento(false);
-
-        ticket.getServicios().add(servicio);
-
-        // Guardar Ticket
-        ticketController.guardarTicket(ticket);
-
-        System.out.println("Venta registrada y agregada al ticket: " 
-            + producto.getNombre() + " x" + cantidad);
-
-        return true;
-    }
 
 
 

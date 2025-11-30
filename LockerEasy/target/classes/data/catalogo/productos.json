@@ -2,7 +2,7 @@
   {
     "precio": 12,
     "etiquetas": ["Consumible"],
-    "existentes": 14,
+    "existentes": 8,
     "id": 1,
     "nombre": "Agua 600ml",
     "disponible": true
@@ -10,7 +10,7 @@
   {
     "precio": 15,
     "etiquetas": ["Consumible"],
-    "existentes": 13,
+    "existentes": 10,
     "id": 2,
     "nombre": "Galletas empaquetadas",
     "disponible": true
@@ -18,7 +18,7 @@
   {
     "precio": 5,
     "etiquetas": ["Consumible"],
-    "existentes": 33,
+    "existentes": 27,
     "id": 3,
     "nombre": "Dulces",
     "disponible": true
@@ -26,7 +26,7 @@
   {
     "precio": 2,
     "etiquetas": ["Impresión"],
-    "existentes": 999,
+    "existentes": 988,
     "id": 4,
     "nombre": "Impresión B/N",
     "disponible": true
@@ -50,7 +50,7 @@
   {
     "precio": 30,
     "etiquetas": ["Trámite"],
-    "existentes": 997,
+    "existentes": 980,
     "id": 7,
     "nombre": "Constancia",
     "disponible": true
@@ -58,7 +58,7 @@
   {
     "precio": 10,
     "etiquetas": ["Trámite"],
-    "existentes": 997,
+    "existentes": 990,
     "id": 8,
     "nombre": "Impresión de constancia electrónica",
     "disponible": true
@@ -66,7 +66,7 @@
   {
     "precio": 20,
     "etiquetas": ["Trámite"],
-    "existentes": 997,
+    "existentes": 994,
     "id": 9,
     "nombre": "Copia Certifica",
     "disponible": true

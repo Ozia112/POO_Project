@@ -14,11 +14,16 @@ public class RentaController {
     private ReporteController reporteController;
     private final Map<Ubicacion, Renta> rentasActivas;
 
+    // ================= CONFIG DINÁMICO =================
+    private int minutosTolerancia = Config.getMinutosTolerancia();     // PATCH
+    private float precioHoraGeneral = Config.getPrecioHoraLocker();   // PATCH
+
     private static final int MINUTOS_EN_HORA = 60;
     private final int MINUTOS_CANCELACION = Config.getMinutosCancelacion();
+
+    // (Ya no se usarán estas dos, pero se dejan para no romper compatibilidad)
     private final int MINUTOS_TOLERANCIA = Config.getMinutosTolerancia();
     private final int LIMITE_MINUTOS_PRIMERA_HORA = MINUTOS_EN_HORA + MINUTOS_TOLERANCIA;
-    
 
     public RentaController() {
         this.rentasActivas = new HashMap<>();
@@ -42,8 +47,8 @@ public class RentaController {
         try {
             Renta renta = new Renta();
             renta.setNombre("Locker");
-            renta.setPrecio(Config.getPrecioHoraLocker());
-            renta.setCantidad(1); // Se calcula al cerrar
+            renta.setPrecio(precioHoraGeneral);    // PATCH: usa el precio dinámico
+            renta.setCantidad(1);
             renta.setInicioRenta(ticket.getTiempoEmision());
             renta.setStateOcupado(true);
             renta.setUbicacion(ubicacion);
@@ -63,7 +68,6 @@ public class RentaController {
                 reporteController.agregarTicket(ticket);
             }
 
-            // Guardar en cache
             rentasActivas.put(ubicacion, renta);
 
             System.out.println("Renta iniciada en " + ubicacion + " con ticket ID: " + ticket.getTicketId());
@@ -110,13 +114,22 @@ public class RentaController {
     public int calcularTiempoTrancurrido(Renta renta, Instant tiempo) {
         Instant inicio = renta.getInicioRenta();
         long diferenciaMinutos = Duration.between(inicio, tiempo).toMinutes();
+
+        // ================== PATCH: usar tolerancia dinámica ==================
+        int limiteTolerancia = minutosTolerancia;
+        int limitePrimeraHora = MINUTOS_EN_HORA + minutosTolerancia;
+        // ====================================================================
+
         int horasRentadas;
+
         if (diferenciaMinutos <= MINUTOS_CANCELACION) {
-                horasRentadas = 0;
-        } else if (diferenciaMinutos <= LIMITE_MINUTOS_PRIMERA_HORA) {
+            horasRentadas = 0;
+        } 
+        else if (diferenciaMinutos <= limitePrimeraHora) {      // PATCH
             horasRentadas = 1;
-        } else {
-            long minutosRestantes = diferenciaMinutos - LIMITE_MINUTOS_PRIMERA_HORA;
+        } 
+        else {
+            long minutosRestantes = diferenciaMinutos - limitePrimeraHora;   // PATCH
             int horasAdicionales = (int) ((minutosRestantes + MINUTOS_EN_HORA - 1) / MINUTOS_EN_HORA);
             horasRentadas = 1 + horasAdicionales;
         }
@@ -141,7 +154,6 @@ public class RentaController {
         Renta renta = rentasActivas.get(ubicacion);
         if (renta == null) return null;
         
-        // Buscar en el reporte el ticket que contenga este servicio de renta
         if (reporteController != null) {
             var tickets = reporteController.getReporte().getTickets();
             for (Ticket ticket : tickets) {
@@ -184,4 +196,14 @@ public class RentaController {
             renta.setInicioRenta(ticket.getTiempoEmision());
         }
     }
+
+    // ==========================================================
+    // ===============   PARTE DINÁMICA REAL     ================
+    // ==========================================================
+
+    public void setTolerancia(int m) { minutosTolerancia = m; }
+    public int getTolerancia() { return minutosTolerancia; }
+
+    public void setPrecioGeneral(float p) { precioHoraGeneral = p; }
+    public float getPrecioGeneral() { return precioHoraGeneral; }
 }

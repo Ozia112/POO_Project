@@ -44,4 +44,42 @@ public class Ticket {
     public void setTiempoEmision(Instant tiempo_emision) { this.tiempo_emision = tiempo_emision; }
     public void setServicios(List<Servicio> servicios) { this.servicios = servicios; }
     public void setTotalTicket(float total_ticket) { this.total_ticket = total_ticket; }
+    
+    //================================
+    //  NUEVOS MÉTODOS NECESARIOS
+    // ================================
+
+    /**
+     * Agrega un servicio al ticket y recalcula automáticamente el total.
+     */
+    public void agregarServicio(Servicio servicio) {
+        if (servicio == null) return;
+
+        if (this.servicios == null) {
+            this.servicios = new ArrayList<>();
+        }
+
+        this.servicios.add(servicio);
+        recalcularTotal();
+    }
+
+    /**
+     * Recalcula el total del ticket sumando todos los servicios existentes.
+     */
+    public void recalcularTotal() {
+        float total = 0f;
+
+        if (servicios != null) {
+            for (Servicio s : servicios) {
+                if (s != null) {
+                    total += s.getTotalServicio();
+                }
+            }
+        }
+
+        this.total_ticket = total;
+    }
+
+
+
 }
