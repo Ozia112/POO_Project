@@ -1,26 +1,42 @@
 [
   {
-    "precio": 50,
-    "etiquetas": ["Bebidas"],
-    "existentes": 53,
+    "precio": 1,
+    "etiquetas": ["Consumible"],
+    "existentes": 0,
     "id": 1,
-    "nombre": "Producto A",
-    "disponible": true
+    "nombre": "a",
+    "disponible": false
   },
   {
-    "precio": 75,
-    "etiquetas": ["Tramites"],
-    "existentes": 1,
+    "precio": 1,
+    "etiquetas": ["Consumible"],
+    "existentes": 5,
     "id": 2,
-    "nombre": "Producto B",
-    "disponible": true
+    "nombre": "a",
+    "disponible": false
   },
   {
-    "precio": 30,
-    "etiquetas": ["Papeleria"],
-    "existentes": 200,
+    "precio": 123,
+    "etiquetas": ["Impresión"],
+    "existentes": 0,
     "id": 3,
-    "nombre": "Producto C",
-    "disponible": true
+    "nombre": "as",
+    "disponible": false
+  },
+  {
+    "precio": 123,
+    "etiquetas": ["Trámite"],
+    "existentes": 0,
+    "id": 4,
+    "nombre": "as",
+    "disponible": false
+  },
+  {
+    "precio": 123,
+    "etiquetas": ["Impresión"],
+    "existentes": 0,
+    "id": 5,
+    "nombre": "as",
+    "disponible": false
   }
 ]

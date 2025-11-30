@@ -1,3 +1,200 @@
-body{
-    color:blue
+
+/* ============================================================
+   CSS DE TicketGUI
+   ============================================================ */
+.ticket-box {
+    -fx-background-color: #ffffff;
+    -fx-padding: 25;
+    -fx-spacing: 18;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+
+    /* SOMBRA SUAVECITA */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.21), 25, 0.2, 0, 4);
+
+    -fx-max-width: 380px;
+}
+
+.ticket-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.btn-cerrar-ticket {
+    -fx-background-color: #6e8b5b;
+    -fx-text-fill: white;
+    -fx-background-radius: 10;
+    -fx-padding: 4 10;
+}
+
+.ticket-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.ticket-value {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333;
+}
+
+.ticket-header-row {
+    -fx-font-size: 12px;
+    -fx-opacity: 0.8;
+}
+
+.ticket-data-row {
+    -fx-font-size: 14px;
+    -fx-padding: 5 0;
+}
+
+.ticket-popup {
+    -fx-background-color: white;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 30, 0.2, 0, 4);
+}
+
+.ticket-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.ticket-client {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+
+
+
+/* ============================================================
+   CSS DE SERVICIOSGUI
+   ============================================================ */
+.root {
+    -fx-background-color: #b7b7b7; /* gris del fondo general del mockup */
+    -fx-padding: 0;
+}
+
+/* SIDEBAR IZQUIERDO*/
+.sidebar {
+    -fx-background-color: #d1d1d1;
+    -fx-pref-width: 210;
+    -fx-padding: 40 25 40 25;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 15, 0.2, 0, 4);
+}
+
+.menu-item {
+    -fx-font-size: 20px;
+    -fx-text-fill: #333;
+    -fx-padding: 10 0 10 0;
+}
+
+.menu-item:hover {
+    -fx-text-fill: #4a6f4a;
+    -fx-cursor: hand;
+}
+
+/*  TITULOS Y LABELS */
+.titulo1 {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c2c2c;
+}
+
+.label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2f2f2f;
+}
+
+/* FORMULARIO (CAJA 1)*/
+.caja-form {
+    -fx-background-color: linear-gradient(to bottom, #f2ffe9, #d4e7c9);
+    -fx-padding: 30;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0.2, 0, 4);
+}
+
+
+/* campos */
+
+.text-field, .combo-box {
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 10;
+    -fx-font-size: 16px;
+}
+
+
+/* Botón verde */
+.btn-green {
+    -fx-background-color: #6b8d6b;
+    -fx-text-fill: white;
+    -fx-padding: 8 20;
+    -fx-background-radius: 10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.btn-green:hover {
+    -fx-background-color: #587a58;
+    -fx-cursor: hand;
+}
+
+/* GRÁFICA (CAJA 2) */
+.caja-grafica {
+    -fx-background-color: #c5ecb4;
+    -fx-padding: 20;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0.15, 0, 3);
+    -fx-max-width: 420;
+}
+
+.graph-placeholder {
+    -fx-background-color: #b7deb3;
+    -fx-background-radius: 20;
+    -fx-pref-height: 180;
+    -fx-border-color: rgba(0,0,0,0.10);
+    -fx-border-radius: 20;
+}
+
+/* Pill buttons */
+.pill {
+    -fx-background-color: #ececec;
+    -fx-padding: 6 15;
+    -fx-background-radius: 12;
+    -fx-font-size: 14px;
+}
+
+.pill:hover {
+    -fx-background-color: #d6d6d6;
+}
+
+/*  CAJA DEL REPORTE (DERECHA)*/
+.caja-reporte {
+    -fx-background-color: #8ea684;
+    -fx-padding: 25;
+    -fx-pref-width: 450;
+    -fx-background-radius: 40;
+    -fx-border-radius: 40;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0.20, 0, 4);
+}
+
+.titulo-reporte {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+/* Tabla */
+.tabla-reporte {
+    -fx-background-color: #f3ffe9;
+    -fx-padding: 15;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0.15, 0, 3);
 }

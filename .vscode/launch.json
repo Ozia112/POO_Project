@@ -3,6 +3,9 @@
     "configurations": [
         {
             "type": "java",
+            "name": "App",
+            "request": "launch",
+            "mainClass": "App",
             "name": "TestConection",
             "request": "launch",
             "mainClass": "TestConection",
