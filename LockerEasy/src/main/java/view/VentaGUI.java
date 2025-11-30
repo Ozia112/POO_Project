@@ -258,6 +258,7 @@ public class VentaGUI {
 		tabla.getItems().clear();
 		tabla.getItems().addAll(ventaController.obtenerTodosLosProductos());
 	}
+  
 	public Pane getVistaIntegrada() {
 
 		// ---- ES EXACTAMENTE LO MISMO DE mostrar(...) PERO SIN CREAR ESCENA NI STAGE ----
@@ -415,6 +416,7 @@ public class VentaGUI {
 
 		return root;
 	}
+
 
 
 }

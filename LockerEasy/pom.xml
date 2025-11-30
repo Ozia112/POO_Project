@@ -21,7 +21,6 @@
             <version>11.2.0</version>
         </dependency>
 
-
         <!-- ==== Jackson ==== -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -99,7 +98,6 @@
 
     <build>
         <plugins>
-        
             <!-- JavaFX plugin REAL y FUNCIONAL -->
             <plugin>
                 <groupId>org.openjfx</groupId>
