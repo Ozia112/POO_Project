@@ -1,23 +1,23 @@
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\App.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\controller\Config.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\controller\EtiquetaController.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\controller\RentaController.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\controller\ReporteController.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\controller\TicketController.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\controller\VentaController.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\Main.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\model\Etiqueta.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\model\Renta.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\model\Reporte.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\model\Servicio.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\model\Ticket.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\model\TipoServicio.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\model\Ubicacion.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\model\Venta.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\TestConection.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\view\EtiquetasGUI.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\view\PruebasGUI.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\view\RentaGUI.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\view\ServiciosGUI.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\view\TicketGUI.java
-C:\Users\fabio\OneDrive\Documentos\GitHub\POO_Project\LockerEasy\src\main\java\view\VentaGUI.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/App.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/Main.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/TestConection.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/Config.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/EtiquetaController.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/RentaController.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/ReporteController.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/TicketController.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/controller/VentaController.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Etiqueta.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Renta.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Reporte.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Servicio.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Ticket.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/TipoServicio.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Ubicacion.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/model/Venta.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/EtiquetasGUI.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/PruebasGUI.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/RentaGUI.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/ServiciosGUI.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/TicketGUI.java
+/home/fabiogonzalez/Documentos/pruba clonar/POO_Project/LockerEasy/src/main/java/view/VentaGUI.java
