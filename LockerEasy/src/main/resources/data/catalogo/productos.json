@@ -1,9 +1,8 @@
 [
   {
-    
     "precio": 12,
     "etiquetas": ["Consumible"],
-    "existentes": 7,
+    "existentes": 6,
     "id": 1,
     "nombre": "Agua 600ml",
     "disponible": true
@@ -11,7 +10,7 @@
   {
     "precio": 15,
     "etiquetas": ["Consumible"],
-    "existentes": 9,
+    "existentes": 8,
     "id": 2,
     "nombre": "Galletas empaquetadas",
     "disponible": true
@@ -27,7 +26,7 @@
   {
     "precio": 2,
     "etiquetas": ["Impresión"],
-    "existentes": 988,
+    "existentes": 987,
     "id": 4,
     "nombre": "Impresión B/N",
     "disponible": true
@@ -51,7 +50,7 @@
   {
     "precio": 30,
     "etiquetas": ["Trámite"],
-    "existentes": 979,
+    "existentes": 978,
     "id": 7,
     "nombre": "Constancia",
     "disponible": true
@@ -71,45 +70,5 @@
     "id": 9,
     "nombre": "Copia Certifica",
     "disponible": true
-
-    "precio": 1,
-    "etiquetas": ["Consumible"],
-    "existentes": 0,
-    "id": 1,
-    "nombre": "a",
-    "disponible": false
-  },
-  {
-    "precio": 1,
-    "etiquetas": ["Consumible"],
-    "existentes": 5,
-    "id": 2,
-    "nombre": "a",
-    "disponible": false
-  },
-  {
-    "precio": 123,
-    "etiquetas": ["Impresión"],
-    "existentes": 0,
-    "id": 3,
-    "nombre": "as",
-    "disponible": false
-  },
-  {
-    "precio": 123,
-    "etiquetas": ["Trámite"],
-    "existentes": 0,
-    "id": 4,
-    "nombre": "as",
-    "disponible": false
-  },
-  {
-    "precio": 123,
-    "etiquetas": ["Impresión"],
-    "existentes": 0,
-    "id": 5,
-    "nombre": "as",
-    "disponible": false
-
   }
 ]
