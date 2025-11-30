@@ -6,6 +6,9 @@
             "name": "App",
             "request": "launch",
             "mainClass": "App",
+            "name": "TestConection",
+            "request": "launch",
+            "mainClass": "TestConection",
             "projectName": "LockerEasy"
         },
         {

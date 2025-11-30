@@ -1,9 +1,13 @@
 package model;
 
+import jakarta.persistence.*; //bd
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
+
+/*@Entity     //Con esto identificamos que la clase va a ae ser una tabla 
+@Table(name = "tickets")*/
 
 public class Ticket {
     private LocalDate fecha_reporte;
