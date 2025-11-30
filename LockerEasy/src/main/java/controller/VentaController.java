@@ -10,6 +10,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import model.Servicio;
 import model.Ticket;
 import model.Venta;
 
@@ -173,10 +174,10 @@ public class VentaController {
             producto.setDisponible(true);
         }
     }
+            public boolean registrarVenta(int idProducto, int cantidad, Ticket ticket, TicketController ticketController) {
 
-    public boolean registrarVenta(int idProducto, int cantidad, Ticket ticket, TicketController ticketController) {
         Venta producto = catalogo.get(idProducto);
-        if(producto == null) {
+        if (producto == null) {
             System.err.println("Producto no encontrado: " + idProducto);
             return false;
         }
@@ -186,6 +187,7 @@ public class VentaController {
             return false;
         }
 
+        // Validar inventario si aplica
         if (etiquetaController.etiquetasAfectanInventario(producto.getEtiquetas())) {
             if (producto.getExistentes() < cantidad) {
                 System.err.println("Inventario insuficiente. Disponible: " + producto.getExistentes());
@@ -197,9 +199,38 @@ public class VentaController {
             guardarProductos();
         }
 
-        System.out.println("Venta registrada: " + producto.getNombre() + " x" + cantidad);
+        // -----------------------------------------------
+        // 🔥 Crear objeto VENTA para el ticket
+        // -----------------------------------------------
+        Venta ventaServicio = new Venta(
+                producto.getIdProducto(),
+                producto.getNombre(),
+                producto.getPrecio(),
+                cantidad,
+                producto.getEtiquetas(),
+                producto.isDisponible()
+        );
+
+        ventaServicio.setCantidad(cantidad);
+
+        // Crear Servicio y agregar al Ticket
+        Servicio servicio = new Servicio();
+        servicio.setServicioId(ticket.getServicios().size() + 1);
+        servicio.setTipoServicio(ventaServicio);
+        servicio.setAplicarDescuento(false);
+
+        ticket.getServicios().add(servicio);
+
+        // Guardar Ticket
+        ticketController.guardarTicket(ticket);
+
+        System.out.println("Venta registrada y agregada al ticket: " 
+            + producto.getNombre() + " x" + cantidad);
+
         return true;
     }
+
+
 
     public Venta buscarProdcuto(int idProducto) {
         return catalogo.get(idProducto);

@@ -20,8 +20,9 @@ import model.Renta;
 import model.Servicio;
 import model.Ticket;
 import model.Ubicacion;
+import model.Venta;
 
-public class PruebasGUI {
+public class ServiciosGUI {
 
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -66,14 +67,23 @@ public class PruebasGUI {
         Tab tabRenta = new Tab("Renta");
         tabRenta.setContent(crearVistaRenta());
 
-        tabPane.getTabs().addAll(tabServicios, tabRenta);
+        Tab tabVentas = new Tab("Ventas");
+
+        // Crear instancia de VentaGUI
+        VentaGUI ventaGUI = new VentaGUI(ventaController);
+
+        // Insertar la vista integrada
+        tabVentas.setContent(ventaGUI.getVistaIntegrada());
+
+
+        tabPane.getTabs().addAll(tabServicios, tabRenta, tabVentas);
 
         VBox root = new VBox(tabPane);
         root.setPadding(new Insets(10));
 
         Scene scene = new Scene(root, 1200, 600);
         stage.setScene(scene);
-        stage.setTitle("Pruebas del Sistema - LockerEasy");
+        stage.setTitle("Servicios - LockerEasy");
         stage.show();
     }
 
@@ -165,46 +175,129 @@ public class PruebasGUI {
                 clientBox
         );
     }
+        private VBox crearSeccionAcciones() {
 
-    private VBox crearSeccionAcciones() {
-        ChoiceBox<String> acciones = new ChoiceBox<>();
-        acciones.getItems().addAll("Agregar servicio", "Iniciar renta", "Registrar venta");
-        acciones.setValue("Agregar servicio");
+            ComboBox<String> combo = new ComboBox<>();
+            combo.getItems().addAll("Renta", "Trámite", "Consumible");
+            combo.setPromptText("Selecciona servicio");
 
-        Button btnAccion = new Button("Ejecutar acción");
-        btnAccion.setVisible(false);
+            Button btnAccion = new Button();
+            btnAccion.setVisible(false);
 
-        // Listener para cambios en el ChoiceBox
-        acciones.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.equals("Agregar servicio")) {
-                acciones.getItems().remove("Agregar servicio");
-                btnAccion.setVisible(true);
-                btnAccion.setText(newVal);
-            } else {
+            // === NUEVO: ComboBox para productos ===
+            ComboBox<model.Venta> comboProductos = new ComboBox<>();
+            comboProductos.setVisible(false);
+            comboProductos.setPrefWidth(200);
+
+            Button btnAgregarProducto = new Button("Agregar al Ticket");
+            btnAgregarProducto.setVisible(false);
+
+            // Cuando selecciona el tipo
+            combo.valueProperty().addListener((obs, oldVal, newVal) -> {
+
                 btnAccion.setVisible(false);
-            }
-        });
+                comboProductos.setVisible(false);
+                btnAgregarProducto.setVisible(false);
 
-        btnAccion.setOnAction(e -> {
-            String accion = acciones.getValue();
+                if (newVal == null) return;
 
-            if(txtNombre.getText().trim().isEmpty()) {
-                consolaTickets.appendText("[ERROR] Debes llenar nombre.\n");
-                return;
-            }
+                switch (newVal) {
 
-            switch (accion) {
-                case "Iniciar renta" -> manejarPreIniciarRenta();
-                case "Registrar venta" -> manejarCrearTicketConVenta();
-            }
-        });
+                    case "Renta" -> {
+                        btnAccion.setVisible(true);
+                        btnAccion.setText("Iniciar Renta");
+                    }
 
-        return new VBox(5,
-                new Label("Acciones"),
-                acciones,
-                btnAccion
-        );
-    }
+                    case "Trámite" -> {
+                        comboProductos.getItems().clear();
+                        comboProductos.getItems().addAll(
+                                ventaController.obtenerTodosLosProductos()
+                                        .stream()
+                                        .filter(p -> p.getEtiquetas().contains("Trámite"))
+                                        .toList()
+                        );
+
+                        comboProductos.setVisible(true);
+                        btnAgregarProducto.setVisible(true);
+                    }
+
+                    case "Consumible" -> {
+                        comboProductos.getItems().clear();
+                        comboProductos.getItems().addAll(
+                                ventaController.obtenerTodosLosProductos()
+                                        .stream()
+                                        .filter(p -> p.getEtiquetas().contains("Consumible"))
+                                        .toList()
+                        );
+
+                        comboProductos.setVisible(true);
+                        btnAgregarProducto.setVisible(true);
+                    }
+                }
+            });
+
+            // === BOTÓN PARA RENTA ===
+            btnAccion.setOnAction(e -> {
+                String tipo = combo.getValue();
+
+                if (txtNombre.getText().trim().isEmpty()) {
+                    consolaTickets.appendText("[ERROR] Debes llenar el nombre.\n");
+                    return;
+                }
+
+                if ("Renta".equals(tipo)) {
+                    manejarPreIniciarRenta();
+                }
+            });
+
+            // === BOTÓN PARA AGREGAR PRODUCTO ===
+            btnAgregarProducto.setOnAction(e -> {
+
+                model.Venta producto = comboProductos.getValue();
+
+                if (producto == null) {
+                    consolaTickets.appendText("[ERROR] Selecciona un producto.\n");
+                    return;
+                }
+
+                if (txtNombre.getText().trim().isEmpty()) {
+                    consolaTickets.appendText("[ERROR] Debes llenar el nombre.\n");
+                    return;
+                }
+
+                // Crear ticket si no existe
+                if (ticketActual == null) {
+                    ticketActual = ticketController.crearNuevoTicket(
+                            txtNombre.getText(),
+                            txtCorreo.getText()
+                    );
+                }
+
+                boolean ok = ventaController.registrarVenta(
+                        producto.getIdProducto(),
+                        1,
+                        ticketActual,
+                        ticketController
+                );
+
+                if (ok) {
+                    agregarTicketALista(ticketActual);
+                    consolaTickets.appendText("[OK] Se agregó: " + producto.getNombre() + "\n");
+                } else {
+                    consolaTickets.appendText("[ERROR] No se pudo registrar la venta.\n");
+                }
+            });
+
+            return new VBox(10,
+                    new Label("Tipo de Servicio:"),
+                    combo,
+                    btnAccion,
+                    comboProductos,        // nuevo
+                    btnAgregarProducto     // nuevo
+            );
+        }
+
+
 
     private GridPane crearGridUbicaciones() {
         GridPane grid = new GridPane();
@@ -249,38 +342,50 @@ public class PruebasGUI {
     // --------------- HANDLER EVENT METHODS -------------------
 
     private void manejarPreIniciarRenta() {
-        String nombre = txtNombre.getText().trim();
-        String correo = txtCorreo.getText().trim();
-
-        // Crear ticket temporal
-        nombreClienteTemp = nombre;
-        correoClienteTemp = correo;
+        nombreClienteTemp = txtNombre.getText().trim();
+        correoClienteTemp = txtCorreo.getText().trim();
 
         modoIniciarRenta = true;
 
-        tabPane.getSelectionModel().select(1); // Cambiar a la pestaña de Renta
+        tabPane.getSelectionModel().select(1);
         gridUbicaciones.setVisible(true);
 
         actualizarGridUbicaciones();
     }
 
-     private void manejarCrearTicketConVenta() {
-        String nombre = txtNombre.getText().trim();
-        String correo = txtCorreo.getText().trim();
+        private void manejarCrearTicketConVenta() {
+            String nombre = txtNombre.getText().trim();
+            String correo = txtCorreo.getText().trim();
 
-        ticketActual = ticketController.crearNuevoTicket(nombre, correo);
-        
-        boolean ok = ventaController.registrarVenta(1, 2, ticketActual, ticketController);
-        
-        if (ok) {
-            agregarTicketALista(ticketActual);
-            txtNombre.clear();
-            txtCorreo.clear();
-        } else {
-            consolaTickets.clear();
-            consolaTickets.appendText("[ERROR] No se pudo registrar la venta.\n");
+            // Crear ticket si es el primero
+            ticketActual = ticketController.crearNuevoTicket(nombre, correo);
+
+            // Obtener el producto seleccionado del ComboBox
+            ComboBox<Venta> comboProductos = (ComboBox<Venta>) ((HBox)((VBox)((VBox) ((HBox)((VBox) tabPane.getTabs().get(0).getContent()).getChildren().get(1)).getChildren().get(1))).getChildren().get(0)).getChildren().get(0);
+            Venta producto = comboProductos.getValue();
+
+            if (producto == null) {
+                consolaTickets.appendText("[ERROR] Selecciona un producto.\n");
+                return;
+            }
+
+            int idProducto = producto.getIdProducto();
+
+            // Registrar venta REAL
+            boolean ok = ventaController.registrarVenta(idProducto, 1, ticketActual, ticketController);
+
+            if (ok) {
+                agregarTicketALista(ticketActual);
+                consolaTickets.appendText("[OK] Se agregó: " + producto.getNombre() + "\n");
+                txtNombre.clear();
+                txtCorreo.clear();
+            } else {
+                consolaTickets.appendText("[ERROR] No se pudo registrar la venta.\n");
+            }
+
+            showCurrentTicket(ticketActual);
         }
-    }
+
 
     private void manejarClickUbicacion(Ubicacion ubicacion) {
         if (modoIniciarRenta) {
@@ -310,7 +415,7 @@ public class PruebasGUI {
                 consolaTickets.appendText("[ERROR] No se pudo iniciar la renta.\n");
             }
 
-            tabPane.getSelectionModel().select(0); // Volver a la pestaña de Servicios
+            tabPane.getSelectionModel().select(0);
         } else {
             mostrarEstadoUbicacion(ubicacion);
         }
@@ -370,7 +475,6 @@ public class PruebasGUI {
         boolean ok = rentaController.finalizarRenta(ubicacion, ticket, ticketController);
 
         if (ok) {
-            // Actualizar la vista del ticket
             if (ticketActual != null && ticketActual.getTicketId() == ticket.getTicketId()) {
                 showCurrentTicket(ticket);
             }
@@ -404,7 +508,6 @@ public class PruebasGUI {
         ticket.setTiempoEmision(tiempoRetrocedido);
         rentaController.setInicioRentaFromTicket(ubicacionSeleccionada, ticket);
 
-        // Actualizar vista
         if (ticketActual != null && ticketActual.getTicketId() == ticket.getTicketId()) {
             showCurrentTicket(ticket);
         }
@@ -435,11 +538,9 @@ public class PruebasGUI {
 
         consolaTickets.clear();
 
-        // Encabezado
         consolaTickets.appendText("=== Ticket ID: " + ticket.getTicketId() + " ===\n");
         consolaTickets.appendText("Cliente: " + ticket.getNombreCliente() + "\n");
 
-        // Correo si existe
         if (ticket.getCorreoCliente() != null && !ticket.getCorreoCliente().isEmpty()) {
             consolaTickets.appendText("Correo: " + ticket.getCorreoCliente() + "\n");
         }
@@ -447,7 +548,6 @@ public class PruebasGUI {
         consolaTickets.appendText("Tiempo emision: " + instantToString(ticket.getTiempoEmision()) + "\n");
         consolaTickets.appendText("\nServicios:\n");
 
-        // Mostrar servicios
         if (ticket.getServicios().isEmpty()) {
             consolaTickets.appendText("  (Sin servicios)\n");
         } else {
@@ -486,12 +586,10 @@ public class PruebasGUI {
     }
 
     private void agregarTicketALista(Ticket ticket) {
-        // Verificar si el ticket ya está en la lista
         for (var node : listaTickets.getChildren()) {
             if (node instanceof Label) {
                 Label lbl = (Label) node;
                 if (lbl.getText().contains("ID: " + ticket.getTicketId())) {
-                    // Ya existe, solo actualizar
                     ticketActual = ticket;
                     showCurrentTicket(ticket);
                     return;
@@ -499,7 +597,6 @@ public class PruebasGUI {
             }
         }
 
-        // Si no existe, crear nuevo
         Label lblTicket = new Label("ID: " + ticket.getTicketId() + " - " + ticket.getNombreCliente());
         lblTicket.setStyle("-fx-padding: 5; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0; -fx-cursor: hand;");
         
@@ -513,12 +610,9 @@ public class PruebasGUI {
         
         listaTickets.getChildren().add(lblTicket);
         
-        // Mostrar el ticket recién agregado
         ticketActual = ticket;
         showCurrentTicket(ticket);
     }
-
-    // GRID UBICACIONES METHODS
 
     private void actualizarGridUbicaciones() {
         for (var node : gridUbicaciones.getChildren()) {
