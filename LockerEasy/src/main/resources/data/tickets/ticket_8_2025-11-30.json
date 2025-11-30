@@ -1,0 +1,9 @@
+{
+  "id" : 8,
+  "fecha_reporte" : "2025-11-30",
+  "tiempo_emision" : "2025-11-30T10:11:48.928344200Z",
+  "nombre_cliente" : "adasd",
+  "correo_cliente" : "",
+  "servicios" : [ ],
+  "total_ticket" : 50.0
+}

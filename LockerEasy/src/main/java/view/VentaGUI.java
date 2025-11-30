@@ -258,4 +258,165 @@ public class VentaGUI {
 		tabla.getItems().clear();
 		tabla.getItems().addAll(ventaController.obtenerTodosLosProductos());
 	}
+  
+	public Pane getVistaIntegrada() {
+
+		// ---- ES EXACTAMENTE LO MISMO DE mostrar(...) PERO SIN CREAR ESCENA NI STAGE ----
+
+		TableView<Venta> tabla = new TableView<>();
+		tabla.setPrefWidth(700);
+
+		TableColumn<Venta, String> colId = new TableColumn<>("ID");
+		colId.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty("#" + c.getValue().getIdProducto()));
+
+		TableColumn<Venta, String> colNombre = new TableColumn<>("Nombre");
+		colNombre.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
+
+		TableColumn<Venta, String> colPrecio = new TableColumn<>("Precio");
+		colPrecio.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty("$" + c.getValue().getPrecio()));
+
+		TableColumn<Venta, String> colExistentes = new TableColumn<>("Existentes");
+		colExistentes.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(String.valueOf(c.getValue().getExistentes())));
+
+		TableColumn<Venta, String> colDisponible = new TableColumn<>("Disponible");
+		colDisponible.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().isDisponible() ? "Sí" : "No"));
+
+		TableColumn<Venta, String> colEtiquetas = new TableColumn<>("Etiquetas");
+		colEtiquetas.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
+				String.join(", ", c.getValue().getEtiquetas() == null ? List.of() : c.getValue().getEtiquetas())
+		));
+
+		tabla.getColumns().addAll(colId, colNombre, colPrecio, colExistentes, colDisponible, colEtiquetas);
+
+		colId.setMaxWidth(80); colId.setPrefWidth(60);
+		colPrecio.setMaxWidth(120); colPrecio.setPrefWidth(120);
+		colExistentes.setMaxWidth(100); colExistentes.setPrefWidth(90);
+		colDisponible.setMaxWidth(120); colDisponible.setPrefWidth(100);
+		colNombre.setMinWidth(220); colNombre.setPrefWidth(300);
+
+		tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+		// ---- FORM ----
+		VBox form = new VBox(12);
+		form.setPadding(new Insets(20));
+		form.setPrefWidth(420);
+
+		Label tituloForm = new Label("Gestionar Productos");
+
+		TextField txtId = new TextField();
+		TextField txtNombre = new TextField();
+		TextField txtPrecio = new TextField();
+		TextField txtExistentes = new TextField();
+
+		txtId.setPromptText("ID para editar/eliminar");
+		txtNombre.setPromptText("Nombre del producto");
+		txtPrecio.setPromptText("Precio");
+		txtExistentes.setPromptText("Existentes");
+
+		ComboBox<String> comboEtiquetas = new ComboBox<>();
+		comboEtiquetas.getItems().addAll("Consumible", "Impresión", "Trámite");
+
+		CheckBox chkDisponible = new CheckBox("Disponible");
+
+		GridPane grid = new GridPane();
+		grid.setHgap(10); grid.setVgap(10);
+		grid.setPadding(new Insets(8));
+
+		grid.addRow(0, new Label("ID:"), txtId);
+		grid.addRow(1, new Label("Producto:"), txtNombre);
+		grid.addRow(2, new Label("Precio:"), txtPrecio);
+		grid.addRow(3, new Label("Existentes:"), txtExistentes);
+		grid.addRow(4, new Label("Etiqueta:"), comboEtiquetas);
+		grid.addRow(5, chkDisponible);
+
+		HBox botones = new HBox(8);
+		Button btnAgregar = new Button("Agregar");
+		Button btnModificar = new Button("Modificar");
+		Button btnEliminar = new Button("Eliminar");
+		botones.getChildren().addAll(btnAgregar, btnModificar, btnEliminar);
+
+		form.getChildren().addAll(tituloForm, grid, botones);
+
+		HBox root = new HBox(20, form, tabla);
+		root.setPadding(new Insets(20));
+
+		// ---- MISMA LÓGICA ----
+		actualizarTabla(tabla);
+
+		tabla.getSelectionModel().selectedItemProperty().addListener((obs, oldV, nueva) -> {
+			if (nueva == null) return;
+			txtId.setText(String.valueOf(nueva.getIdProducto()));
+			txtNombre.setText(nueva.getNombre());
+			txtPrecio.setText(String.valueOf(nueva.getPrecio()));
+			txtExistentes.setText(String.valueOf(nueva.getExistentes()));
+			comboEtiquetas.setValue(
+				nueva.getEtiquetas() == null || nueva.getEtiquetas().isEmpty() ?
+						null : nueva.getEtiquetas().get(0)
+			);
+			chkDisponible.setSelected(nueva.isDisponible());
+		});
+
+		btnAgregar.setOnAction(e -> {
+			String nombre = txtNombre.getText().trim();
+			if (nombre.isEmpty()) return;
+
+			float precio = 0;
+			int exist = 0;
+			try { precio = Float.parseFloat(txtPrecio.getText().trim()); } catch (Exception ignored) {}
+			try { exist = Integer.parseInt(txtExistentes.getText().trim()); } catch (Exception ignored) {}
+
+			List<String> tags = comboEtiquetas.getValue() == null ? List.of() : List.of(comboEtiquetas.getValue());
+
+			if (ventaController.agregarProducto(nombre, precio, exist, tags)) {
+				actualizarTabla(tabla);
+				txtId.clear(); txtNombre.clear(); txtPrecio.clear(); txtExistentes.clear();
+				comboEtiquetas.getSelectionModel().clearSelection();
+				chkDisponible.setSelected(false);
+			}
+		});
+
+		btnModificar.setOnAction(e -> {
+			String idText = txtId.getText().trim();
+			if (idText.isEmpty()) return;
+
+			int id;
+			try { id = Integer.parseInt(idText); } catch (Exception ex) { return; }
+
+			Venta p = ventaController.buscarProdcuto(id);
+			if (p == null) return;
+
+			if (!txtNombre.getText().trim().isEmpty())
+				ventaController.actualizarProducto(id, txtNombre.getText().trim());
+
+			if (!txtPrecio.getText().trim().isEmpty())
+				ventaController.actualizarProducto(id, Float.parseFloat(txtPrecio.getText().trim()));
+
+			if (!txtExistentes.getText().trim().isEmpty())
+				ventaController.actualizarProducto(id, Integer.parseInt(txtExistentes.getText().trim()));
+
+			List<String> tags = comboEtiquetas.getValue() == null ? List.of() : List.of(comboEtiquetas.getValue());
+			if (!tags.isEmpty())
+				ventaController.actualizarProdcuto(id, tags);
+
+			ventaController.actualizarProducto(id, chkDisponible.isSelected());
+
+			actualizarTabla(tabla);
+		});
+
+		btnEliminar.setOnAction(e -> {
+			String idText = txtId.getText().trim();
+			if (idText.isEmpty()) return;
+
+			int id;
+			try { id = Integer.parseInt(idText); } catch (Exception ex) { return; }
+
+			if (ventaController.eliminarProducto(id))
+				actualizarTabla(tabla);
+		});
+
+		return root;
+	}
+
+
+
 }

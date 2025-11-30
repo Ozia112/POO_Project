@@ -7,7 +7,16 @@ public class Venta extends TipoServicio {
     private int id;
     private int existentes; // inventario
     private List<String> etiquetas;
-    private boolean disponible; // true si existen > 0 o si es inagotable(estos pueden ser modificados desde configuracion)
+            private boolean disponible; // true si existen > 0 o si es inagotable(estos pueden ser modificados desde configuracion)
+
+                   
+    
+        @Override
+        public String toString() {
+            return getNombre() + " ($" + getPrecio() + ")";
+        }
+
+
 
     public Venta(int id, String nombre, float precio, int cantidad, int existentes, List<String> etiquetas, boolean disponible) {
         super(nombre, precio, cantidad);
@@ -36,4 +45,7 @@ public class Venta extends TipoServicio {
     public void setExistentes(int existentes) { this.existentes = existentes; }
     public void setDisponible(boolean disponible) { this.disponible = disponible; }
     public void setEtiquetas(List<String> etiquetas) { this.etiquetas = etiquetas; }
+
+
+
 }

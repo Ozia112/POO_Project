@@ -10,6 +10,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import model.Servicio;
 import model.Ticket;
 import model.Venta;
 
@@ -173,33 +174,64 @@ public class VentaController {
             producto.setDisponible(true);
         }
     }
+        public boolean registrarVenta(int idProducto, int cantidad, Ticket ticket, TicketController ticketController) {
 
-    public boolean registrarVenta(int idProducto, int cantidad, Ticket ticket, TicketController ticketController) {
-        Venta producto = catalogo.get(idProducto);
-        if(producto == null) {
-            System.err.println("Producto no encontrado: " + idProducto);
-            return false;
-        }
-
-        if (!producto.isDisponible()) {
-            System.err.println("Producto no disponible: " + producto.getNombre());
-            return false;
-        }
-
-        if (etiquetaController.etiquetasAfectanInventario(producto.getEtiquetas())) {
-            if (producto.getExistentes() < cantidad) {
-                System.err.println("Inventario insuficiente. Disponible: " + producto.getExistentes());
+            Venta producto = catalogo.get(idProducto);
+            if (producto == null) {
+                System.err.println("Producto no encontrado: " + idProducto);
                 return false;
             }
 
-            producto.setExistentes(producto.getExistentes() - cantidad);
-            actualizarDisponibilidad(producto);
-            guardarProductos();
+            if (!producto.isDisponible()) {
+                System.err.println("Producto no disponible: " + producto.getNombre());
+                return false;
+            }
+
+            // Inventario si aplica
+            if (etiquetaController.etiquetasAfectanInventario(producto.getEtiquetas())) {
+                if (producto.getExistentes() < cantidad) {
+                    System.err.println("Inventario insuficiente. Disponible: " + producto.getExistentes());
+                    return false;
+                }
+
+                producto.setExistentes(producto.getExistentes() - cantidad);
+                actualizarDisponibilidad(producto);
+                guardarProductos();
+            }
+
+            // ---------------------------------------------
+            // *** CREAR OBJETO SERVICIO ***
+            // ---------------------------------------------
+            Servicio servicio = new Servicio();
+            servicio.setServicioId(ticket.getServicios().size() + 1);
+            servicio.setTipoServicio(producto);       // TipoServicio = Venta
+            producto.setCantidad(cantidad);           // Aplicar cantidad a la venta
+            servicio.setAplicarDescuento(false);
+
+            // ---------------------------------------------
+            // AGREGAR AL TICKET
+            // ---------------------------------------------
+            ticket.getServicios().add(servicio);
+
+            // ---------------------------------------------
+            // RE-CALCULAR TOTAL DEL TICKET
+            // ---------------------------------------------
+            float total = 0f;
+            for (Servicio s : ticket.getServicios()) {
+                total += s.getTotalServicio();
+            }
+            ticket.setTotalTicket(total);
+
+            // ---------------------------------------------
+            // GUARDAR
+            // ---------------------------------------------
+            ticketController.guardarTicket(ticket);
+
+            System.out.println("Venta registrada y agregada al ticket: " + producto.getNombre() + " x" + cantidad);
+            return true;
         }
 
-        System.out.println("Venta registrada: " + producto.getNombre() + " x" + cantidad);
-        return true;
-    }
+
 
     public Venta buscarProdcuto(int idProducto) {
         return catalogo.get(idProducto);

@@ -1,3 +1,6 @@
+
+LockerEasy/target/
 LockerEasy/src/main/resources/hibernate.cfg.xml
 LockerEasy/target/*
-*.class
+*.classLockerEasy/target/
+Class
