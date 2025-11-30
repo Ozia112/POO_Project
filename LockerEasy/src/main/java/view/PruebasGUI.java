@@ -3,6 +3,7 @@ package view;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
+import controller.InventarioController;
 import controller.RentaController;
 import controller.ReporteController;
 import controller.TicketController;
@@ -20,6 +21,9 @@ import model.Renta;
 import model.Servicio;
 import model.Ticket;
 import model.Ubicacion;
+import model.Etiqueta;
+
+import java.util.List;
 
 public class PruebasGUI {
 
@@ -50,7 +54,6 @@ public class PruebasGUI {
     private String correoClienteTemp = null;
 
     public void mostrar(Stage stage) {
-        rentaController.setReporteController(reporteController);
 
         // Crear consolas
         crearConsolas();
@@ -211,11 +214,11 @@ public class PruebasGUI {
         grid.setHgap(5);
         grid.setVgap(5);
 
-        Ubicacion[] ubicaciones = Ubicacion.values();
+        List<Ubicacion> ubicaciones = rentaController.getUbicacionDAO().obtenerTodas();
 
-        for (int i = 0; i < ubicaciones.length; i++) {
-            Ubicacion ubicacion = ubicaciones[i];
-            Button btn = new Button(ubicacion.name());
+        for (int i = 0; i < ubicaciones.size(); i++) {
+            Ubicacion ubicacion = ubicaciones.get(i);
+            Button btn = new Button(ubicacion.getNombreLocker());
             btn.setPrefSize(150, 80);
             btn.setUserData(ubicacion);
 
@@ -270,7 +273,7 @@ public class PruebasGUI {
 
         ticketActual = ticketController.crearNuevoTicket(nombre, correo);
         
-        boolean ok = ventaController.registrarVenta(1, 2, ticketActual, ticketController);
+        boolean ok = ventaController.registrarVenta(1L, 2, ticketActual);
         
         if (ok) {
             agregarTicketALista(ticketActual);
@@ -284,14 +287,14 @@ public class PruebasGUI {
 
     private void manejarClickUbicacion(Ubicacion ubicacion) {
         if (modoIniciarRenta) {
-            Renta rentaExistente = rentaController.getRentaActiva(ubicacion);
-            if (rentaExistente != null) {
-                consolaTickets.appendText("[ERROR] La ubicación " + ubicacion.name() + " ya tiene una renta activa.\n");
+            Renta rentaExistente = rentaController.getRenta(ubicacion);
+            if (rentaExistente != null && rentaExistente.getCierreRenta() == null) {
+                consolaTickets.appendText("[ERROR] La ubicación " + ubicacion.getNombreTorre() + ubicacion.getNombreLocker() + " ya tiene una renta activa.\n");
                 return;
             }
 
             ticketActual = ticketController.crearNuevoTicket(nombreClienteTemp, correoClienteTemp);
-            boolean ok = rentaController.iniciarRenta(ubicacion, ticketActual, ticketController);
+            boolean ok = rentaController.iniciarRenta(ubicacion, ticketActual);
 
             if (ok) {
                 agregarTicketALista(ticketActual);
@@ -320,12 +323,12 @@ public class PruebasGUI {
         ubicacionSeleccionada = ubicacion;
         estadoUbicacionBox.getChildren().clear();
 
-        Label lblTitulo = new Label("Ubicacion: " + ubicacion.name());
+        Label lblTitulo = new Label("Ubicacion: " + ubicacion.getNombreTorre() + ubicacion.getNombreLocker());
         lblTitulo.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
-        Renta renta = rentaController.getRentaActiva(ubicacion);
+        Renta renta = rentaController.getRenta(ubicacion);
 
-        if (renta == null) {
+        if (renta == null || renta.getCierreRenta() != null) {
             estadoUbicacionBox.getChildren().addAll(
                     lblTitulo,
                     new Label("Estado: Disponible"),
@@ -333,6 +336,15 @@ public class PruebasGUI {
             );
         } else {
             Ticket ticket = rentaController.getTicketDeRenta(ubicacion);
+
+            if (ticket == null) {
+                estadoUbicacionBox.getChildren().addAll(
+                        lblTitulo,
+                        new Label("Estado: Error"),
+                        new Label("No se encontró el ticket asociado")
+                );
+                return;
+            }
 
             int horasAcumuladas = rentaController.calcularTiempoTrancurrido(renta, Instant.now());
             float totalAcumuladoActual = horasAcumuladas * renta.getPrecio();
@@ -359,15 +371,21 @@ public class PruebasGUI {
     }
 
     private void manejarFinalizarRenta(Ubicacion ubicacion) {
-        Renta renta = rentaController.getRentaActiva(ubicacion);
+        Renta renta = rentaController.getRenta(ubicacion);
         if (renta == null) {
             consolaTickets.clear();
-            consolaTickets.appendText("[ERROR] No hay una renta activa en " + ubicacion.name() + ".\n");
+            consolaTickets.appendText("[ERROR] No hay una renta activa en " + ubicacion.getNombreLocker() + ".\n");
             return;
         }
 
         Ticket ticket = rentaController.getTicketDeRenta(ubicacion);
-        boolean ok = rentaController.finalizarRenta(ubicacion, ticket, ticketController);
+        if (ticket == null) {
+            consolaTickets.clear();
+            consolaTickets.appendText("[ERROR] No se encontró el ticket asociado a la renta en " + ubicacion.getNombreLocker() + ".\n");
+            return;
+        }
+        
+        boolean ok = rentaController.finalizarRenta(ubicacion, ticket);
 
         if (ok) {
             // Actualizar la vista del ticket
@@ -375,13 +393,12 @@ public class PruebasGUI {
                 showCurrentTicket(ticket);
             }
 
-            rentaController.liberarUbicacion(ubicacion);
             actualizarGridUbicaciones();
             actualizarRentasEnProgreso();
             mostrarEstadoUbicacion(ubicacion);
         } else {
             consolaTickets.clear();
-            consolaTickets.appendText("[ERROR] No se pudo finalizar la renta en " + ubicacion.name() + ".\n");
+            consolaTickets.appendText("[ERROR] No se pudo finalizar la renta en " + ubicacion.getNombreLocker() + ".\n");
         }
     }
 
@@ -392,17 +409,26 @@ public class PruebasGUI {
             return;
         }
 
-        Renta rentaActual = rentaController.getRentaActiva(ubicacionSeleccionada);
-        if (rentaActual == null) {
+        Renta rentaActual = rentaController.getRenta(ubicacionSeleccionada);
+        if (rentaActual == null || rentaActual.getCierreRenta() != null) {
             consolaTickets.clear();
-            consolaTickets.appendText("[ERROR] No hay renta activa en " + ubicacionSeleccionada.name() + ".\n");
+            consolaTickets.appendText("[ERROR] No hay renta activa en " + ubicacionSeleccionada.getNombreTorre() + ubicacionSeleccionada.getNombreLocker() + ".\n");
             return;
         }
 
         Ticket ticket = rentaController.getTicketDeRenta(ubicacionSeleccionada);
+        if (ticket == null) {
+            consolaTickets.clear();
+            consolaTickets.appendText("[ERROR] No se encontró el ticket asociado a la renta en " + ubicacionSeleccionada.getNombreTorre() + ubicacionSeleccionada.getNombreLocker() + ".\n");
+            return;
+        }
+
         Instant tiempoRetrocedido = ticket.getTiempoEmision().minusSeconds(3600);
         ticket.setTiempoEmision(tiempoRetrocedido);
-        rentaController.setInicioRentaFromTicket(ubicacionSeleccionada, ticket);
+        ticketController.getTicketDAO().actualizar(ticket);
+
+        rentaActual.setInicioRenta(tiempoRetrocedido);
+        rentaController.getRentaDAO().actualizar(rentaActual);
 
         // Actualizar vista
         if (ticketActual != null && ticketActual.getTicketId() == ticket.getTicketId()) {
@@ -412,7 +438,7 @@ public class PruebasGUI {
     }
 
     private void manejarMostrarReporte() {
-        var rep = reporteController.getReporte();
+        var rep = reporteController.getReporteActual();
 
         consolaReportes.appendText("\n=== REPORTE DEL DÍA ===\n");
         consolaReportes.appendText("Fecha: " + rep.getFechaReporte() + "\n");
@@ -469,7 +495,7 @@ public class PruebasGUI {
         if (tipoServicio instanceof Renta) {
             Renta renta = (Renta) tipoServicio;
             consolaTickets.appendText("\n  [RENTA]\n");
-            consolaTickets.appendText("  - Ubicacion: " + (renta.getUbicacion() != null ? renta.getUbicacion().name() : "N/A") + "\n");
+            consolaTickets.appendText("  - Ubicacion: " + (renta.getUbicacion() != null ? renta.getUbicacion().getNombreLocker() : "N/A") + "\n");
             consolaTickets.appendText("  - Inicio: " + instantToString(renta.getInicioRenta()) + "\n");
             consolaTickets.appendText("  - Cierre: " + instantToString(renta.getCierreRenta()) + "\n");
             consolaTickets.appendText("  - Horas: " + renta.getCantidad() + "\n");
@@ -531,7 +557,7 @@ public class PruebasGUI {
     }
 
     private void actualizarEstiloBotonUbicacion(Button btn, Ubicacion ubicacion) {
-        Renta renta = rentaController.getRentaActiva(ubicacion);
+        Renta renta = rentaController.getRenta(ubicacion);
         
         if (modoIniciarRenta) {
             if (renta != null) {
@@ -553,12 +579,15 @@ public class PruebasGUI {
 
     private void actualizarRentasEnProgreso() {
         rentasEnProgresoBox.getChildren().clear();
+
+        List<Ubicacion> ubicaciones = rentaController.getUbicacionDAO().obtenerTodas();
         
-        for (Ubicacion ub : Ubicacion.values()) {
-            Renta renta = rentaController.getRentaActiva(ub);
-            if (renta != null) {
+        for (Ubicacion ub : ubicaciones) {
+            Renta renta = rentaController.getRenta(ub);
+            if (renta != null && renta.getCierreRenta() == null) {
                 Ticket ticket = rentaController.getTicketDeRenta(ub);
-                Label lblRenta = new Label(ub.name() + "\n" + ticket.getNombreCliente());
+                Label lblRenta = new Label(ub.getNombreLocker() + "\n" +
+                                        ticket.getNombreCliente());
                 lblRenta.setStyle("-fx-padding: 8; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-background-color: #fff3cd; -fx-cursor: hand;");
                 
                 lblRenta.setOnMouseClicked(e -> {
