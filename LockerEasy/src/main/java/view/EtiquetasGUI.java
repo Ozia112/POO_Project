@@ -6,9 +6,7 @@ import controller.EtiquetaController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -17,12 +15,15 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.Etiqueta;
 
 public class EtiquetasGUI {
 
     private final EtiquetaController etiquetaController;
+    private VBox formularioContainer;
+    private VBox listaEtiquetas;
 
     public EtiquetasGUI(EtiquetaController etiquetaController) {
         this.etiquetaController = etiquetaController;
@@ -58,36 +59,41 @@ public class EtiquetasGUI {
         titulo.getStyleClass().add("titulo1");
         titulo.setStyle("-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #333;");
 
-        // Panel informativo más compacto
+        // Panel informativo más compacto con emojis
         VBox infoBox = new VBox(5);
         infoBox.setStyle("-fx-background-color: #E3F2FD; -fx-padding: 12; -fx-background-radius: 10; -fx-border-color: #2196F3; -fx-border-width: 2; -fx-border-radius: 10;");
         infoBox.setMaxWidth(900);
         
         Label lblInfo = new Label("ℹ️ Guía Rápida");
-        lblInfo.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1976D2;");
+        lblInfo.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1976D2; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
         
         HBox hboxInfo = new HBox(30);
         hboxInfo.setAlignment(Pos.CENTER_LEFT);
         
         VBox col1 = new VBox(3);
         Label lblExplicacion1 = new Label("✓ Afecta Inventario = Las ventas reducen existencias");
-        lblExplicacion1.setStyle("-fx-font-size: 11px;");
+        lblExplicacion1.setStyle("-fx-font-size: 11px; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
         Label lblExplicacion2 = new Label("✗ No afecta = Las ventas NO modifican existencias");
-        lblExplicacion2.setStyle("-fx-font-size: 11px;");
+        lblExplicacion2.setStyle("-fx-font-size: 11px; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
         col1.getChildren().addAll(lblExplicacion1, lblExplicacion2);
         
         VBox col2 = new VBox(3);
         Label lblExplicacion3 = new Label("⚠️ Solo CONSUMIBLES afecta inventario");
-        lblExplicacion3.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #D32F2F;");
+        lblExplicacion3.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #D32F2F; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
         Label lblExplicacion4 = new Label("💡 Doble click para modificar");
-        lblExplicacion4.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #666;");
+        lblExplicacion4.setStyle("-fx-font-size: 11px; -fx-font-style: italic; -fx-text-fill: #666; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
         col2.getChildren().addAll(lblExplicacion3, lblExplicacion4);
         
         hboxInfo.getChildren().addAll(col1, col2);
         infoBox.getChildren().addAll(lblInfo, hboxInfo);
 
+        // Contenedor para formularios inline
+        formularioContainer = new VBox(10);
+        formularioContainer.setAlignment(Pos.TOP_CENTER);
+        formularioContainer.setMaxWidth(900);
+
         // Lista de etiquetas (VBox que se actualiza)
-        VBox listaEtiquetas = new VBox(8);
+        listaEtiquetas = new VBox(8);
         listaEtiquetas.setPadding(new Insets(15));
         listaEtiquetas.setAlignment(Pos.TOP_CENTER);
         listaEtiquetas.setStyle("-fx-background-color: white;");
@@ -108,6 +114,7 @@ public class EtiquetasGUI {
             "-fx-padding: 14 28; " +
             "-fx-background-radius: 10; " +
             "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI'; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 6, 0, 0, 3);"
         );
         btnAgregar.setMaxWidth(350);
@@ -120,6 +127,7 @@ public class EtiquetasGUI {
             "-fx-padding: 14 28; " +
             "-fx-background-radius: 10; " +
             "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI'; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 8, 0, 0, 4);"
         ));
         
@@ -131,31 +139,32 @@ public class EtiquetasGUI {
             "-fx-padding: 14 28; " +
             "-fx-background-radius: 10; " +
             "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI'; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 6, 0, 0, 3);"
         ));
 
-        btnAgregar.setOnAction(e -> mostrarDialogoAgregar(listaEtiquetas));
+        btnAgregar.setOnAction(e -> mostrarFormularioAgregar());
 
         // Cargar etiquetas iniciales
-        actualizarLista(listaEtiquetas);
+        actualizarLista();
 
-        root.getChildren().addAll(titulo, infoBox, scrollPane, btnAgregar);
+        root.getChildren().addAll(titulo, infoBox, formularioContainer, scrollPane, btnAgregar);
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
         return root;
     }
 
-    private void actualizarLista(VBox listaEtiquetas) {
+    private void actualizarLista() {
         listaEtiquetas.getChildren().clear();
         List<Etiqueta> etiquetas = etiquetaController.obtenerTodasEtiquetas();
 
         for (Etiqueta etiqueta : etiquetas) {
-            HBox itemBox = crearItemEtiqueta(etiqueta, listaEtiquetas);
+            HBox itemBox = crearItemEtiqueta(etiqueta);
             listaEtiquetas.getChildren().add(itemBox);
         }
     }
 
-    private HBox crearItemEtiqueta(Etiqueta etiqueta, VBox listaEtiquetas) {
+    private HBox crearItemEtiqueta(Etiqueta etiqueta) {
         HBox itemBox = new HBox(20);
         itemBox.setPadding(new Insets(15, 20, 15, 20));
         itemBox.setAlignment(Pos.CENTER_LEFT);
@@ -191,8 +200,8 @@ public class EtiquetasGUI {
         // Indicador de afecta inventario con badge
         String textoAfecta = etiqueta.isAfectaInventario() ? "✓ Afecta Inventario" : "✗ No afecta";
         String estiloAfecta = etiqueta.isAfectaInventario() 
-            ? "-fx-text-fill: white; -fx-background-color: #f44336; -fx-font-weight: bold; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; -fx-min-width: 160;"
-            : "-fx-text-fill: white; -fx-background-color: #9e9e9e; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; -fx-min-width: 160;";
+            ? "-fx-text-fill: white; -fx-background-color: #f44336; -fx-font-weight: bold; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; -fx-min-width: 160; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';"
+            : "-fx-text-fill: white; -fx-background-color: #9e9e9e; -fx-padding: 6 14; -fx-background-radius: 15; -fx-font-size: 12px; -fx-min-width: 160; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';";
         
         Label lblAfecta = new Label(textoAfecta);
         lblAfecta.setStyle(estiloAfecta);
@@ -207,6 +216,7 @@ public class EtiquetasGUI {
             "-fx-padding: 10 16; " +
             "-fx-background-radius: 8; " +
             "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI'; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 2);"
         );
         
@@ -217,6 +227,7 @@ public class EtiquetasGUI {
             "-fx-padding: 10 16; " +
             "-fx-background-radius: 8; " +
             "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI'; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 6, 0, 0, 3);"
         ));
         
@@ -227,30 +238,16 @@ public class EtiquetasGUI {
             "-fx-padding: 10 16; " +
             "-fx-background-radius: 8; " +
             "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI'; " +
             "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 2);"
         ));
         
-        btnEliminar.setOnAction(e -> {
-            Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmacion.setTitle("Confirmar eliminación");
-            confirmacion.setHeaderText("¿Eliminar etiqueta?");
-            confirmacion.setContentText("Etiqueta: " + etiqueta.getNombre());
-            confirmacion.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            
-            if (confirmacion.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
-                if (etiquetaController.eliminarEtiqueta(etiqueta.getEtiquetaId())) {
-                    actualizarLista(listaEtiquetas);
-                    mostrarAlerta("Éxito", "Etiqueta eliminada correctamente");
-                } else {
-                    mostrarAlerta("Error", "No se pudo eliminar la etiqueta");
-                }
-            }
-        });
+        btnEliminar.setOnAction(e -> mostrarConfirmacionEliminar(etiqueta));
 
         // Doble click para modificar
         itemBox.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                mostrarDialogoModificar(etiqueta, listaEtiquetas);
+                mostrarFormularioModificar(etiqueta);
             }
         });
 
@@ -279,113 +276,254 @@ public class EtiquetasGUI {
         return itemBox;
     }
 
-    private void mostrarDialogoAgregar(VBox listaEtiquetas) {
-        Alert dialogo = new Alert(Alert.AlertType.NONE);
-        dialogo.setTitle("Agregar Etiqueta");
-        dialogo.setHeaderText("Nueva Etiqueta");
-        dialogo.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+    private void mostrarFormularioAgregar() {
+        formularioContainer.getChildren().clear();
+        
+        VBox formulario = new VBox(12);
+        formulario.setPadding(new Insets(20));
+        formulario.setStyle(
+            "-fx-background-color: #E8F5E9; " +
+            "-fx-border-color: #4CAF50; " +
+            "-fx-border-width: 2; " +
+            "-fx-border-radius: 10; " +
+            "-fx-background-radius: 10;"
+        );
+        formulario.setMaxWidth(850);
 
-        VBox contenido = new VBox(15);
-        contenido.setPadding(new Insets(20));
-        contenido.setStyle("-fx-background-color: white;");
+        Label titulo = new Label("➕ Nueva Etiqueta");
+        titulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2E7D32; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
 
         Label lblNombre = new Label("Nombre:");
         lblNombre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
         TextField txtNombre = new TextField();
         txtNombre.setPromptText("Ej: Consumibles, Papelería, Trámites");
         txtNombre.setStyle("-fx-font-size: 13px; -fx-padding: 8;");
-        txtNombre.setPrefWidth(350);
+        txtNombre.setPrefWidth(400);
 
         CheckBox chkAfecta = new CheckBox("Afecta Inventario");
         chkAfecta.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
         
-        Label lblAyuda = new Label("✓ Marcar SOLO si requiere control de stock (ej: consumibles)");
-        lblAyuda.setStyle("-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic;");
+        Label lblAyuda = new Label("💡 Marcar SOLO si requiere control de stock (ej: consumibles)");
+        lblAyuda.setStyle("-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
 
-        contenido.getChildren().addAll(lblNombre, txtNombre, chkAfecta, lblAyuda);
-        dialogo.getDialogPane().setContent(contenido);
-        dialogo.getDialogPane().setMinWidth(450);
+        HBox botones = new HBox(10);
+        botones.setAlignment(Pos.CENTER_RIGHT);
+        
+        Button btnGuardar = new Button("✓ Guardar");
+        btnGuardar.setStyle(
+            "-fx-background-color: #4CAF50; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 13px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 8 20; " +
+            "-fx-background-radius: 5; " +
+            "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI';"
+        );
+        
+        Button btnCancelar = new Button("✗ Cancelar");
+        btnCancelar.setStyle(
+            "-fx-background-color: #9e9e9e; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 13px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 8 20; " +
+            "-fx-background-radius: 5; " +
+            "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI';"
+        );
 
-        ButtonType btnGuardar = new ButtonType("Guardar", ButtonType.OK.getButtonData());
-        ButtonType btnCancelar = new ButtonType("Cancelar", ButtonType.CANCEL.getButtonData());
-        dialogo.getButtonTypes().addAll(btnGuardar, btnCancelar);
+        btnGuardar.setOnAction(e -> {
+            String nombre = txtNombre.getText().trim();
+            if (nombre.isEmpty()) {
+                mostrarMensaje("⚠️ El nombre no puede estar vacío", "#FFF3CD", "#856404");
+                return;
+            }
 
-        dialogo.showAndWait().ifPresent(response -> {
-            if (response == btnGuardar) {
-                String nombre = txtNombre.getText().trim();
-                if (nombre.isEmpty()) {
-                    mostrarAlerta("Error", "El nombre no puede estar vacío");
-                    return;
-                }
-
-                if (etiquetaController.agregarEtiqueta(nombre, chkAfecta.isSelected())) {
-                    actualizarLista(listaEtiquetas);
-                    mostrarAlerta("Éxito", "Etiqueta agregada: " + nombre);
-                } else {
-                    mostrarAlerta("Error", "No se pudo agregar la etiqueta");
-                }
+            if (etiquetaController.agregarEtiqueta(nombre, chkAfecta.isSelected())) {
+                actualizarLista();
+                mostrarMensaje("✓ Etiqueta agregada: " + nombre, "#D4EDDA", "#155724");
+                formularioContainer.getChildren().clear();
+            } else {
+                mostrarMensaje("✗ No se pudo agregar la etiqueta", "#F8D7DA", "#721C24");
             }
         });
+
+        btnCancelar.setOnAction(e -> formularioContainer.getChildren().clear());
+
+        botones.getChildren().addAll(btnGuardar, btnCancelar);
+        formulario.getChildren().addAll(titulo, lblNombre, txtNombre, chkAfecta, lblAyuda, botones);
+        formularioContainer.getChildren().add(formulario);
     }
 
-    private void mostrarDialogoModificar(Etiqueta etiqueta, VBox listaEtiquetas) {
-        Alert dialogo = new Alert(Alert.AlertType.NONE);
-        dialogo.setTitle("Modificar Etiqueta");
-        dialogo.setHeaderText("Editar: " + etiqueta.getNombre());
-        dialogo.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+    private void mostrarFormularioModificar(Etiqueta etiqueta) {
+        formularioContainer.getChildren().clear();
+        
+        VBox formulario = new VBox(12);
+        formulario.setPadding(new Insets(20));
+        formulario.setStyle(
+            "-fx-background-color: #E3F2FD; " +
+            "-fx-border-color: #2196F3; " +
+            "-fx-border-width: 2; " +
+            "-fx-border-radius: 10; " +
+            "-fx-background-radius: 10;"
+        );
+        formulario.setMaxWidth(850);
 
-        VBox contenido = new VBox(15);
-        contenido.setPadding(new Insets(20));
-        contenido.setStyle("-fx-background-color: white;");
-
-        Label lblId = new Label("ID: #" + etiqueta.getEtiquetaId());
-        lblId.setStyle("-fx-font-weight: bold; -fx-text-fill: #2196F3; -fx-font-size: 13px;");
+        Label titulo = new Label("✏️ Modificar Etiqueta #" + etiqueta.getEtiquetaId());
+        titulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1976D2; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
 
         Label lblNombre = new Label("Nombre:");
         lblNombre.setStyle("-fx-font-weight: bold; -fx-font-size: 13px;");
         TextField txtNombre = new TextField(etiqueta.getNombre());
         txtNombre.setStyle("-fx-font-size: 13px; -fx-padding: 8;");
-        txtNombre.setPrefWidth(350);
+        txtNombre.setPrefWidth(400);
 
         CheckBox chkAfecta = new CheckBox("Afecta Inventario");
         chkAfecta.setSelected(etiqueta.isAfectaInventario());
         chkAfecta.setStyle("-fx-font-size: 13px; -fx-font-weight: bold;");
         
-        Label lblAyuda = new Label("✓ Marcar SOLO si requiere control de stock (ej: consumibles)");
-        lblAyuda.setStyle("-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic;");
+        Label lblAyuda = new Label("💡 Marcar SOLO si requiere control de stock (ej: consumibles)");
+        lblAyuda.setStyle("-fx-font-size: 11px; -fx-text-fill: #666; -fx-font-style: italic; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
 
-        contenido.getChildren().addAll(lblId, lblNombre, txtNombre, chkAfecta, lblAyuda);
-        dialogo.getDialogPane().setContent(contenido);
-        dialogo.getDialogPane().setMinWidth(450);
+        HBox botones = new HBox(10);
+        botones.setAlignment(Pos.CENTER_RIGHT);
+        
+        Button btnGuardar = new Button("✓ Guardar");
+        btnGuardar.setStyle(
+            "-fx-background-color: #2196F3; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 13px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 8 20; " +
+            "-fx-background-radius: 5; " +
+            "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI';"
+        );
+        
+        Button btnCancelar = new Button("✗ Cancelar");
+        btnCancelar.setStyle(
+            "-fx-background-color: #9e9e9e; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 13px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 8 20; " +
+            "-fx-background-radius: 5; " +
+            "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI';"
+        );
 
-        ButtonType btnGuardar = new ButtonType("Guardar", ButtonType.OK.getButtonData());
-        ButtonType btnCancelar = new ButtonType("Cancelar", ButtonType.CANCEL.getButtonData());
-        dialogo.getButtonTypes().addAll(btnGuardar, btnCancelar);
+        btnGuardar.setOnAction(e -> {
+            String nombre = txtNombre.getText().trim();
+            if (nombre.isEmpty()) {
+                mostrarMensaje("⚠️ El nombre no puede estar vacío", "#FFF3CD", "#856404");
+                return;
+            }
 
-        dialogo.showAndWait().ifPresent(response -> {
-            if (response == btnGuardar) {
-                String nombre = txtNombre.getText().trim();
-                if (nombre.isEmpty()) {
-                    mostrarAlerta("Error", "El nombre no puede estar vacío");
-                    return;
-                }
-
-                if (etiquetaController.actualizarEtiqueta(etiqueta.getEtiquetaId(), nombre, chkAfecta.isSelected())) {
-                    actualizarLista(listaEtiquetas);
-                    mostrarAlerta("Éxito", "Etiqueta modificada correctamente");
-                } else {
-                    mostrarAlerta("Error", "No se pudo modificar la etiqueta");
-                }
+            if (etiquetaController.actualizarEtiqueta(etiqueta.getEtiquetaId(), nombre, chkAfecta.isSelected())) {
+                actualizarLista();
+                mostrarMensaje("✓ Etiqueta modificada correctamente", "#D4EDDA", "#155724");
+                formularioContainer.getChildren().clear();
+            } else {
+                mostrarMensaje("✗ No se pudo modificar la etiqueta", "#F8D7DA", "#721C24");
             }
         });
+
+        btnCancelar.setOnAction(e -> formularioContainer.getChildren().clear());
+
+        botones.getChildren().addAll(btnGuardar, btnCancelar);
+        formulario.getChildren().addAll(titulo, lblNombre, txtNombre, chkAfecta, lblAyuda, botones);
+        formularioContainer.getChildren().add(formulario);
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-        alert.showAndWait();
+    private void mostrarConfirmacionEliminar(Etiqueta etiqueta) {
+        formularioContainer.getChildren().clear();
+        
+        VBox formulario = new VBox(15);
+        formulario.setPadding(new Insets(20));
+        formulario.setStyle(
+            "-fx-background-color: #FFEBEE; " +
+            "-fx-border-color: #f44336; " +
+            "-fx-border-width: 2; " +
+            "-fx-border-radius: 10; " +
+            "-fx-background-radius: 10;"
+        );
+        formulario.setMaxWidth(850);
+        formulario.setAlignment(Pos.CENTER);
+
+        Label titulo = new Label("⚠️ ¿Eliminar etiqueta?");
+        titulo.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #c62828; -fx-font-family: 'Segoe UI Emoji', 'Segoe UI';");
+
+        Label mensaje = new Label("Etiqueta: " + etiqueta.getNombre());
+        mensaje.setStyle("-fx-font-size: 14px; -fx-text-fill: #333;");
+
+        HBox botones = new HBox(10);
+        botones.setAlignment(Pos.CENTER);
+        
+        Button btnAceptar = new Button("✓ Aceptar");
+        btnAceptar.setStyle(
+            "-fx-background-color: #f44336; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 13px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 8 20; " +
+            "-fx-background-radius: 5; " +
+            "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI';"
+        );
+        
+        Button btnCancelar = new Button("✗ Cancelar");
+        btnCancelar.setStyle(
+            "-fx-background-color: #9e9e9e; " +
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 13px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 8 20; " +
+            "-fx-background-radius: 5; " +
+            "-fx-cursor: hand; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI';"
+        );
+
+        btnAceptar.setOnAction(e -> {
+            if (etiquetaController.eliminarEtiqueta(etiqueta.getEtiquetaId())) {
+                actualizarLista();
+                mostrarMensaje("✓ Etiqueta eliminada correctamente", "#D4EDDA", "#155724");
+                formularioContainer.getChildren().clear();
+            } else {
+                mostrarMensaje("✗ No se pudo eliminar la etiqueta", "#F8D7DA", "#721C24");
+            }
+        });
+
+        btnCancelar.setOnAction(e -> formularioContainer.getChildren().clear());
+
+        botones.getChildren().addAll(btnAceptar, btnCancelar);
+        formulario.getChildren().addAll(titulo, mensaje, botones);
+        formularioContainer.getChildren().add(formulario);
+    }
+
+    private void mostrarMensaje(String texto, String bgColor, String textColor) {
+        formularioContainer.getChildren().clear();
+        
+        Label mensaje = new Label(texto);
+        mensaje.setStyle(
+            "-fx-background-color: " + bgColor + "; " +
+            "-fx-text-fill: " + textColor + "; " +
+            "-fx-font-size: 14px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 15 20; " +
+            "-fx-background-radius: 8; " +
+            "-fx-border-color: " + textColor + "; " +
+            "-fx-border-width: 1; " +
+            "-fx-border-radius: 8; " +
+            "-fx-font-family: 'Segoe UI Emoji', 'Segoe UI';"
+        );
+        mensaje.setMaxWidth(850);
+        
+        formularioContainer.getChildren().add(mensaje);
+        
+        // Auto-ocultar después de 3 segundos
+        javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(3));
+        delay.setOnFinished(e -> formularioContainer.getChildren().clear());
+        delay.play();
     }
 }
