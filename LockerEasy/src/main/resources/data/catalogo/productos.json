@@ -2,7 +2,7 @@
   {
     "precio": 12,
     "etiquetas": ["Consumible"],
-    "existentes": 8,
+    "existentes": 7,
     "id": 1,
     "nombre": "Agua 600ml",
     "disponible": true
@@ -10,7 +10,7 @@
   {
     "precio": 15,
     "etiquetas": ["Consumible"],
-    "existentes": 10,
+    "existentes": 9,
     "id": 2,
     "nombre": "Galletas empaquetadas",
     "disponible": true
@@ -18,7 +18,7 @@
   {
     "precio": 5,
     "etiquetas": ["Consumible"],
-    "existentes": 27,
+    "existentes": 26,
     "id": 3,
     "nombre": "Dulces",
     "disponible": true
@@ -50,7 +50,7 @@
   {
     "precio": 30,
     "etiquetas": ["Trámite"],
-    "existentes": 980,
+    "existentes": 979,
     "id": 7,
     "nombre": "Constancia",
     "disponible": true

@@ -69,12 +69,8 @@ public class ServiciosGUI {
 
         Tab tabVentas = new Tab("Ventas");
 
-        // Crear instancia de VentaGUI
         VentaGUI ventaGUI = new VentaGUI(ventaController);
-
-        // Insertar la vista integrada
         tabVentas.setContent(ventaGUI.getVistaIntegrada());
-
 
         tabPane.getTabs().addAll(tabServicios, tabRenta, tabVentas);
 
@@ -82,6 +78,12 @@ public class ServiciosGUI {
         root.setPadding(new Insets(10));
 
         Scene scene = new Scene(root, 1200, 600);
+
+        // ============================
+        // CSS APLICADO
+        // ============================
+        scene.getStylesheets().add("view/Styles/Styles.css");
+
         stage.setScene(scene);
         stage.setTitle("Servicios - LockerEasy");
         stage.show();
@@ -90,9 +92,15 @@ public class ServiciosGUI {
     // ------------------- COMPONENT CREATION METHODS -------------------
 
     private VBox crearVistaServicios() {
+
         VBox boxCrearTicket = crearSeccionCrearTicket();
+        boxCrearTicket.getStyleClass().add("caja-form"); // CSS APLICADO
+
         VBox boxAcciones = crearSeccionAcciones();
+        boxAcciones.getStyleClass().add("caja-form"); // CSS APLICADO
+
         HBox boxBotonesUtilidad = crearBotonesUtilidad();
+        boxBotonesUtilidad.getStyleClass().add("pill"); // CSS APLICADO
 
         listaTickets = new VBox(5);
         listaTickets.setPadding(new Insets(10));
@@ -110,24 +118,26 @@ public class ServiciosGUI {
 
         VBox boxConsolaTickets = new VBox(new Label("Consola de Tickets"), consolaTickets);
         VBox boxConsolaReportes = new VBox(new Label("Consola de Reportes"), consolaReportes);
+        boxConsolaTickets.getStyleClass().add("caja-reporte"); // CSS APLICADO
+        boxConsolaReportes.getStyleClass().add("caja-reporte"); // CSS APLICADO
 
         HBox consolasHBox = new HBox(20, boxConsolaTickets, boxConsolaReportes);
         consolasHBox.setPadding(new Insets(10));
-        consolasHBox.setStyle("-fx-border-color: green; -fx-border-width: 2;");
 
         VBox.setVgrow(consolasHBox, Priority.ALWAYS);
 
         return new VBox(10, topSection, consolasHBox);
     }
 
-    private HBox crearVistaRenta() {
+        private HBox crearVistaRenta() {
+
         gridUbicaciones = crearGridUbicaciones();
+        gridUbicaciones.getStyleClass().add("caja-form"); // CSS APLICADO
 
         estadoUbicacionBox = new VBox(10);
         estadoUbicacionBox.setPadding(new Insets(10));
         estadoUbicacionBox.setStyle("-fx-border-color: #cccccc; -fx-border-width: 1;");
         estadoUbicacionBox.setPrefWidth(300);
-        estadoUbicacionBox.getChildren().add(new Label("Selecciona una ubicación"));
 
         rentasEnProgresoBox = new VBox(5);
         rentasEnProgresoBox.setPadding(new Insets(10));
@@ -141,83 +151,87 @@ public class ServiciosGUI {
 
         actualizarRentasEnProgreso();
 
-       VBox herramientas = crearHerramientasDeLockers();
+        VBox herramientas = crearHerramientasDeLockers();
+        herramientas.getStyleClass().add("caja-form"); // CSS APLICADO
 
-            HBox contenido = new HBox(10,
+        HBox contenido = new HBox(10,
                 gridUbicaciones,
                 estadoUbicacionBox,
                 boxRentas,
-                herramientas // NUEVO PANEL
-            );
+                herramientas
+        );
 
         contenido.setPadding(new Insets(10));
         HBox.setHgrow(rentasEnProgresoBox, Priority.ALWAYS);
-                        
-        
-        
+
         return contenido;
     }
-            private VBox crearHerramientasDeLockers() {
 
-            // -------- CANCELAR RENTA --------
-            Button btnCancelar = new Button("Cancelar renta activa");
-            btnCancelar.setMaxWidth(Double.MAX_VALUE);
-            btnCancelar.setOnAction(e -> {
+    private VBox crearHerramientasDeLockers() {
 
-                if (ubicacionSeleccionada == null) {
-                    consolaTickets.appendText("[ERROR] Selecciona una ubicación.\n");
-                    return;
-                }
+        Button btnCancelar = new Button("Cancelar renta activa");
+        btnCancelar.setMaxWidth(Double.MAX_VALUE);
+        btnCancelar.getStyleClass().add("btn-green"); // CSS APLICADO
 
-                var renta = rentaController.getRentaActiva(ubicacionSeleccionada);
-                if (renta == null) {
-                    consolaTickets.appendText("[ERROR] No hay renta activa en esa ubicación.\n");
-                    return;
-                }
+        btnCancelar.setOnAction(e -> {
+            if (ubicacionSeleccionada == null) {
+                consolaTickets.appendText("[ERROR] Selecciona una ubicación.\n");
+                return;
+            }
 
-                var ticket = rentaController.getTicketDeRenta(ubicacionSeleccionada);
+            var renta = rentaController.getRentaActiva(ubicacionSeleccionada);
+            if (renta == null) {
+                consolaTickets.appendText("[ERROR] No hay renta activa en esa ubicación.\n");
+                return;
+            }
 
-                rentaController.finalizarRenta(ubicacionSeleccionada, ticket, ticketController);
-                rentaController.liberarUbicacion(ubicacionSeleccionada);
+            var ticket = rentaController.getTicketDeRenta(ubicacionSeleccionada);
 
-                actualizarGridUbicaciones();
-                actualizarRentasEnProgreso();
-                mostrarEstadoUbicacion(ubicacionSeleccionada);
+            rentaController.finalizarRenta(ubicacionSeleccionada, ticket, ticketController);
+            rentaController.liberarUbicacion(ubicacionSeleccionada);
 
-                consolaTickets.appendText("[OK] Renta cancelada manualmente.\n");
-            });
+            actualizarGridUbicaciones();
+            actualizarRentasEnProgreso();
+            mostrarEstadoUbicacion(ubicacionSeleccionada);
 
-            // -------- TOLERANCIA --------
-            TextField txtTol = new TextField();
-            txtTol.setPromptText("Minutos de tolerancia");
+            consolaTickets.appendText("[OK] Renta cancelada manualmente.\n");
+        });
 
-            Button btnTol = new Button("Guardar tolerancia");
-            btnTol.setOnAction(e -> {
-                try {
-                    int min = Integer.parseInt(txtTol.getText());
-                    rentaController.setTolerancia(min);
-                    consolaTickets.appendText("[OK] Nueva tolerancia: " + min + " minutos.\n");
-                } catch (NumberFormatException ex) {
-                    consolaTickets.appendText("[ERROR] Valor inválido.\n");
-                }
-            });
+        TextField txtTol = new TextField();
+        txtTol.setPromptText("Minutos de tolerancia");
+        txtTol.getStyleClass().add("text-field"); // CSS APLICADO
 
-            // -------- PRECIO POR HORA --------
-            TextField txtPrecio = new TextField();
-            txtPrecio.setPromptText("Precio por hora ($)");
+        Button btnTol = new Button("Guardar tolerancia");
+        btnTol.getStyleClass().add("btn-green"); // CSS APLICADO
 
-            Button btnPrecio = new Button("Guardar precio");
-            btnPrecio.setOnAction(e -> {
-                try {
-                    float precio = Float.parseFloat(txtPrecio.getText());
-                    rentaController.setPrecioGeneral(precio);
-                    consolaTickets.appendText("[OK] Nuevo precio por hora: $" + precio + "\n");
-                } catch (NumberFormatException ex) {
-                    consolaTickets.appendText("[ERROR] Valor inválido.\n");
-                }
-            });
+        btnTol.setOnAction(e -> {
+            try {
+                int min = Integer.parseInt(txtTol.getText());
+                rentaController.setTolerancia(min);
+                consolaTickets.appendText("[OK] Nueva tolerancia: " + min + " minutos.\n");
+            } catch (NumberFormatException ex) {
+                consolaTickets.appendText("[ERROR] Valor inválido.\n");
+            }
+        });
 
-            VBox box = new VBox(10,
+        TextField txtPrecio = new TextField();
+        txtPrecio.setPromptText("Precio por hora ($)");
+        txtPrecio.getStyleClass().add("text-field"); // CSS APLICADO
+
+        Button btnPrecio = new Button("Guardar precio");
+        btnPrecio.getStyleClass().add("btn-green"); // CSS APLICADO
+
+        btnPrecio.setOnAction(e -> {
+            try {
+                float precio = Float.parseFloat(txtPrecio.getText());
+                rentaController.setPrecioGeneral(precio);
+                consolaTickets.appendText("[OK] Nuevo precio por hora: $" + precio + "\n");
+            } catch (NumberFormatException ex) {
+                consolaTickets.appendText("[ERROR] Valor inválido.\n");
+            }
+        });
+
+        VBox box = new VBox(10,
                 new Label("Herramientas de Lockers"),
                 btnCancelar,
                 new Separator(),
@@ -228,35 +242,37 @@ public class ServiciosGUI {
                 new Label("Precio por hora"),
                 txtPrecio,
                 btnPrecio
-            );
+        );
 
-            box.setPadding(new Insets(10));
-            box.setStyle("-fx-border-color: #cccccc; -fx-border-width: 1;");
+        box.setPadding(new Insets(10));
+        box.setStyle("-fx-border-color: #cccccc; -fx-border-width: 1;");
 
-            return box;
-        }
-
-
-
+        return box;
+    }
 
     private void crearConsolas() {
         consolaTickets = new TextArea();
         consolaTickets.setPrefHeight(400);
         consolaTickets.setEditable(false);
         consolaTickets.setPromptText("Consola de Tickets");
+        consolaTickets.getStyleClass().add("ticket-box"); // CSS APLICADO
 
         consolaReportes = new TextArea();
         consolaReportes.setPrefHeight(400);
         consolaReportes.setEditable(false);
         consolaReportes.setPromptText("Consola de Reportes");
+        consolaReportes.getStyleClass().add("ticket-box"); // CSS APLICADO
     }
 
     private VBox crearSeccionCrearTicket() {
+
         txtNombre = new TextField();
         txtNombre.setPromptText("Nombre cliente");
+        txtNombre.getStyleClass().add("text-field"); // CSS APLICADO
 
         txtCorreo = new TextField();
         txtCorreo.setPromptText("Correo cliente");
+        txtCorreo.getStyleClass().add("text-field"); // CSS APLICADO
 
         VBox dataCliente = new VBox(5, txtNombre, txtCorreo);
         HBox clientBox = new HBox(10, new Label("Cliente:"), dataCliente);
@@ -266,91 +282,91 @@ public class ServiciosGUI {
                 clientBox
         );
     }
-        private VBox crearSeccionAcciones() {
 
-            ComboBox<String> combo = new ComboBox<>();
-            combo.getItems().addAll("Renta", "Trámite", "Consumible","Impresión");
-            combo.setPromptText("Selecciona servicio");
+    private VBox crearSeccionAcciones() {
 
-            Button btnAccion = new Button();
+        ComboBox<String> combo = new ComboBox<>();
+        combo.getItems().addAll("Renta", "Trámite", "Consumible", "Impresión");
+        combo.setPromptText("Selecciona servicio");
+        combo.getStyleClass().add("combo-box"); // CSS APLICADO
+
+        Button btnAccion = new Button();
+        btnAccion.setVisible(false);
+        btnAccion.getStyleClass().add("btn-green"); // CSS APLICADO
+
+        Button btnFinalizarTicket = new Button("Finalizar Ticket");
+        btnFinalizarTicket.setVisible(false);
+        btnFinalizarTicket.getStyleClass().add("btn-green"); // CSS APLICADO
+
+        ComboBox<model.Venta> comboProductos = new ComboBox<>();
+        comboProductos.setVisible(false);
+        comboProductos.setPrefWidth(200);
+        comboProductos.getStyleClass().add("combo-box"); // CSS APLICADO
+
+        Button btnAgregarProducto = new Button("Agregar al Ticket");
+        btnAgregarProducto.setVisible(false);
+        btnAgregarProducto.getStyleClass().add("btn-green"); // CSS APLICADO
+
+        combo.valueProperty().addListener((obs, oldVal, newVal) -> {
+
+            comboProductos.setDisable(false);
+            btnAgregarProducto.setDisable(false);
+            btnFinalizarTicket.setDisable(false);
+
             btnAccion.setVisible(false);
-
-            Button btnFinalizarTicket = new Button("Finalizar Ticket");
+            comboProductos.setVisible(false);
+            btnAgregarProducto.setVisible(false);
             btnFinalizarTicket.setVisible(false);
 
-            // === NUEVO: ComboBox para productos ===
-            ComboBox<model.Venta> comboProductos = new ComboBox<>();
-            comboProductos.setVisible(false);
-            comboProductos.setPrefWidth(200);
+            if (newVal == null) return;
 
-            Button btnAgregarProducto = new Button("Agregar al Ticket");
-            btnAgregarProducto.setVisible(false);
-            
-            // Cuando selecciona el tipo
-                combo.valueProperty().addListener((obs, oldVal, newVal) -> {
+            switch (newVal) {
 
-                    // Siempre REHABILITAR controles cuando se selecciona un tipo
-                    comboProductos.setDisable(false);
-                    btnAgregarProducto.setDisable(false);
-                    btnFinalizarTicket.setDisable(false);
-
-                    // Ocultar por defecto
-                    btnAccion.setVisible(false);
-                    comboProductos.setVisible(false);
-                    btnAgregarProducto.setVisible(false);
-                    btnFinalizarTicket.setVisible(false);
-
-                    if (newVal == null) return;
-
-                switch (newVal) {
-
-                    case "Renta" -> {
-                        btnAccion.setVisible(true);
-                        btnAccion.setText("Iniciar Renta");
-                    }
-
-                    case "Trámite" -> {
-                        comboProductos.getItems().clear();
-                        comboProductos.getItems().addAll(
-                                ventaController.obtenerTodosLosProductos()
-                                        .stream()
-                                        .filter(p -> p.getEtiquetas().contains("Trámite"))
-                                        .toList()
-                        );
-
-                        comboProductos.setVisible(true);
-                        btnAgregarProducto.setVisible(true);
-                        btnFinalizarTicket.setVisible(true);
-                    }
-
-                    case "Consumible" -> {
-                        comboProductos.getItems().clear();
-                        comboProductos.getItems().addAll(
-                                ventaController.obtenerTodosLosProductos()
-                                        .stream()
-                                        .filter(p -> p.getEtiquetas().contains("Consumible"))
-                                        .toList()
-                        );
-
-                        comboProductos.setVisible(true);
-                        btnAgregarProducto.setVisible(true);
-                        btnFinalizarTicket.setVisible(true);
-                    }
-
-                   case "Impresión" -> {
-                            comboProductos.getItems().clear();
-                            comboProductos.getItems().addAll(
-                                ventaController.obtenerTodosLosProductos()
-                                        .stream()
-                                        .filter(p -> p.getEtiquetas().contains("Impresión"))
-                                        .toList()
-                            );
-                            comboProductos.setVisible(true);
-                            btnAgregarProducto.setVisible(true);
-                            btnFinalizarTicket.setVisible(true);
-                     }
+                case "Renta" -> {
+                    btnAccion.setVisible(true);
+                    btnAccion.setText("Iniciar Renta");
                 }
-            });
+
+                case "Trámite" -> {
+                    comboProductos.getItems().clear();
+                    comboProductos.getItems().addAll(
+                            ventaController.obtenerTodosLosProductos()
+                                    .stream()
+                                    .filter(p -> p.getEtiquetas().contains("Trámite"))
+                                    .toList()
+                    );
+                    comboProductos.setVisible(true);
+                    btnAgregarProducto.setVisible(true);
+                    btnFinalizarTicket.setVisible(true);
+                }
+
+                case "Consumible" -> {
+                    comboProductos.getItems().clear();
+                    comboProductos.getItems().addAll(
+                            ventaController.obtenerTodosLosProductos()
+                                    .stream()
+                                    .filter(p -> p.getEtiquetas().contains("Consumible"))
+                                    .toList()
+                    );
+                    comboProductos.setVisible(true);
+                    btnAgregarProducto.setVisible(true);
+                    btnFinalizarTicket.setVisible(true);
+                }
+
+                case "Impresión" -> {
+                    comboProductos.getItems().clear();
+                    comboProductos.getItems().addAll(
+                            ventaController.obtenerTodosLosProductos()
+                                    .stream()
+                                    .filter(p -> p.getEtiquetas().contains("Impresión"))
+                                    .toList()
+                    );
+                    comboProductos.setVisible(true);
+                    btnAgregarProducto.setVisible(true);
+                    btnFinalizarTicket.setVisible(true);
+                }
+            }
+        });
 
             // === BOTÓN PARA RENTA ===
             btnAccion.setOnAction(e -> {
@@ -453,46 +469,59 @@ public class ServiciosGUI {
 
     
 
-    private GridPane crearGridUbicaciones() {
-        GridPane grid = new GridPane();
-        grid.setHgap(5);
-        grid.setVgap(5);
+   private GridPane crearGridUbicaciones() {
+    GridPane grid = new GridPane();
+    grid.setHgap(5);
+    grid.setVgap(5);
 
-        Ubicacion[] ubicaciones = Ubicacion.values();
+    // CSS APLICADO
+    grid.getStyleClass().add("caja-form");
 
-        for (int i = 0; i < ubicaciones.length; i++) {
-            Ubicacion ubicacion = ubicaciones[i];
-            Button btn = new Button(ubicacion.name());
-            btn.setPrefSize(150, 80);
-            btn.setUserData(ubicacion);
+    Ubicacion[] ubicaciones = Ubicacion.values();
 
-            actualizarEstiloBotonUbicacion(btn, ubicacion);
+    for (int i = 0; i < ubicaciones.length; i++) {
+        Ubicacion ubicacion = ubicaciones[i];
+        Button btn = new Button(ubicacion.name());
+        btn.setPrefSize(150, 80);
+        btn.setUserData(ubicacion);
 
-            btn.setOnAction(e -> manejarClickUbicacion(ubicacion));
+        actualizarEstiloBotonUbicacion(btn, ubicacion);
 
-            int row = i / 2;
-            int col = i % 2;
-            grid.add(btn, col, row);
-        }
+        btn.setOnAction(e -> manejarClickUbicacion(ubicacion));
 
-        return grid;
+        int row = i / 2;
+        int col = i % 2;
+
+        // CSS APLICADO
+        btn.getStyleClass().add("pill");
+
+        grid.add(btn, col, row);
     }
 
-    private HBox crearBotonesUtilidad() {
-        Button btnActualizarInicio = new Button("Actualizar -1 hora inicio(TEST)");
-        btnActualizarInicio.setOnAction(e -> manejarActualizarHora());
+    return grid;
+}
+private HBox crearBotonesUtilidad() {
+    Button btnActualizarInicio = new Button("Actualizar -1 hora inicio(TEST)");
+    btnActualizarInicio.setOnAction(e -> manejarActualizarHora());
+    btnActualizarInicio.getStyleClass().add("btn-green");  // CSS APLICADO
 
-        Button btnClsTicketConsole = new Button("Limpiar consola");
-        btnClsTicketConsole.setOnAction(e -> consolaTickets.clear());
+    Button btnClsTicketConsole = new Button("Limpiar consola");
+    btnClsTicketConsole.setOnAction(e -> consolaTickets.clear());
+    btnClsTicketConsole.getStyleClass().add("btn-green");  // CSS APLICADO
 
-        Button btnReporte = new Button("Mostrar reporte del día");
-        btnReporte.setOnAction(e -> manejarMostrarReporte());
+    Button btnReporte = new Button("Mostrar reporte del día");
+    btnReporte.setOnAction(e -> manejarMostrarReporte());
+    btnReporte.getStyleClass().add("btn-green");  // CSS APLICADO
 
+    HBox box = new HBox(20, btnActualizarInicio, btnClsTicketConsole, btnReporte);
+    box.setAlignment(Pos.CENTER_RIGHT);
 
-        HBox box = new HBox(20, btnActualizarInicio, btnClsTicketConsole, btnReporte);
-        box.setAlignment(Pos.CENTER_RIGHT);
-        return box;
-    }
+    // CSS APLICADO
+    box.getStyleClass().add("caja-form");
+
+    return box;
+}
+
 
     // --------------- HANDLER EVENT METHODS -------------------
 
