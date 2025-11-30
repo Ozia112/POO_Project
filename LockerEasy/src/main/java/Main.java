@@ -15,6 +15,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
 
+        
         // ===== Controladores Reales =====
         ReporteController reporteController = new ReporteController();
         TicketController ticketController = new TicketController(reporteController);
@@ -23,23 +24,15 @@ public class Main extends Application {
         EtiquetaController etiquetaController = new EtiquetaController();
 
         // ===== UI Bonita =====
-        
-        
         ServiciosGUI gui = new ServiciosGUI(
-            ticketController,
-            ventaController,
-            rentaController,
-            reporteController,
-            etiquetaController
+                ticketController,
+                ventaController,
+                rentaController,
+                reporteController,
+                etiquetaController
         );
 
         gui.mostrar(stage);
-        
-
-        /*  Versión temporal para probar la gestión de productos
-        VentaGUI ventaGui = new VentaGUI(ventaController);
-        ventaGui.mostrar(stage);
-        */
     }
 
     public static void main(String[] args) {

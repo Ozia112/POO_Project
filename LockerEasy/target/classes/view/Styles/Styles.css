@@ -198,3 +198,13 @@
     -fx-background-radius: 20;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0.15, 0, 3);
 }
+
+.check-box-list-cell > .check-box {
+    -fx-opacity: 1;
+    -fx-padding: 0 6 0 6;
+}
+
+.check-box-list-cell {
+    -fx-background-color: white;
+    -fx-padding: 4;
+}

@@ -14,6 +14,13 @@
     </properties>
 
     <dependencies>
+        <!-- ==== ControlsFX ==== -->
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.2.0</version>
+        </dependency>
+
 
         <!-- ==== Jackson ==== -->
         <dependency>
@@ -92,7 +99,7 @@
 
     <build>
         <plugins>
-
+        
             <!-- JavaFX plugin REAL y FUNCIONAL -->
             <plugin>
                 <groupId>org.openjfx</groupId>
