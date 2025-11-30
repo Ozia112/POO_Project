@@ -38,5 +38,13 @@
     "id": 5,
     "nombre": "as",
     "disponible": false
+  },
+  {
+    "precio": 120,
+    "etiquetas": ["Consumible"],
+    "existentes": 96,
+    "id": 6,
+    "nombre": "LECHE",
+    "disponible": true
   }
 ]

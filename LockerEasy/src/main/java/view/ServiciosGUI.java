@@ -11,13 +11,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.collections.ListChangeListener;
 
 import model.Renta;
 import model.Servicio;
 import model.Ticket;
 import model.Ubicacion;
-import model.Reporte;
 
 import view.VentaGUI;
 import view.RentaGUI;
@@ -25,13 +23,9 @@ import view.RentaGUI;
 import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.controlsfx.control.CheckListView;
 
 public class ServiciosGUI {
 
-    // =========================================================
-    // CONTROLADORES
-    // =========================================================
     private final TicketController ticketController;
     private final VentaController ventaController;
     private final RentaController rentaController;
@@ -40,9 +34,6 @@ public class ServiciosGUI {
 
     private Ticket ticketActual = null;
 
-    // =========================================================
-    // CONSTRUCTOR
-    // =========================================================
     public ServiciosGUI(
             TicketController ticketController,
             VentaController ventaController,
@@ -59,9 +50,6 @@ public class ServiciosGUI {
         rentaController.setReporteController(reporteController);
     }
 
-    // =========================================================
-    // CREAR TICKET
-    // =========================================================
     private void crearNuevoTicket(String nombre, String correo) {
 
         if (correo == null || correo.isBlank())
@@ -69,64 +57,19 @@ public class ServiciosGUI {
 
         ticketActual = ticketController.crearNuevoTicket(nombre, correo);
 
-        // Agregar al reporte del día
+        // Agregar al reporte
         reporteController.getReporte().getTickets().add(ticketActual);
-
         ticketController.guardarTicket(ticketActual);
 
         System.out.println("[LOG] Ticket creado: " + ticketActual.getTicketId());
     }
 
-    // =========================================================
-    // AGREGAR SERVICIO (SOLO lo que YA existe)
-    // =========================================================
-    private void agregarServicio(String tipo) {
-
-        if (ticketActual == null) return;
-
-        switch (tipo) {
-
-            case "Consumible":
-                ventaController.registrarVenta(1, 1, ticketActual, ticketController);
-                break;
-
-            case "Impresión":
-                ventaController.registrarVenta(2, 1, ticketActual, ticketController);
-                break;
-
-            case "Agregar":
-                ventaController.registrarVenta(3, 1, ticketActual, ticketController);
-                break;
-
-            case "Trámite":
-                ventaController.registrarVenta(1, 1, ticketActual, ticketController);
-                break;
-
-            case "Renta":
-                rentaController.iniciarRenta(
-                        Ubicacion.PA_T1_L1,
-                        ticketActual,
-                        ticketController
-                );
-                break;
-        }
-
-        System.out.println("[LOG] Servicio agregado: " + tipo);
-    }
-
-    // =========================================================
-    // TABLA REPORTE DEL DÍA
-    // =========================================================
     private void actualizarTablaDia(TableView<Ticket> tabla) {
         tabla.getItems().clear();
         tabla.getItems().addAll(reporteController.getReporte().getTickets());
     }
 
-    // =========================================================
-    // PREVIEW TICKET (COMPLETO)
-    // =========================================================
     private void mostrarTicket(VBox box, Ticket t) {
-
         box.getChildren().clear();
 
         if (t == null) {
@@ -141,7 +84,6 @@ public class ServiciosGUI {
         box.getChildren().add(new Label("Cliente: " + t.getNombreCliente()));
         box.getChildren().add(new Label("Correo: " + t.getCorreoCliente()));
 
-        // Servicios
         box.getChildren().add(new Label("\nServicios:"));
 
         VBox lista = new VBox(5);
@@ -149,7 +91,6 @@ public class ServiciosGUI {
         if (t.getServicios().isEmpty()) {
             lista.getChildren().add(new Label("(Sin servicios)"));
         } else {
-
             for (Servicio s : t.getServicios()) {
 
                 if (s.getTipoServicio() instanceof model.Venta v) {
@@ -179,23 +120,17 @@ public class ServiciosGUI {
         box.getChildren().add(total);
     }
 
-    // =========================================================
-    // HISTORIAL REPORTES
-    // =========================================================
     private List<File> obtenerReportes() {
         File carpeta = new File("src/main/resources/data/reportes");
         return List.of(carpeta.listFiles((d, name) -> name.endsWith(".json")));
     }
 
-    // =========================================================
-    // UI PRINCIPAL
-    // =========================================================
     public void mostrar(Stage stage) {
-        // ========================= LATERAL =========================
+
+        // ------------------ LATERAL ------------------
         VBox side = new VBox(25);
         side.getStyleClass().add("sidebar");
 
-        // ---- Label Renta (clickable) ----
         Label lblRenta = new Label("Renta");
         lblRenta.setStyle("-fx-cursor: hand;");
         lblRenta.setOnMouseClicked(e -> {
@@ -203,7 +138,6 @@ public class ServiciosGUI {
             new RentaGUI(rentaController, ticketController, reporteController).mostrar(rentaStage);
         });
 
-        // ---- Label Ventas (clickable, estilo profesional) ----
         Label lblVentas = new Label("Ventas");
         lblVentas.setStyle("-fx-cursor: hand;");
         lblVentas.setOnMouseClicked(ev -> {
@@ -211,16 +145,13 @@ public class ServiciosGUI {
             new VentaGUI(ventaController).mostrar(ventaStage);
         });
 
-        // ---- ADD TO SIDE ----
         side.getChildren().addAll(
                 new Label("Servicios"),
                 lblRenta,
                 lblVentas
         );
 
-        // =====================================================
-        // FORM
-        // =====================================================
+        // ------------------ FORM ------------------
         VBox form = new VBox(20);
         form.setPrefWidth(420);
         form.getStyleClass().add("caja-form");
@@ -239,71 +170,88 @@ public class ServiciosGUI {
         ComboBox<String> comboTipo = new ComboBox<>();
         comboTipo.getItems().addAll("Consumible", "Impresión", "Agregar", "Trámite", "Renta");
 
-        CheckListView<model.Venta> checkConsumibles = new CheckListView<>();
-        checkConsumibles.setFocusTraversable(false);
-        checkConsumibles.setPrefHeight(160);
-        checkConsumibles.setStyle("-fx-background-radius:10;");
-        checkConsumibles.setCellFactory(list -> new ListCell<model.Venta>() {
-            @Override
-            protected void updateItem(model.Venta item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.getNombre() + " - $" + item.getPrecio());
-            }
-        });
-
+        // ------------------ LISTA NORMAL ------------------
         List<model.Venta> consumibles = ventaController.obtenerTodosLosProductos();
-        if (consumibles != null) checkConsumibles.getItems().addAll(consumibles);
 
-        VBox boxConsumibles = new VBox(10, new Label("Consumibles disponibles"), checkConsumibles);
-        boxConsumibles.setPadding(new Insets(10));
-        boxConsumibles.setStyle("-fx-background-color:white; -fx-background-radius:10;");
-        boxConsumibles.setManaged(false);
-        boxConsumibles.setVisible(false);
+        VBox listaConsumiblesBox = new VBox(10);
+        listaConsumiblesBox.setPadding(new Insets(10));
+        listaConsumiblesBox.setStyle("-fx-background-color:white; -fx-background-radius:10;");
+        listaConsumiblesBox.setManaged(false);
+        listaConsumiblesBox.setVisible(false);
+
+        Label lblCons = new Label("Consumibles disponibles");
+        listaConsumiblesBox.getChildren().add(lblCons);
+
+        VBox listaVBox = new VBox(8);
+
+        for (model.Venta v : consumibles) {
+
+            HBox fila = new HBox(10);
+            Label lbl = new Label(v.getNombre() + " - $" + v.getPrecio());
+            Button btnAdd = new Button("Agregar");
+            btnAdd.getStyleClass().add("btn-green");
+
+            btnAdd.setOnAction(e -> {
+
+                if (ticketActual == null) {
+                    crearNuevoTicket(txtNombre.getText(), txtCorreo.getText());
+                    mostrarTicket(listaVBox, ticketActual);
+                }
+
+                ventaController.registrarVenta(
+                        v.getIdProducto(),
+                        1,
+                        ticketActual,
+                        ticketController
+                );
+
+                mostrarTicket(listaVBox.getParent() instanceof VBox pv ? (VBox) pv : new VBox(), ticketActual);
+            });
+
+            fila.getChildren().addAll(lbl, btnAdd);
+            listaVBox.getChildren().add(fila);
+        }
+
+        listaConsumiblesBox.getChildren().add(listaVBox);
 
         comboTipo.valueProperty().addListener((obs, old, val) -> {
             boolean mostrar = "Consumible".equals(val);
-            boxConsumibles.setManaged(mostrar);
-            boxConsumibles.setVisible(mostrar);
+            listaConsumiblesBox.setManaged(mostrar);
+            listaConsumiblesBox.setVisible(mostrar);
         });
 
         Button btn = new Button("Agregar");
         btn.getStyleClass().add("btn-green");
 
+        VBox boxPreview = new VBox();
+
         form.getChildren().addAll(
                 tituloForm, txtNombre, txtCorreo,
                 lblTipoServicio,
                 comboTipo,
-                boxConsumibles,
+                listaConsumiblesBox,
                 btn
         );
 
-        // =====================================================
-        // PANEL INFERIOR
-        // =====================================================
-        HBox panelInferior = new HBox(25);
-        panelInferior.setPadding(new Insets(15));
-
-        // PREVIEW
+        // ------------------ PANEL INFERIOR ------------------
         VBox preview = new VBox(10);
         preview.setPadding(new Insets(15));
         preview.setStyle("-fx-background-color:white; -fx-background-radius:10;");
         preview.setPrefSize(450, 350);
 
-        // GRÁFICA
         VBox grafica = new VBox();
         grafica.setPrefSize(450, 350);
         grafica.setStyle("-fx-background-color:white; -fx-background-radius:10;");
         grafica.setPadding(new Insets(15));
         grafica.getChildren().add(new Label("Gráfica semanal (placeholder)"));
 
-        panelInferior.getChildren().addAll(preview, grafica);
+        HBox panelInferior = new HBox(25, preview, grafica);
+        panelInferior.setPadding(new Insets(15));
 
         VBox centro = new VBox(25, form, panelInferior);
         centro.setPadding(new Insets(20));
 
-        // =====================================================
-        // DERECHA
-        // =====================================================
+        // ------------------ DERECHA ------------------
         TableView<Ticket> tablaDia = new TableView<>();
         tablaDia.setPrefWidth(380);
 
@@ -329,29 +277,20 @@ public class ServiciosGUI {
         });
 
         ListView<String> listaReportes = new ListView<>();
-
         listaReportes.getItems().addAll(
-                obtenerReportes().stream()
-                        .map(File::getName)
-                        .collect(Collectors.toList())
+                obtenerReportes().stream().map(File::getName).collect(Collectors.toList())
         );
 
         TabPane tabsDer = new TabPane();
-
         Tab tabDia = new Tab("Reporte del día", tablaDia);
         tabDia.setClosable(false);
-
         Tab tabHist = new Tab("Historial", listaReportes);
         tabHist.setClosable(false);
-
         tabsDer.getTabs().addAll(tabDia, tabHist);
 
         VBox derecha = new VBox(20, new Label("Reportes"), tabsDer);
         derecha.setPadding(new Insets(20));
 
-        // =====================================================
-        // ROOT
-        // =====================================================
         HBox root = new HBox(side, centro, derecha);
 
         Scene scene = new Scene(new StackPane(root), 1280, 720);
@@ -363,11 +302,8 @@ public class ServiciosGUI {
         stage.setScene(scene);
         stage.show();
 
-        // =====================================================
-        // EVENTO AGREGAR
-        // =====================================================
+        // BOTÓN AGREGAR (general)
         btn.setOnAction(e -> {
-
             String nombre = txtNombre.getText().trim();
             String correo = txtCorreo.getText().trim();
             String tipo = comboTipo.getValue();
@@ -386,56 +322,19 @@ public class ServiciosGUI {
                 crearNuevoTicket(nombre, correo);
 
             if (!"Consumible".equals(tipo)) {
-                agregarServicio(tipo);
+                ventaController.registrarVenta(1, 1, ticketActual, ticketController);
             }
 
             mostrarTicket(preview, ticketActual);
             actualizarTablaDia(tablaDia);
-
-            ticketActual = null;
-
-            txtNombre.clear();
-            txtCorreo.clear();
-            comboTipo.getSelectionModel().clearSelection();
-            checkConsumibles.getCheckModel().clearChecks();
-            boxConsumibles.setManaged(false);
-            boxConsumibles.setVisible(false);
         });
 
-        txtNombre.textProperty().addListener((obs, oldText, newText) -> {
+        txtNombre.textProperty().addListener((obs, old, newText) -> {
             if (newText != null && !newText.isBlank() && ticketActual == null) {
                 crearNuevoTicket(txtNombre.getText(), txtCorreo.getText());
                 mostrarTicket(preview, ticketActual);
             }
         });
-
-        checkConsumibles.getCheckModel().getCheckedItems().addListener(
-                (ListChangeListener<model.Venta>) c -> {
-                    while (c.next()) {
-                        if (c.wasAdded() && ticketActual != null) {
-                            for (model.Venta p : c.getAddedSubList()) {
-                                ventaController.registrarVenta(
-                                        p.getIdProducto(),
-                                        1,
-                                        ticketActual,
-                                        ticketController
-                                );
-                            }
-                        }
-                        if (c.wasRemoved() && ticketActual != null) {
-                            for (model.Venta p : c.getRemoved()) {
-                                ticketActual.getServicios().removeIf(s ->
-                                        s.getTipoServicio() instanceof model.Venta v &&
-                                        v.getIdProducto() == p.getIdProducto()
-                                );
-                            }
-                        }
-                    }
-                    mostrarTicket(preview, ticketActual);
-                    actualizarTablaDia(tablaDia);
-                }
-);
-
 
         actualizarTablaDia(tablaDia);
     }
