@@ -1,31 +1,49 @@
-# STORY BOARD
+### STORYBOARD
 
 ## Scene 1
 
-![StoryBoard1..png](https://github.com/Ozia112/POO_Project/blob/temp.TM-03.Presentation/(E)Presentation/Assets/StoryBoard1..png)
+![Scene1.png](StoryBoard5..png)
 
-**Description:** Opening scene: the presenter is seated at the desk, working on the laptop and welcoming the audience. Sets the context for LockerEasy and mentions Don David’s business.
+**Description:** The presenter appears on camera, introducing the topic of the video and briefly explaining the purpose of the LockerEasy project.
 
 ---
 
 ## Scene 2
 
-![StoryBoard8.png](https://github.com/Ozia112/POO_Project/blob/temp.TM-03.Presentation/(E)Presentation/Assets/StoryBoard8.png)
+![Scene2.png](StoryBoard3..png)
 
-**Description:** The presenter interviews various team members, each sitting across the table. The scene focuses on the team’s honest reflections about the main problems, adapting to changing requirements, and how it felt when a member left and another joined. This segment shows the real voices and emotions of the group.
+**Description:** The presenter continues discussing the project while showing supporting visuals related to the development process and the initial stages of the system.
 
 ---
 
 ## Scene 3
 
-![StoryBoard5..png](https://github.com/Ozia112/POO_Project/blob/temp.TM-03.Presentation/(E)Presentation/Assets/StoryBoard5..png)
+![Scene3.png](StoryBoard8.png)
 
-**Description:** The presenter returns to camera, now more reflective. Here, they wrap up the story, explaining the actions taken after facing so many problems, what the team learned from the experience, and how these lessons will guide the next stage. The message is honest and motivating..
+**Description:** A short interview segment from Stage 2 is shown, featuring a formal conversation about the team’s challenges and progress.
 
 ---
 
 ## Scene 4
 
-![StoryBoard7.png](https://github.com/Ozia112/POO_Project/blob/temp.TM-03.Presentation/(E)Presentation/Assets/StoryBoard7.png)
+![Scene4.png](StoryBoard1..png)
 
-**Description:** Final scene: the presenter returns to camera, waves to the audience, and shares the main lessons learned. Closes the video with thanks and next steps.
+**Description:** The video returns to the main camera shot where the presenter expands on key technical decisions and important parts of the project.
+
+---
+
+## Scene 5
+
+![Scene5.png](StoryBoard9.png)
+
+**Description:** An online interview with a team member is displayed, discussing the workflow and pressure experienced during Stage 3.
+
+---
+
+## Scene 6
+
+![Scene6.png](StoryBoard7.png)
+
+**Description:** The presenter closes the video, thanking the audience and officially concluding the explanation of LockerEasy’s development.
+
+---
