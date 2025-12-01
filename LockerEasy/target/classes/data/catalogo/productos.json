@@ -1,0 +1,115 @@
+[
+  {
+    
+    "precio": 12,
+    "etiquetas": ["Consumible"],
+    "existentes": 7,
+    "id": 1,
+    "nombre": "Agua 600ml",
+    "disponible": true
+  },
+  {
+    "precio": 15,
+    "etiquetas": ["Consumible"],
+    "existentes": 9,
+    "id": 2,
+    "nombre": "Galletas empaquetadas",
+    "disponible": true
+  },
+  {
+    "precio": 5,
+    "etiquetas": ["Consumible"],
+    "existentes": 26,
+    "id": 3,
+    "nombre": "Dulces",
+    "disponible": true
+  },
+  {
+    "precio": 2,
+    "etiquetas": ["Impresión"],
+    "existentes": 988,
+    "id": 4,
+    "nombre": "Impresión B/N",
+    "disponible": true
+  },
+  {
+    "precio": 5,
+    "etiquetas": ["Impresión"],
+    "existentes": 999,
+    "id": 5,
+    "nombre": "Impresión Color",
+    "disponible": true
+  },
+  {
+    "precio": 1,
+    "etiquetas": ["Impresión"],
+    "existentes": 999,
+    "id": 6,
+    "nombre": "Copia simple",
+    "disponible": true
+  },
+  {
+    "precio": 30,
+    "etiquetas": ["Trámite"],
+    "existentes": 979,
+    "id": 7,
+    "nombre": "Constancia",
+    "disponible": true
+  },
+  {
+    "precio": 10,
+    "etiquetas": ["Trámite"],
+    "existentes": 990,
+    "id": 8,
+    "nombre": "Impresión de constancia electrónica",
+    "disponible": true
+  },
+  {
+    "precio": 20,
+    "etiquetas": ["Trámite"],
+    "existentes": 994,
+    "id": 9,
+    "nombre": "Copia Certifica",
+    "disponible": true
+
+    "precio": 1,
+    "etiquetas": ["Consumible"],
+    "existentes": 0,
+    "id": 1,
+    "nombre": "a",
+    "disponible": false
+  },
+  {
+    "precio": 1,
+    "etiquetas": ["Consumible"],
+    "existentes": 5,
+    "id": 2,
+    "nombre": "a",
+    "disponible": false
+  },
+  {
+    "precio": 123,
+    "etiquetas": ["Impresión"],
+    "existentes": 0,
+    "id": 3,
+    "nombre": "as",
+    "disponible": false
+  },
+  {
+    "precio": 123,
+    "etiquetas": ["Trámite"],
+    "existentes": 0,
+    "id": 4,
+    "nombre": "as",
+    "disponible": false
+  },
+  {
+    "precio": 123,
+    "etiquetas": ["Impresión"],
+    "existentes": 0,
+    "id": 5,
+    "nombre": "as",
+    "disponible": false
+
+  }
+]

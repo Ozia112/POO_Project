@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Configuracion de la base de datos-->
+        <property name= "connection.url">jdbc:postgresql://localhost:5432/NOMBRE_DB</property>
+        <property name= "connection.username">TU_USUARIO</property>
+        <property name= "connection.password">TU_CONTRASEÑA</property>
+
+        <!-- Dialecto de Hibernate -->
+        <property name= "connection.driver.class">org.postgresql.Driver</property>
+        <property name= "dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        
+        <!-- Mostrar SQL en consola -->
+        <property name= "show_sql">true</property>
+        <property name= "hbm2ddl.auto">update</property>
+        
+        <!-- Mapeo de las clases -->
+        <mapping class= "model.TipoServicio"/>
+        <mapping class= "model.Ubicacion"/>
+        <mapping class= "model.Ticket"/>
+        <mapping class= "model.Renta"/>
+        <mapping class= "model.Etiqueta"/>
+        <mapping class= "model.Servicio"/>
+        <mapping class= "model.Venta"/>
+    </session-factory>
+</hibernate-configuration>
