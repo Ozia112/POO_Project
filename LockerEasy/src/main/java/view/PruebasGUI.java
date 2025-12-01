@@ -21,11 +21,8 @@ public class PruebasGUI {
         // === Crear controllers reales ===
         reporteController = new ReporteController();
         ticketController = new TicketController();
-        rentaController = new RentaController();
-        ventaController = new VentaController();
-
-        // Dependencias necesarias
-        rentaController.setReporteController(reporteController);
+        rentaController = new RentaController(ticketController, reporteController);
+        ventaController = new VentaController(ticketController, reporteController);
 
         System.out.println("[LOGICA] Controladores cargados correctamente.");
     }
@@ -57,10 +54,9 @@ public class PruebasGUI {
 
         // De momento todo cuesta $50 para pruebas
         ventaController.registrarVenta(
-                1,       // ID producto
+                1L,      // ID producto (Long)
                 1,       // Cantidad
-                ticketActual,
-                ticketController
+                ticketActual
         );
 
         System.out.println(" → Total actual del ticket: $" + ticketActual.getTotalTicket());
@@ -79,10 +75,13 @@ public class PruebasGUI {
 
         System.out.println("[LOGICA] Iniciando renta…");
 
+        // Crear ubicación temporal para prueba (en realidad debería obtenerse de BD)
+        Ubicacion ubicacion = new Ubicacion();
+        ubicacion.setUbicacionId(1L);
+        
         rentaController.iniciarRenta(
-                Ubicacion.PA_T1_L1,
-                ticketActual,
-                ticketController
+                ubicacion,
+                ticketActual
         );
 
         System.out.println(" → Renta iniciada.");

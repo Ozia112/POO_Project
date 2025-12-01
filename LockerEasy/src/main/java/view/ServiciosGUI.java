@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 import controller.EtiquetaController;
+import controller.InventarioController;
 import controller.RentaController;
 import controller.ReporteController;
 import controller.TicketController;
@@ -51,6 +52,7 @@ public class ServiciosGUI {
     private final RentaController rentaController = new RentaController();
     private final VentaController ventaController = new VentaController();
     private final EtiquetaController etiquetaController = new EtiquetaController();
+    private final InventarioController inventarioController = new InventarioController();
 
     // ------------------ UI COMPONENTS ------------------
     private Ticket ticketActual = null;
@@ -65,14 +67,13 @@ public class ServiciosGUI {
     private VBox rentasEnProgresoBox;
     private boolean modoIniciarRenta = false;
     private TabPane tabPane;
+    private ComboBox<String> comboTipoServicio; // Para actualizar etiquetas dinámicamente
 
     // ------------------- TEMP VARIABLES -------------------
     private String nombreClienteTemp = null;
     private String correoClienteTemp = null;
 
     public void mostrar(Stage stage) {
-        rentaController.setReporteController(reporteController);
-
         // Crear consolas
         crearConsolas();
 
@@ -92,6 +93,13 @@ public class ServiciosGUI {
         tabConfig.setContent(crearVistaConfig());
 
         tabPane.getTabs().addAll(tabServicios, tabRenta, tabConfig);
+        
+        // Listener para actualizar etiquetas cuando se cambie de pestaña
+        tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab == tabServicios && comboTipoServicio != null) {
+                actualizarEtiquetasCombo();
+            }
+        });
 
         VBox root = new VBox(tabPane);
         root.setPadding(new Insets(10));
@@ -174,10 +182,17 @@ public class ServiciosGUI {
         return root;
     }
 
-        private HBox crearVistaRenta() {
-
+    private VBox crearVistaRenta() {
+        // Usar RentaGUI directamente
+        RentaGUI rentaGUI = new RentaGUI(rentaController, ticketController, reporteController);
+        
+        // Crear contenedor para la vista de renta
+        VBox container = new VBox();
+        container.setPadding(new Insets(10));
+        
+        // Obtener la vista desde RentaGUI (necesitamos adaptar RentaGUI para que devuelva un Pane)
         gridUbicaciones = crearGridUbicaciones();
-        gridUbicaciones.getStyleClass().add("caja-form"); // CSS APLICADO
+        gridUbicaciones.getStyleClass().add("caja-form");
 
         estadoUbicacionBox = new VBox(10);
         estadoUbicacionBox.setPadding(new Insets(10));
@@ -197,7 +212,7 @@ public class ServiciosGUI {
         actualizarRentasEnProgreso();
 
         VBox herramientas = crearHerramientasDeLockers();
-        herramientas.getStyleClass().add("caja-form"); // CSS APLICADO
+        herramientas.getStyleClass().add("caja-form");
 
         HBox contenido = new HBox(10,
                 gridUbicaciones,
@@ -208,8 +223,11 @@ public class ServiciosGUI {
 
         contenido.setPadding(new Insets(10));
         HBox.setHgrow(rentasEnProgresoBox, Priority.ALWAYS);
+        
+        container.getChildren().add(contenido);
+        VBox.setVgrow(contenido, Priority.ALWAYS);
 
-        return contenido;
+        return container;
     }
 
     private VBox crearHerramientasDeLockers() {
@@ -224,7 +242,7 @@ public class ServiciosGUI {
                 return;
             }
 
-            var renta = rentaController.getRentaActiva(ubicacionSeleccionada);
+            var renta = rentaController.getRenta(ubicacionSeleccionada);
             if (renta == null) {
                 consolaTickets.appendText("[ERROR] No hay renta activa en esa ubicación.\n");
                 return;
@@ -232,8 +250,7 @@ public class ServiciosGUI {
 
             var ticket = rentaController.getTicketDeRenta(ubicacionSeleccionada);
 
-            rentaController.finalizarRenta(ubicacionSeleccionada, ticket, ticketController);
-            rentaController.liberarUbicacion(ubicacionSeleccionada);
+            rentaController.finalizarRenta(ubicacionSeleccionada, ticket);
 
             actualizarGridUbicaciones();
             actualizarRentasEnProgreso();
@@ -242,51 +259,14 @@ public class ServiciosGUI {
             consolaTickets.appendText("[OK] Renta cancelada manualmente.\n");
         });
 
-        TextField txtTol = new TextField();
-        txtTol.setPromptText("Minutos de tolerancia");
-        txtTol.getStyleClass().add("text-field"); // CSS APLICADO
-
-        Button btnTol = new Button("Guardar tolerancia");
-        btnTol.getStyleClass().add("btn-green"); // CSS APLICADO
-
-        btnTol.setOnAction(e -> {
-            try {
-                int min = Integer.parseInt(txtTol.getText());
-                rentaController.setTolerancia(min);
-                consolaTickets.appendText("[OK] Nueva tolerancia: " + min + " minutos.\n");
-            } catch (NumberFormatException ex) {
-                consolaTickets.appendText("[ERROR] Valor inválido.\n");
-            }
-        });
-
-        TextField txtPrecio = new TextField();
-        txtPrecio.setPromptText("Precio por hora ($)");
-        txtPrecio.getStyleClass().add("text-field"); // CSS APLICADO
-
-        Button btnPrecio = new Button("Guardar precio");
-        btnPrecio.getStyleClass().add("btn-green"); // CSS APLICADO
-
-        btnPrecio.setOnAction(e -> {
-            try {
-                float precio = Float.parseFloat(txtPrecio.getText());
-                rentaController.setPrecioGeneral(precio);
-                consolaTickets.appendText("[OK] Nuevo precio por hora: $" + precio + "\n");
-            } catch (NumberFormatException ex) {
-                consolaTickets.appendText("[ERROR] Valor inválido.\n");
-            }
-        });
+        Label lblInfo = new Label("La tolerancia y precio se configuran en Config.java");
+        lblInfo.setWrapText(true);
 
         VBox box = new VBox(10,
                 new Label("Herramientas de Lockers"),
                 btnCancelar,
                 new Separator(),
-                new Label("Tolerancia"),
-                txtTol,
-                btnTol,
-                new Separator(),
-                new Label("Precio por hora"),
-                txtPrecio,
-                btnPrecio
+                lblInfo
         );
 
         box.setPadding(new Insets(10));
@@ -330,10 +310,13 @@ public class ServiciosGUI {
 
     private VBox crearSeccionAcciones() {
 
-        ComboBox<String> combo = new ComboBox<>();
-        combo.getItems().addAll("Renta", "Trámite", "Consumible", "Impresión");
-        combo.setPromptText("Selecciona servicio");
-        combo.getStyleClass().add("combo-box"); // CSS APLICADO
+        comboTipoServicio = new ComboBox<>();
+        
+        // Cargar etiquetas dinámicamente desde la base de datos
+        actualizarEtiquetasCombo();
+        
+        comboTipoServicio.setPromptText("Selecciona servicio");
+        comboTipoServicio.getStyleClass().add("combo-box"); // CSS APLICADO
 
         Button btnAccion = new Button();
         btnAccion.setVisible(false);
@@ -352,7 +335,7 @@ public class ServiciosGUI {
         btnAgregarProducto.setVisible(false);
         btnAgregarProducto.getStyleClass().add("btn-green"); // CSS APLICADO
 
-        combo.valueProperty().addListener((obs, oldVal, newVal) -> {
+        comboTipoServicio.valueProperty().addListener((obs, oldVal, newVal) -> {
 
             comboProductos.setDisable(false);
             btnAgregarProducto.setDisable(false);
@@ -365,57 +348,27 @@ public class ServiciosGUI {
 
             if (newVal == null) return;
 
-            switch (newVal) {
-
-                case "Renta" -> {
-                    btnAccion.setVisible(true);
-                    btnAccion.setText("Iniciar Renta");
-                }
-
-                case "Trámite" -> {
-                    comboProductos.getItems().clear();
-                    comboProductos.getItems().addAll(
-                            ventaController.obtenerTodosLosProductos()
-                                    .stream()
-                                    .filter(p -> p.getEtiquetas().contains("Trámite"))
-                                    .toList()
-                    );
-                    comboProductos.setVisible(true);
-                    btnAgregarProducto.setVisible(true);
-                    btnFinalizarTicket.setVisible(true);
-                }
-
-                case "Consumible" -> {
-                    comboProductos.getItems().clear();
-                    comboProductos.getItems().addAll(
-                            ventaController.obtenerTodosLosProductos()
-                                    .stream()
-                                    .filter(p -> p.getEtiquetas().contains("Consumible"))
-                                    .toList()
-                    );
-                    comboProductos.setVisible(true);
-                    btnAgregarProducto.setVisible(true);
-                    btnFinalizarTicket.setVisible(true);
-                }
-
-                case "Impresión" -> {
-                    comboProductos.getItems().clear();
-                    comboProductos.getItems().addAll(
-                            ventaController.obtenerTodosLosProductos()
-                                    .stream()
-                                    .filter(p -> p.getEtiquetas().contains("Impresión"))
-                                    .toList()
-                    );
-                    comboProductos.setVisible(true);
-                    btnAgregarProducto.setVisible(true);
-                    btnFinalizarTicket.setVisible(true);
-                }
+            if ("Renta".equals(newVal)) {
+                btnAccion.setVisible(true);
+                btnAccion.setText("Iniciar Renta");
+            } else {
+                // Para cualquier otra etiqueta, cargar productos filtrados
+                comboProductos.getItems().clear();
+                comboProductos.getItems().addAll(
+                        inventarioController.obtenerTodosLosProductos()
+                                .stream()
+                                .filter(p -> p.getEtiqueta() != null && newVal.equals(p.getEtiqueta().getNombre()))
+                                .toList()
+                );
+                comboProductos.setVisible(true);
+                btnAgregarProducto.setVisible(true);
+                btnFinalizarTicket.setVisible(true);
             }
         });
 
             // === BOTÓN PARA RENTA ===
             btnAccion.setOnAction(e -> {
-                String tipo = combo.getValue();
+                String tipo = comboTipoServicio.getValue();
 
                 if (txtNombre.getText().trim().isEmpty()) {
                     consolaTickets.appendText("[ERROR] Debes llenar el nombre.\n");
@@ -455,8 +408,7 @@ public class ServiciosGUI {
                 boolean ok = ventaController.registrarVenta(
                         producto.getIdProducto(),
                         1,
-                        ticketActual,
-                        ticketController
+                        ticketActual
                 );
 
                 if (ok) {
@@ -503,7 +455,7 @@ public class ServiciosGUI {
 
             return new VBox(10,
                     new Label("Tipo de Servicio:"),
-                    combo,
+                    comboTipoServicio,
                     btnAccion,
                     comboProductos,        // nuevo
                     btnAgregarProducto,     // nuevo
@@ -514,6 +466,25 @@ public class ServiciosGUI {
 
     
 
+    // ------------------- MÉTODO PARA ACTUALIZAR ETIQUETAS -------------------
+    private void actualizarEtiquetasCombo() {
+        if (comboTipoServicio == null) return;
+        
+        String valorActual = comboTipoServicio.getValue();
+        comboTipoServicio.getItems().clear();
+        
+        comboTipoServicio.getItems().add("Renta");
+        var etiquetas = etiquetaController.getEtiquetaDAO().obtenerTodas();
+        for (var etiqueta : etiquetas) {
+            comboTipoServicio.getItems().add(etiqueta.getNombre());
+        }
+        
+        // Restaurar valor si aún existe
+        if (valorActual != null && comboTipoServicio.getItems().contains(valorActual)) {
+            comboTipoServicio.setValue(valorActual);
+        }
+    }
+
    private GridPane crearGridUbicaciones() {
     GridPane grid = new GridPane();
     grid.setHgap(5);
@@ -522,11 +493,11 @@ public class ServiciosGUI {
     // CSS APLICADO
     grid.getStyleClass().add("caja-form");
 
-    Ubicacion[] ubicaciones = Ubicacion.values();
+    List<Ubicacion> ubicaciones = rentaController.getUbicacionDAO().obtenerTodas();
 
-    for (int i = 0; i < ubicaciones.length; i++) {
-        Ubicacion ubicacion = ubicaciones[i];
-        Button btn = new Button(ubicacion.name());
+    for (int i = 0; i < ubicaciones.size(); i++) {
+        Ubicacion ubicacion = ubicaciones.get(i);
+        Button btn = new Button(ubicacion.getNombreLocker());
         btn.setPrefSize(150, 80);
         btn.setUserData(ubicacion);
 
@@ -598,10 +569,10 @@ private HBox crearBotonesUtilidad() {
                 return;
             }
 
-            int idProducto = producto.getIdProducto();
+            Long idProducto = producto.getIdProducto();
 
             // Registrar venta REAL
-            boolean ok = ventaController.registrarVenta(idProducto, 1, ticketActual, ticketController);
+            boolean ok = ventaController.registrarVenta(idProducto, 1, ticketActual);
 
             if (ok) {
                 agregarTicketALista(ticketActual);
@@ -618,14 +589,19 @@ private HBox crearBotonesUtilidad() {
 
     private void manejarClickUbicacion(Ubicacion ubicacion) {
         if (modoIniciarRenta) {
-            Renta rentaExistente = rentaController.getRentaActiva(ubicacion);
+            // Verificar que la ubicación esté disponible
+            Renta rentaExistente = rentaController.getRenta(ubicacion);
             if (rentaExistente != null) {
-                consolaTickets.appendText("[ERROR] La ubicación " + ubicacion.name() + " ya tiene una renta activa.\n");
+                consolaTickets.appendText("[ERROR] La ubicación " + ubicacion.getNombreLocker() + " ya tiene una renta activa.\n");
                 return;
             }
 
+            // Crear y GUARDAR el ticket en la BD primero
             ticketActual = ticketController.crearNuevoTicket(nombreClienteTemp, correoClienteTemp);
-            boolean ok = rentaController.iniciarRenta(ubicacion, ticketActual, ticketController);
+            ticketController.getTicketDAO().guardar(ticketActual);
+            
+            // Ahora sí iniciar la renta con el ticket persistido
+            boolean ok = rentaController.iniciarRenta(ubicacion, ticketActual);
 
             if (ok) {
                 agregarTicketALista(ticketActual);
@@ -639,9 +615,11 @@ private HBox crearBotonesUtilidad() {
                 actualizarGridUbicaciones();
                 actualizarRentasEnProgreso();
                 mostrarEstadoUbicacion(ubicacion);
+                
+                consolaTickets.appendText("[OK] Renta iniciada en " + ubicacion.getNombreLocker() + "\n");
             } else {
                 consolaTickets.clear();
-                consolaTickets.appendText("[ERROR] No se pudo iniciar la renta.\n");
+                consolaTickets.appendText("[ERROR] No se pudo iniciar la renta. Verifica la consola de errores.\n");
             }
 
             tabPane.getSelectionModel().select(0);
@@ -654,10 +632,10 @@ private HBox crearBotonesUtilidad() {
         ubicacionSeleccionada = ubicacion;
         estadoUbicacionBox.getChildren().clear();
 
-        Label lblTitulo = new Label("Ubicacion: " + ubicacion.name());
+        Label lblTitulo = new Label("Ubicacion: " + ubicacion.getNombreLocker());
         lblTitulo.setStyle("-fx-font-weight: bold; -fx-font-size: 16px;");
 
-        Renta renta = rentaController.getRentaActiva(ubicacion);
+        Renta renta = rentaController.getRenta(ubicacion);
 
         if (renta == null) {
             estadoUbicacionBox.getChildren().addAll(
@@ -693,28 +671,26 @@ private HBox crearBotonesUtilidad() {
     }
 
     private void manejarFinalizarRenta(Ubicacion ubicacion) {
-        Renta renta = rentaController.getRentaActiva(ubicacion);
+        Renta renta = rentaController.getRenta(ubicacion);
         if (renta == null) {
             consolaTickets.clear();
-            consolaTickets.appendText("[ERROR] No hay una renta activa en " + ubicacion.name() + ".\n");
+            consolaTickets.appendText("[ERROR] No hay una renta activa en " + ubicacion.getNombreLocker() + ".\n");
             return;
         }
 
         Ticket ticket = rentaController.getTicketDeRenta(ubicacion);
-        boolean ok = rentaController.finalizarRenta(ubicacion, ticket, ticketController);
+        boolean ok = rentaController.finalizarRenta(ubicacion, ticket);
 
         if (ok) {
             if (ticketActual != null && ticketActual.getTicketId() == ticket.getTicketId()) {
                 showCurrentTicket(ticket);
             }
-
-            rentaController.liberarUbicacion(ubicacion);
             actualizarGridUbicaciones();
             actualizarRentasEnProgreso();
             mostrarEstadoUbicacion(ubicacion);
         } else {
             consolaTickets.clear();
-            consolaTickets.appendText("[ERROR] No se pudo finalizar la renta en " + ubicacion.name() + ".\n");
+            consolaTickets.appendText("[ERROR] No se pudo finalizar la renta en " + ubicacion.getNombreLocker() + ".\n");
         }
     }
 
@@ -725,17 +701,23 @@ private HBox crearBotonesUtilidad() {
             return;
         }
 
-        Renta rentaActual = rentaController.getRentaActiva(ubicacionSeleccionada);
+        Renta rentaActual = rentaController.getRenta(ubicacionSeleccionada);
         if (rentaActual == null) {
             consolaTickets.clear();
-            consolaTickets.appendText("[ERROR] No hay renta activa en " + ubicacionSeleccionada.name() + ".\n");
+            consolaTickets.appendText("[ERROR] No hay renta activa en " + ubicacionSeleccionada.getNombreLocker() + ".\n");
             return;
         }
 
         Ticket ticket = rentaController.getTicketDeRenta(ubicacionSeleccionada);
         Instant tiempoRetrocedido = ticket.getTiempoEmision().minusSeconds(3600);
         ticket.setTiempoEmision(tiempoRetrocedido);
-        rentaController.setInicioRentaFromTicket(ubicacionSeleccionada, ticket);
+        
+        // Actualizar la renta directamente
+        Renta renta = rentaController.getRenta(ubicacionSeleccionada);
+        if (renta != null) {
+            renta.setInicioRenta(tiempoRetrocedido);
+            rentaController.getRentaDAO().actualizar(renta);
+        }
 
         if (ticketActual != null && ticketActual.getTicketId() == ticket.getTicketId()) {
             showCurrentTicket(ticket);
@@ -744,7 +726,7 @@ private HBox crearBotonesUtilidad() {
     }
 
     private void manejarMostrarReporte() {
-        var rep = reporteController.getReporte();
+        var rep = reporteController.getReporteActual();
 
         consolaReportes.appendText("\n=== REPORTE DEL DÍA ===\n");
         consolaReportes.appendText("Fecha: " + rep.getFechaReporte() + "\n");
@@ -798,7 +780,7 @@ private HBox crearBotonesUtilidad() {
         if (tipoServicio instanceof Renta) {
             Renta renta = (Renta) tipoServicio;
             consolaTickets.appendText("\n  [RENTA]\n");
-            consolaTickets.appendText("  - Ubicacion: " + (renta.getUbicacion() != null ? renta.getUbicacion().name() : "N/A") + "\n");
+            consolaTickets.appendText("  - Ubicacion: " + (renta.getUbicacion() != null ? renta.getUbicacion().getNombreLocker() : "N/A") + "\n");
             consolaTickets.appendText("  - Inicio: " + instantToString(renta.getInicioRenta()) + "\n");
             consolaTickets.appendText("  - Cierre: " + instantToString(renta.getCierreRenta()) + "\n");
             consolaTickets.appendText("  - Horas: " + renta.getCantidad() + "\n");
@@ -854,7 +836,7 @@ private HBox crearBotonesUtilidad() {
     }
 
     private void actualizarEstiloBotonUbicacion(Button btn, Ubicacion ubicacion) {
-        Renta renta = rentaController.getRentaActiva(ubicacion);
+        Renta renta = rentaController.getRenta(ubicacion);
         
         if (modoIniciarRenta) {
             if (renta != null) {
@@ -877,11 +859,11 @@ private HBox crearBotonesUtilidad() {
     private void actualizarRentasEnProgreso() {
         rentasEnProgresoBox.getChildren().clear();
         
-        for (Ubicacion ub : Ubicacion.values()) {
-            Renta renta = rentaController.getRentaActiva(ub);
+        for (Ubicacion ub : rentaController.getUbicacionDAO().obtenerTodas()) {
+            Renta renta = rentaController.getRenta(ub);
             if (renta != null) {
                 Ticket ticket = rentaController.getTicketDeRenta(ub);
-                Label lblRenta = new Label(ub.name() + "\n" + ticket.getNombreCliente());
+                Label lblRenta = new Label(ub.getNombreLocker() + "\n" + ticket.getNombreCliente());
                 lblRenta.setStyle("-fx-padding: 8; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-background-color: #fff3cd; -fx-cursor: hand;");
                 
                 lblRenta.setOnMouseClicked(e -> {
@@ -913,9 +895,7 @@ private HBox crearBotonesUtilidad() {
         ticketActual = ticketController.crearNuevoTicket(nombre, correo);
 
         // Agregar al reporte del día
-        reporteController.getReporte().getTickets().add(ticketActual);
-
-        ticketController.guardarTicket(ticketActual);
+        reporteController.agregarTicket(ticketActual);
 
         System.out.println("[LOG] Ticket creado: " + ticketActual.getTicketId());
     }
@@ -931,23 +911,26 @@ private HBox crearBotonesUtilidad() {
         switch (tipo) {
 
             case "Consumible":
-                ventaController.registrarVenta(1, 1, ticketActual, ticketController);
+                ventaController.registrarVenta(1L, 1, ticketActual);
                 break;
 
             case "Impresión":
-                ventaController.registrarVenta(2, 1, ticketActual, ticketController);
+                ventaController.registrarVenta(2L, 1, ticketActual);
                 break;
 
             case "Trámite":
-                ventaController.registrarVenta(1, 1, ticketActual, ticketController);
+                ventaController.registrarVenta(1L, 1, ticketActual);
                 break;
 
             case "Renta":
-                rentaController.iniciarRenta(
-                        Ubicacion.PA_T1_L1,
-                        ticketActual,
-                        ticketController
-                );
+                // Obtener primera ubicación disponible o usar la primera de la lista
+                List<Ubicacion> ubicaciones = rentaController.getUbicacionDAO().obtenerTodas();
+                if (!ubicaciones.isEmpty()) {
+                    rentaController.iniciarRenta(
+                            ubicaciones.get(0),
+                            ticketActual
+                    );
+                }
                 break;
         }
 
@@ -960,7 +943,7 @@ private HBox crearBotonesUtilidad() {
     // =========================================================
     private void actualizarTablaDia(TableView<Ticket> tabla) {
         tabla.getItems().clear();
-        tabla.getItems().addAll(reporteController.getReporte().getTickets());
+        tabla.getItems().addAll(reporteController.getReporteActual().getTickets());
     }
 
 

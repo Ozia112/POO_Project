@@ -13,26 +13,18 @@ import model.Ticket;
 import model.Ubicacion;
 
 import java.time.Instant;
+import java.util.List;
 
 public class RentaGUI {
 
-    // =====================================================
-    // CONTROLADORES
-    // =====================================================
     private final RentaController rentaController;
     private final TicketController ticketController;
     private final ReporteController reporteController;
 
-    // =====================================================
-    // UI ELEMENTOS
-    // =====================================================
     private GridPane gridLockers;
     private ListView<Renta> listaRentas;
     private VBox panelDetalle;
 
-    // =====================================================
-    // CONSTRUCTOR
-    // =====================================================
     public RentaGUI(
             RentaController rentaController,
             TicketController ticketController,
@@ -43,27 +35,23 @@ public class RentaGUI {
         this.reporteController = reporteController;
     }
 
-    // =====================================================
-    // CONSTRUIR CUADRÍCULA DE LOCKERS
-    // Igualito a PRUEBASGUI pero en forma de botones
-    // =====================================================
     private void construirGridLockers() {
-
         gridLockers = new GridPane();
         gridLockers.setHgap(15);
         gridLockers.setVgap(15);
 
+        // Obtener ubicaciones desde BD
+        List<Ubicacion> ubicaciones = rentaController.getUbicacionDAO().obtenerTodas();
+
         int col = 0;
         int row = 0;
 
-        for (Ubicacion u : Ubicacion.values()) {
-
-            Button b = new Button(u.name());
+        for (Ubicacion u : ubicaciones) {
+            Button b = new Button(u.getNombreLocker());
             b.setPrefWidth(120);
             b.setPrefHeight(40);
 
             actualizarColorLocker(b, u);
-
             b.setOnAction(e -> manejarClickLocker(u));
 
             gridLockers.add(b, col, row);
@@ -76,13 +64,10 @@ public class RentaGUI {
         }
     }
 
-    // =====================================================
-    // ACTUALIZAR COLOR SEGÚN ESTADO (igual que PruebasGUI)
-    // =====================================================
     private void actualizarColorLocker(Button b, Ubicacion u) {
-        boolean ocupado = rentaController.getRentaActiva(u) != null;
+        boolean disponible = rentaController.estaDisponible(u);
 
-        if (!ocupado) {
+        if (disponible) {
             b.setStyle("-fx-background-color: #7ED477; -fx-font-weight: bold;");
         } else {
             b.setStyle("-fx-background-color: #FF8A8A; -fx-font-weight: bold;");
@@ -90,64 +75,52 @@ public class RentaGUI {
     }
 
     private void actualizarColoresLockers() {
+        List<Ubicacion> ubicaciones = rentaController.getUbicacionDAO().obtenerTodas();
+        
+        int index = 0;
         for (var node : gridLockers.getChildren()) {
-            if (node instanceof Button b) {
-                Ubicacion u = Ubicacion.valueOf(b.getText());
-                actualizarColorLocker(b, u);
+            if (node instanceof Button b && index < ubicaciones.size()) {
+                actualizarColorLocker(b, ubicaciones.get(index));
+                index++;
             }
         }
     }
 
-    // =====================================================
-    // MANEJAR CLICK EN LOCKER (LÓGICA REAL → PruebasGUI)
-    // =====================================================
     private void manejarClickLocker(Ubicacion u) {
-
-        // ¿Hay renta activa?
-        Renta activa = rentaController.getRentaActiva(u);
+        Renta activa = rentaController.getRenta(u);
 
         if (activa == null) {
-            // NO HAY RENTA → iniciar nueva
+            // No hay renta → iniciar nueva
             Ticket t = ticketController.crearNuevoTicket("Cliente", "desconocido@mail.com");
+            ticketController.getTicketDAO().guardar(t);
 
-            boolean ok = rentaController.iniciarRenta(
-                    u,
-                    t,
-                    ticketController
-            );
+            boolean ok = rentaController.iniciarRenta(u, t);
 
             if (ok) {
-                reporteController.getReporte().getTickets().add(t);
-                ticketController.guardarTicket(t);
                 cargarRentasEnLista();
-                mostrarDetalle(rentaController.getRentaActiva(u));
+                mostrarDetalle(rentaController.getRenta(u));
                 actualizarColoresLockers();
             }
-
         } else {
-            // YA HAY → mostrar detalles
+            // Ya hay renta → mostrar detalles
             mostrarDetalle(activa);
         }
     }
 
-    // =====================================================
-    // LISTA IZQUIERDA: RENTAS ACTIVAS (igual que PruebasGUI)
-    // =====================================================
     private void cargarRentasEnLista() {
         listaRentas.getItems().clear();
-
-        for (Ubicacion u : Ubicacion.values()) {
-            Renta r = rentaController.getRentaActiva(u);
-
-            if (r != null) listaRentas.getItems().add(r);
+        
+        List<Ubicacion> ubicaciones = rentaController.getUbicacionDAO().obtenerTodas();
+        
+        for (Ubicacion u : ubicaciones) {
+            Renta r = rentaController.getRenta(u);
+            if (r != null && r.getCierreRenta() == null) {
+                listaRentas.getItems().add(r);
+            }
         }
     }
 
-    // =====================================================
-    // MOSTRAR DETALLE (SIN INVENTAR MÉTODOS)
-    // =====================================================
     private void mostrarDetalle(Renta r) {
-
         panelDetalle.getChildren().clear();
 
         if (r == null) {
@@ -157,53 +130,41 @@ public class RentaGUI {
 
         Ticket t = rentaController.getTicketDeRenta(r.getUbicacion());
 
-        Label titulo = new Label("Locker: " + r.getUbicacion());
+        Label titulo = new Label("Locker: " + r.getUbicacion().getNombreLocker());
         titulo.setStyle("-fx-font-size: 22; -fx-font-weight: bold;");
 
-        Label cliente = new Label("Cliente: " + t.getNombreCliente());
+        Label cliente = new Label("Cliente: " + (t != null ? t.getNombreCliente() : "Desconocido"));
         Label inicio = new Label("Inicio: " + r.getInicioRenta());
-        Label cierre = new Label("Cierre: " +
-                (r.getCierreRenta() == null ? "Abierto" : r.getCierreRenta()));
+        Label cierre = new Label("Cierre: " + (r.getCierreRenta() == null ? "Abierto" : r.getCierreRenta()));
 
-        // Calcular precio (solo usando métodos existentes)
         int horas = rentaController.calcularTiempoTrancurrido(r, Instant.now());
         double total = horas * r.getPrecio();
 
-        Label totalLbl = new Label("Total acumulado: $" + total);
+        Label totalLbl = new Label("Total acumulado: $" + String.format("%.2f", total));
         totalLbl.setStyle("-fx-font-size: 18; -fx-font-weight: bold;");
 
         Button cerrar = new Button("Cerrar renta");
         cerrar.setStyle("-fx-background-color:#5da36c; -fx-font-weight: bold;");
 
         cerrar.setOnAction(e -> {
+            if (t == null) {
+                mostrarAlerta("Error", "No se encontró el ticket asociado");
+                return;
+            }
 
-            boolean ok = rentaController.finalizarRenta(
-                    r.getUbicacion(),
-                    t,
-                    ticketController
-            );
+            boolean ok = rentaController.finalizarRenta(r.getUbicacion(), t);
 
             if (ok) {
-                ticketController.guardarTicket(t);
-                reporteController.getReporte().getTickets().add(t);
-
-                rentaController.liberarUbicacion(r.getUbicacion());
                 cargarRentasEnLista();
                 mostrarDetalle(null);
                 actualizarColoresLockers();
             }
         });
 
-        panelDetalle.getChildren().addAll(
-                titulo, cliente, inicio, cierre, totalLbl, cerrar
-        );
+        panelDetalle.getChildren().addAll(titulo, cliente, inicio, cierre, totalLbl, cerrar);
     }
 
-    // =====================================================
-    // MOSTRAR UI PRINCIPAL
-    // =====================================================
     public void mostrar(Stage stage) {
-
         construirGridLockers();
 
         listaRentas = new ListView<>();
@@ -228,5 +189,13 @@ public class RentaGUI {
         stage.setTitle("Renta de Lockers - LockerEasy");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
     }
 }

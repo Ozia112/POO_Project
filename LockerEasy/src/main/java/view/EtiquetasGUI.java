@@ -156,7 +156,7 @@ public class EtiquetasGUI {
 
     private void actualizarLista() {
         listaEtiquetas.getChildren().clear();
-        List<Etiqueta> etiquetas = etiquetaController.obtenerTodasEtiquetas();
+        List<Etiqueta> etiquetas = etiquetaController.getEtiquetaDAO().obtenerTodas();
 
         for (Etiqueta etiqueta : etiquetas) {
             HBox itemBox = crearItemEtiqueta(etiqueta);
@@ -485,7 +485,8 @@ public class EtiquetasGUI {
         );
 
         btnAceptar.setOnAction(e -> {
-            if (etiquetaController.eliminarEtiqueta(etiqueta.getEtiquetaId())) {
+            Etiqueta etiquetaAEliminar = etiquetaController.getEtiquetaDAO().obtener(etiqueta.getEtiquetaId());
+            if (etiquetaAEliminar != null && etiquetaController.eliminarEtiqueta(etiquetaAEliminar)) {
                 actualizarLista();
                 mostrarMensaje("✓ Etiqueta eliminada correctamente", "#D4EDDA", "#155724");
                 formularioContainer.getChildren().clear();

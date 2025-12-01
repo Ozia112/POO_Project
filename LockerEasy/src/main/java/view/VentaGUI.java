@@ -1,431 +1,318 @@
 package view;
 
 import controller.VentaController;
+import controller.InventarioController;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import model.Venta;
+import model.Etiqueta;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class VentaGUI {
 
 	private final VentaController ventaController;
+	private final InventarioController inventarioController;
 
 	public VentaGUI(VentaController ventaController) {
 		this.ventaController = ventaController;
+		this.inventarioController = new InventarioController();
 	}
 
-	public void mostrar(Stage stage) {
+	public VBox getVistaIntegrada() {
+		VBox contenedor = new VBox(15);
+		contenedor.setPadding(new Insets(20));
 
 		// Tabla de productos
 		TableView<Venta> tabla = new TableView<>();
-		tabla.setPrefWidth(700);
+		tabla.setPrefWidth(800);
+		tabla.setPrefHeight(400);
 
 		TableColumn<Venta, String> colId = new TableColumn<>("ID");
 		colId.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(String.valueOf(c.getValue().getIdProducto())));
+		colId.setPrefWidth(60);
 
 		TableColumn<Venta, String> colNombre = new TableColumn<>("Nombre");
 		colNombre.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
+		colNombre.setPrefWidth(250);
 
 		TableColumn<Venta, String> colPrecio = new TableColumn<>("Precio");
-		colPrecio.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty("$" + c.getValue().getPrecio()));
+		colPrecio.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty("$" + String.format("%.2f", c.getValue().getPrecio())));
+		colPrecio.setPrefWidth(100);
 
 		TableColumn<Venta, String> colExistentes = new TableColumn<>("Existentes");
 		colExistentes.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(String.valueOf(c.getValue().getExistentes())));
+		colExistentes.setPrefWidth(100);
 
 		TableColumn<Venta, String> colDisponible = new TableColumn<>("Disponible");
 		colDisponible.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().isDisponible() ? "Sí" : "No"));
-
-		TableColumn<Venta, String> colEtiquetas = new TableColumn<>("Etiquetas");
-		colEtiquetas.setCellValueFactory(c -> {
-			List<String> etiquetas = c.getValue().getEtiquetas();
-			String etiquetasTexto = (etiquetas == null || etiquetas.isEmpty()) ? "" : String.join(", ", etiquetas);
-			return new javafx.beans.property.SimpleStringProperty(etiquetasTexto);
-		});
-
-		tabla.getColumns().addAll(colId, colNombre, colPrecio, colExistentes, colDisponible, colEtiquetas);
-
-		// Ajustes de ancho de columnas
-		colId.setPrefWidth(50);
-		colNombre.setPrefWidth(250);
-		colPrecio.setPrefWidth(100);
-		colExistentes.setPrefWidth(100);
 		colDisponible.setPrefWidth(100);
-		colEtiquetas.setPrefWidth(150);
 
-		// Evitar que quede una 'columna' vacía al final: forzar política que distribuye
-		tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		HBox.setHgrow(tabla, Priority.ALWAYS);
+		TableColumn<Venta, String> colEtiqueta = new TableColumn<>("Etiqueta");
+		colEtiqueta.setCellValueFactory(c -> {
+			Etiqueta etiqueta = c.getValue().getEtiqueta();
+			String etiquetaTexto = (etiqueta == null) ? "" : etiqueta.getNombre();
+			return new javafx.beans.property.SimpleStringProperty(etiquetaTexto);
+		});
+		colEtiqueta.setPrefWidth(150);
 
-		// Formulario: usar GridPane para mostrar etiquetas visibles junto a cada campo
-		VBox form = new VBox(12);
-		form.setPadding(new Insets(20));
-		form.setPrefWidth(420);
-		form.getStyleClass().add("caja-form");
+		tabla.getColumns().addAll(colId, colNombre, colPrecio, colExistentes, colDisponible, colEtiqueta);
 
-		Label tituloForm = new Label("Gestionar Productos");
-		tituloForm.getStyleClass().add("titulo1");
+		// Formulario de edición
+		GridPane formulario = new GridPane();
+		formulario.setHgap(10);
+		formulario.setVgap(10);
 
+		Label lblId = new Label("ID:");
 		TextField txtId = new TextField();
+		txtId.setDisable(true);
+		txtId.setPrefWidth(100);
+
+		Label lblNombre = new Label("Nombre:");
 		TextField txtNombre = new TextField();
+		txtNombre.setPrefWidth(200);
+
+		Label lblPrecio = new Label("Precio:");
 		TextField txtPrecio = new TextField();
+		txtPrecio.setPrefWidth(100);
+
+		Label lblExistentes = new Label("Existentes:");
 		TextField txtExistentes = new TextField();
-		// Prompt text (ejemplos) para ayudar al usuario
-		txtId.setPromptText("Ej: 10 (solo para modificar/eliminar)");
-		txtNombre.setPromptText("Ej: Caja de tornillos");
-		txtPrecio.setPromptText("Ej: 12.50");
-		txtExistentes.setPromptText("Ej: 20");
+		txtExistentes.setPrefWidth(100);
 
-		// Etiquetas restringidas a opciones predefinidas
-		ComboBox<String> comboEtiquetas = new ComboBox<>();
-		comboEtiquetas.getItems().addAll("Consumible", "Impresión", "Trámite");
+		Label lblDisponible = new Label("Disponible:");
+		CheckBox chkDisponible = new CheckBox();
+		
+		Label lblEtiqueta = new Label("Etiqueta:");
+		ComboBox<Etiqueta> comboEtiqueta = new ComboBox<>();
+		comboEtiqueta.setPrefWidth(150);
+		
+		// Cargar etiquetas
+		try {
+			var etiquetaDAO = new controller.EtiquetaController().getEtiquetaDAO();
+			comboEtiqueta.getItems().addAll(etiquetaDAO.obtenerTodas());
+			comboEtiqueta.setCellFactory(param -> new ListCell<Etiqueta>() {
+				@Override
+				protected void updateItem(Etiqueta item, boolean empty) {
+					super.updateItem(item, empty);
+					setText(empty || item == null ? null : item.getNombre());
+				}
+			});
+			comboEtiqueta.setButtonCell(new ListCell<Etiqueta>() {
+				@Override
+				protected void updateItem(Etiqueta item, boolean empty) {
+					super.updateItem(item, empty);
+					setText(empty || item == null ? null : item.getNombre());
+				}
+			});
+			if (!comboEtiqueta.getItems().isEmpty()) {
+				comboEtiqueta.getSelectionModel().select(0);
+			}
+		} catch (Exception ex) {
+			System.err.println("Error cargando etiquetas: " + ex.getMessage());
+		}
 
-		CheckBox chkDisponible = new CheckBox("Disponible para la venta");
+		formulario.add(lblId, 0, 0);
+		formulario.add(txtId, 1, 0);
+		formulario.add(lblNombre, 2, 0);
+		formulario.add(txtNombre, 3, 0);
+		formulario.add(lblPrecio, 0, 1);
+		formulario.add(txtPrecio, 1, 1);
+		formulario.add(lblExistentes, 2, 1);
+		formulario.add(txtExistentes, 3, 1);
+		formulario.add(lblDisponible, 0, 2);
+		formulario.add(chkDisponible, 1, 2);
+		formulario.add(lblEtiqueta, 2, 2);
+		formulario.add(comboEtiqueta, 3, 2);
 
-		// GridPane para alinear etiquetas y campos
-		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(8));
-
-		ColumnConstraints col1 = new ColumnConstraints(160); // ancho fijo para etiquetas
-		ColumnConstraints col2 = new ColumnConstraints();
-		col2.setHgrow(Priority.ALWAYS);
-		grid.getColumnConstraints().addAll(col1, col2);
-
-		// Añadir filas: Label + Control
-		Label lblId = new Label("ID:"); lblId.setLabelFor(txtId);
-		Label lblNombre = new Label("Producto:"); lblNombre.setLabelFor(txtNombre);
-		Label lblPrecio = new Label("Precio :"); lblPrecio.setLabelFor(txtPrecio);
-		Label lblExistentes = new Label("Existentes:"); lblExistentes.setLabelFor(txtExistentes);
-		Label lblEtiqueta = new Label("Etiqueta:"); lblEtiqueta.setLabelFor(comboEtiquetas);
-		// Ajustar tamaño de las etiquetas del formulario para que no sean tan grandes
-		String labelStyle = "-fx-font-size:13px;";
-		lblId.setStyle(labelStyle);
-		lblNombre.setStyle(labelStyle);
-		lblPrecio.setStyle(labelStyle);
-		lblExistentes.setStyle(labelStyle);
-		lblEtiqueta.setStyle(labelStyle);
-
-		grid.add(lblId, 0, 0);
-		grid.add(txtId, 1, 0);
-
-		grid.add(lblNombre, 0, 1);
-		grid.add(txtNombre, 1, 1);
-
-		grid.add(lblPrecio, 0, 2);
-		grid.add(txtPrecio, 1, 2);
-
-		grid.add(lblExistentes, 0, 3);
-		grid.add(txtExistentes, 1, 3);
-
-		grid.add(lblEtiqueta, 0, 4);
-		grid.add(comboEtiquetas, 1, 4);
-
-		// Checkbox en columna de controles
-		grid.add(chkDisponible, 1, 5);
-
-		// Botones de acción: Agregar, Modificar, Eliminar
-		HBox botones = new HBox(8);
+		// Botones
+		HBox botones = new HBox(10);
+		Button btnNuevo = new Button("Nuevo");
 		Button btnAgregar = new Button("Agregar");
 		Button btnModificar = new Button("Modificar");
 		Button btnEliminar = new Button("Eliminar");
-		// Estilo directo para botones del formulario (fuente más pequeña y padding)
-		String btnStyle = "-fx-font-size:12px; -fx-padding:6 12 6 12;";
-		btnAgregar.setStyle(btnStyle);
-		btnModificar.setStyle(btnStyle);
-		btnEliminar.setStyle(btnStyle);
-		botones.getChildren().addAll(btnAgregar, btnModificar, btnEliminar);
+		Button btnRefrescar = new Button("Refrescar");
+		botones.getChildren().addAll(btnNuevo, btnAgregar, btnModificar, btnEliminar, btnRefrescar);
 
-		form.getChildren().addAll(tituloForm, grid, botones);
-
-		// Layout: formulario a la izquierda y catálogo a la derecha
-		form.setPrefWidth(420);
-		tabla.setPrefWidth(750);
-
-		HBox root = new HBox(20, form, tabla);
-		root.setPadding(new Insets(20));
-
-		Scene scene = new Scene(new StackPane(root), 1280, 720);
-		try {
-			scene.getStylesheets().add(getClass().getResource("Styles/Styles.css").toExternalForm());
-		} catch (Exception ex) {
-			// stylesheet opcional: no bloquear si no existe
-		}
-
-		stage.setTitle("Productos - Gestión");
-		stage.setScene(scene);
-		stage.show();
+		contenedor.getChildren().addAll(new Label("Gestión de Productos"), tabla, formulario, botones);
 
 		// Cargar datos iniciales
 		actualizarTabla(tabla);
+		
+		// Botón Nuevo - Limpiar formulario para agregar nuevo producto
+		btnNuevo.setOnAction(e -> {
+			limpiarFormulario(txtId, txtNombre, txtPrecio, txtExistentes, chkDisponible);
+			tabla.getSelectionModel().clearSelection();
+			if (!comboEtiqueta.getItems().isEmpty()) {
+				comboEtiqueta.getSelectionModel().select(0);
+			}
+			txtNombre.requestFocus();
+		});
 
-		// Selección en tabla → llenar formulario con los datos del producto seleccionado
+		// Listener para selección de tabla
 		tabla.getSelectionModel().selectedItemProperty().addListener((obs, oldV, nueva) -> {
 			if (nueva == null) return;
 			txtId.setText(String.valueOf(nueva.getIdProducto()));
 			txtNombre.setText(nueva.getNombre());
 			txtPrecio.setText(String.valueOf(nueva.getPrecio()));
 			txtExistentes.setText(String.valueOf(nueva.getExistentes()));
-			List<String> etiquetasLista = nueva.getEtiquetas();
-			comboEtiquetas.setValue(etiquetasLista == null || etiquetasLista.isEmpty() ? null : etiquetasLista.get(0));
 			chkDisponible.setSelected(nueva.isDisponible());
+			
+			// Seleccionar la etiqueta correspondiente
+			if (nueva.getEtiqueta() != null) {
+				for (Etiqueta etiq : comboEtiqueta.getItems()) {
+					if (etiq.getEtiquetaId().equals(nueva.getEtiqueta().getEtiquetaId())) {
+						comboEtiqueta.getSelectionModel().select(etiq);
+						break;
+					}
+				}
+			}
 		});
 
-		// AGREGAR
+		// Botón Agregar
 		btnAgregar.setOnAction(e -> {
+			// Verificar que no haya un ID (para asegurar que es un producto nuevo)
+			if (!txtId.getText().trim().isEmpty()) {
+				mostrarAlerta("Error", "Para agregar un nuevo producto, presione el botón 'Nuevo' primero");
+				return;
+			}
+			
 			String nombre = txtNombre.getText().trim();
 			if (nombre.isEmpty()) {
-				System.err.println("Nombre vacío");
+				mostrarAlerta("Error", "El nombre no puede estar vacío");
 				return;
 			}
 
-			float precio = 0f;
-			int exist = 0;
-			try { precio = Float.parseFloat(txtPrecio.getText().trim()); } catch (NumberFormatException ex) { /* dejar 0 */ }
-			try { exist = Integer.parseInt(txtExistentes.getText().trim()); } catch (NumberFormatException ex) { /* dejar 0 */ }
-
-			// Obtener etiqueta seleccionada (si hay)
-			List<String> tags = comboEtiquetas.getValue() == null ? List.of() : List.of(comboEtiquetas.getValue());
-
-			boolean ok = ventaController.agregarProducto(nombre, precio, exist, tags);
-			if (ok) {
-				// Refrescar vista y limpiar formulario manualmente (sin botón adicional)
-				actualizarTabla(tabla);
-				txtId.clear(); txtNombre.clear(); txtPrecio.clear(); txtExistentes.clear(); comboEtiquetas.getSelectionModel().clearSelection(); chkDisponible.setSelected(false);
-				tabla.getSelectionModel().clearSelection();
+			try {
+				float precio = Float.parseFloat(txtPrecio.getText().trim());
+				int exist = Integer.parseInt(txtExistentes.getText().trim());
+				
+				// Obtener etiqueta seleccionada
+				Etiqueta etiquetaSeleccionada = comboEtiqueta.getValue();
+				if (etiquetaSeleccionada == null) {
+					mostrarAlerta("Error", "Debe seleccionar una etiqueta");
+					return;
+				}
+				
+				boolean ok = inventarioController.agregarProducto(nombre, precio, exist, etiquetaSeleccionada.getEtiquetaId());
+				if (ok) {
+					actualizarTabla(tabla);
+					limpiarFormulario(txtId, txtNombre, txtPrecio, txtExistentes, chkDisponible);
+					tabla.getSelectionModel().clearSelection();
+					mostrarAlerta("Éxito", "Producto agregado correctamente");
+				} else {
+					mostrarAlerta("Error", "No se pudo agregar el producto");
+				}
+			} catch (NumberFormatException ex) {
+				mostrarAlerta("Error", "Precio y existentes deben ser números válidos");
 			}
 		});
 
-		// MODIFICAR
+		// Botón Modificar
 		btnModificar.setOnAction(e -> {
 			String idText = txtId.getText().trim();
 			if (idText.isEmpty()) {
-				System.err.println("Debe indicar el ID del producto a modificar");
+				mostrarAlerta("Error", "Seleccione un producto de la tabla");
 				return;
 			}
-			int id;
-			try { id = Integer.parseInt(idText); } catch (NumberFormatException ex) { System.err.println("ID inválido"); return; }
 
-			Venta p = ventaController.buscarProdcuto(id);
-			if (p == null) { System.err.println("Producto no encontrado: " + id); return; }
+			try {
+				Long id = Long.parseLong(idText);
+				Venta p = inventarioController.getVentaDAO().obtener(id);
+				if (p == null) {
+					mostrarAlerta("Error", "Producto no encontrado");
+					return;
+				}
 
-			String nuevoNombre = txtNombre.getText().trim();
-			if (!nuevoNombre.isEmpty()) ventaController.actualizarProducto(id, nuevoNombre);
+				String nuevoNombre = txtNombre.getText().trim();
+				if (!nuevoNombre.isEmpty()) p.setNombre(nuevoNombre);
 
-			String precioText = txtPrecio.getText().trim();
-			if (!precioText.isEmpty()) {
-				try { ventaController.actualizarProducto(id, Float.parseFloat(precioText)); } catch (NumberFormatException ex) { System.err.println("Precio inválido"); }
+				String precioText = txtPrecio.getText().trim();
+				if (!precioText.isEmpty()) {
+					p.setPrecio(Float.parseFloat(precioText));
+				}
+
+				String existText = txtExistentes.getText().trim();
+				if (!existText.isEmpty()) {
+					p.setExistentes(Integer.parseInt(existText));
+				}
+
+				p.setDisponible(chkDisponible.isSelected());
+				
+				// Actualizar etiqueta si se seleccionó una
+				Etiqueta etiquetaSeleccionada = comboEtiqueta.getValue();
+				if (etiquetaSeleccionada != null) {
+					p.setEtiqueta(etiquetaSeleccionada);
+				}
+				
+				inventarioController.getVentaDAO().actualizar(p);
+
+				actualizarTabla(tabla);
+				mostrarAlerta("Éxito", "Producto modificado correctamente");
+			} catch (NumberFormatException ex) {
+				mostrarAlerta("Error", "ID, precio y existentes deben ser números válidos");
 			}
-
-			String existText = txtExistentes.getText().trim();
-			if (!existText.isEmpty()) {
-				try { ventaController.actualizarProducto(id, Integer.parseInt(existText)); } catch (NumberFormatException ex) { System.err.println("Existentes inválido"); }
-			}
-
-			List<String> tags = comboEtiquetas.getValue() == null ? List.of() : List.of(comboEtiquetas.getValue());
-			if (!tags.isEmpty()) ventaController.actualizarProdcuto(id, tags);
-
-			ventaController.actualizarProducto(id, chkDisponible.isSelected());
-
-			// Actualizar vista tras cambios realizados
-			actualizarTabla(tabla);
 		});
 
-		// ELIMINAR
+		// Botón Eliminar
 		btnEliminar.setOnAction(e -> {
 			String idText = txtId.getText().trim();
-			if (idText.isEmpty()) { System.err.println("Indique ID a eliminar"); return; }
-			int id;
-			try { id = Integer.parseInt(idText); } catch (NumberFormatException ex) { System.err.println("ID inválido"); return; }
+			if (idText.isEmpty()) {
+				mostrarAlerta("Error", "Seleccione un producto de la tabla");
+				return;
+			}
 
-			boolean ok = ventaController.eliminarProducto(id);
-			if (ok) {
-				// Actualizar vista y limpiar formulario manualmente
-				actualizarTabla(tabla);
-				txtId.clear(); txtNombre.clear(); txtPrecio.clear(); txtExistentes.clear(); comboEtiquetas.getSelectionModel().clearSelection(); chkDisponible.setSelected(false);
-				tabla.getSelectionModel().clearSelection();
+			try {
+				Long id = Long.parseLong(idText);
+				
+				// Confirmar eliminación
+				Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+				confirmacion.setTitle("Confirmar eliminación");
+				confirmacion.setHeaderText(null);
+				confirmacion.setContentText("¿Está seguro de eliminar este producto?");
+				
+				if (confirmacion.showAndWait().get() == ButtonType.OK) {
+					boolean ok = inventarioController.eliminarProducto(id);
+					if (ok) {
+						actualizarTabla(tabla);
+						limpiarFormulario(txtId, txtNombre, txtPrecio, txtExistentes, chkDisponible);
+						tabla.getSelectionModel().clearSelection();
+						mostrarAlerta("Éxito", "Producto eliminado correctamente");
+					} else {
+						mostrarAlerta("Error", "No se pudo eliminar el producto");
+					}
+				}
+			} catch (NumberFormatException ex) {
+				mostrarAlerta("Error", "ID inválido");
 			}
 		});
-	}
 
-	private static List<String> parseEtiquetas(String texto) {
-		if (texto == null || texto.trim().isEmpty()) return List.of();
-		String[] parts = Arrays.stream(texto.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toArray(String[]::new);
-		return Arrays.asList(parts);
+		// Botón Refrescar
+		btnRefrescar.setOnAction(e -> actualizarTabla(tabla));
+
+		return contenedor;
 	}
 
 	private void actualizarTabla(TableView<Venta> tabla) {
 		tabla.getItems().clear();
-		tabla.getItems().addAll(ventaController.obtenerTodosLosProductos());
-	}
-  
-	public Pane getVistaIntegrada() {
-
-		// ---- ES EXACTAMENTE LO MISMO DE mostrar(...) PERO SIN CREAR ESCENA NI STAGE ----
-
-		TableView<Venta> tabla = new TableView<>();
-		tabla.setPrefWidth(700);
-
-		TableColumn<Venta, String> colId = new TableColumn<>("ID");
-		colId.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(String.valueOf(c.getValue().getIdProducto())));
-
-		TableColumn<Venta, String> colNombre = new TableColumn<>("Nombre");
-		colNombre.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
-
-		TableColumn<Venta, String> colPrecio = new TableColumn<>("Precio");
-		colPrecio.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty("$" + c.getValue().getPrecio()));
-
-		TableColumn<Venta, String> colExistentes = new TableColumn<>("Existentes");
-		colExistentes.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(String.valueOf(c.getValue().getExistentes())));
-
-		TableColumn<Venta, String> colDisponible = new TableColumn<>("Disponible");
-		colDisponible.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().isDisponible() ? "Sí" : "No"));
-
-		TableColumn<Venta, String> colEtiquetas = new TableColumn<>("Etiquetas");
-		colEtiquetas.setCellValueFactory(c -> {
-			List<String> etiquetas = c.getValue().getEtiquetas();
-			String etiquetasTexto = (etiquetas == null || etiquetas.isEmpty()) ? "" : String.join(", ", etiquetas);
-			return new javafx.beans.property.SimpleStringProperty(etiquetasTexto);
-		});
-
-		tabla.getColumns().addAll(colId, colNombre, colPrecio, colExistentes, colDisponible, colEtiquetas);
-
-		// Ajustes de ancho de columnas
-		colId.setPrefWidth(50);
-		colNombre.setPrefWidth(250);
-		colPrecio.setPrefWidth(100);
-		colExistentes.setPrefWidth(100);
-		colDisponible.setPrefWidth(100);
-		colEtiquetas.setPrefWidth(150);
-
-		tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-		// ---- FORM ----
-		VBox form = new VBox(12);
-		form.setPadding(new Insets(20));
-		form.setPrefWidth(420);
-
-		Label tituloForm = new Label("Gestionar Productos");
-
-		TextField txtId = new TextField();
-		TextField txtNombre = new TextField();
-		TextField txtPrecio = new TextField();
-		TextField txtExistentes = new TextField();
-
-		txtId.setPromptText("ID para editar/eliminar");
-		txtNombre.setPromptText("Nombre del producto");
-		txtPrecio.setPromptText("Precio");
-		txtExistentes.setPromptText("Existentes");
-
-		ComboBox<String> comboEtiquetas = new ComboBox<>();
-		comboEtiquetas.getItems().addAll("Consumible", "Impresión", "Trámite");
-
-		CheckBox chkDisponible = new CheckBox("Disponible");
-
-		GridPane grid = new GridPane();
-		grid.setHgap(10); grid.setVgap(10);
-		grid.setPadding(new Insets(8));
-
-		grid.addRow(0, new Label("ID:"), txtId);
-		grid.addRow(1, new Label("Producto:"), txtNombre);
-		grid.addRow(2, new Label("Precio:"), txtPrecio);
-		grid.addRow(3, new Label("Existentes:"), txtExistentes);
-		grid.addRow(4, new Label("Etiqueta:"), comboEtiquetas);
-		grid.addRow(5, chkDisponible);
-
-		HBox botones = new HBox(8);
-		Button btnAgregar = new Button("Agregar");
-		Button btnModificar = new Button("Modificar");
-		Button btnEliminar = new Button("Eliminar");
-		botones.getChildren().addAll(btnAgregar, btnModificar, btnEliminar);
-
-		form.getChildren().addAll(tituloForm, grid, botones);
-
-		HBox root = new HBox(20, form, tabla);
-		root.setPadding(new Insets(20));
-
-		// ---- MISMA LÓGICA ----
-		actualizarTabla(tabla);
-
-		tabla.getSelectionModel().selectedItemProperty().addListener((obs, oldV, nueva) -> {
-			if (nueva == null) return;
-			txtId.setText(String.valueOf(nueva.getIdProducto()));
-			txtNombre.setText(nueva.getNombre());
-			txtPrecio.setText(String.valueOf(nueva.getPrecio()));
-			txtExistentes.setText(String.valueOf(nueva.getExistentes()));
-			comboEtiquetas.setValue(
-				nueva.getEtiquetas() == null || nueva.getEtiquetas().isEmpty() ?
-						null : nueva.getEtiquetas().get(0)
-			);
-			chkDisponible.setSelected(nueva.isDisponible());
-		});
-
-		btnAgregar.setOnAction(e -> {
-			String nombre = txtNombre.getText().trim();
-			if (nombre.isEmpty()) return;
-
-			float precio = 0;
-			int exist = 0;
-			try { precio = Float.parseFloat(txtPrecio.getText().trim()); } catch (Exception ignored) {}
-			try { exist = Integer.parseInt(txtExistentes.getText().trim()); } catch (Exception ignored) {}
-
-			List<String> tags = comboEtiquetas.getValue() == null ? List.of() : List.of(comboEtiquetas.getValue());
-
-			if (ventaController.agregarProducto(nombre, precio, exist, tags)) {
-				actualizarTabla(tabla);
-				txtId.clear(); txtNombre.clear(); txtPrecio.clear(); txtExistentes.clear();
-				comboEtiquetas.getSelectionModel().clearSelection();
-				chkDisponible.setSelected(false);
-			}
-		});
-
-		btnModificar.setOnAction(e -> {
-			String idText = txtId.getText().trim();
-			if (idText.isEmpty()) return;
-
-			int id;
-			try { id = Integer.parseInt(idText); } catch (Exception ex) { return; }
-
-			Venta p = ventaController.buscarProdcuto(id);
-			if (p == null) return;
-
-			if (!txtNombre.getText().trim().isEmpty())
-				ventaController.actualizarProducto(id, txtNombre.getText().trim());
-
-			if (!txtPrecio.getText().trim().isEmpty())
-				ventaController.actualizarProducto(id, Float.parseFloat(txtPrecio.getText().trim()));
-
-			if (!txtExistentes.getText().trim().isEmpty())
-				ventaController.actualizarProducto(id, Integer.parseInt(txtExistentes.getText().trim()));
-
-			List<String> tags = comboEtiquetas.getValue() == null ? List.of() : List.of(comboEtiquetas.getValue());
-			if (!tags.isEmpty())
-				ventaController.actualizarProdcuto(id, tags);
-
-			ventaController.actualizarProducto(id, chkDisponible.isSelected());
-
-			actualizarTabla(tabla);
-		});
-
-		btnEliminar.setOnAction(e -> {
-			String idText = txtId.getText().trim();
-			if (idText.isEmpty()) return;
-
-			int id;
-			try { id = Integer.parseInt(idText); } catch (Exception ex) { return; }
-
-			if (ventaController.eliminarProducto(id))
-				actualizarTabla(tabla);
-		});
-
-		return root;
+		List<Venta> productos = inventarioController.getVentaDAO().obtenerTodas();
+		tabla.getItems().addAll(productos);
 	}
 
+	private void limpiarFormulario(TextField txtId, TextField txtNombre, TextField txtPrecio, TextField txtExistentes, CheckBox chkDisponible) {
+		txtId.clear();
+		txtNombre.clear();
+		txtPrecio.clear();
+		txtExistentes.clear();
+		chkDisponible.setSelected(false);
+	}
 
-
+	private void mostrarAlerta(String titulo, String mensaje) {
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.setTitle(titulo);
+		alert.setHeaderText(null);
+		alert.setContentText(mensaje);
+		alert.showAndWait();
+	}
 }
