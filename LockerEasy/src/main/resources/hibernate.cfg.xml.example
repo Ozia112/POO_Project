@@ -21,10 +21,11 @@
         <!-- Mapeo de las clases -->
         <mapping class= "model.TipoServicio"/>
         <mapping class= "model.Ubicacion"/>
-        <mapping class= "model.Ticket"/>
-        <mapping class= "model.Renta"/>
         <mapping class= "model.Etiqueta"/>
         <mapping class= "model.Servicio"/>
+        <mapping class= "model.Ticket"/>
+        <mapping class= "model.Renta"/>
         <mapping class= "model.Venta"/>
+        <mapping class= "model.Reporte"/>
     </session-factory>
 </hibernate-configuration>

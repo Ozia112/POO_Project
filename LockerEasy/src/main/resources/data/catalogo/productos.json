@@ -1,8 +1,14 @@
 [
   {
+<<<<<<< HEAD
     "precio": 12,
     "etiquetas": ["Consumible"],
     "existentes": 6,
+=======
+    "precio": 50,
+    "etiquetas": ["Bebidas"],
+    "existentes": 51,
+>>>>>>> temp.TM-01.Design.DATABASE-WIP
     "id": 1,
     "nombre": "Agua 600ml",
     "disponible": true

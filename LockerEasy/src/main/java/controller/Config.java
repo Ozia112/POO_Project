@@ -1,14 +1,5 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
-import model.Renta;
-import model.Servicio;
-import model.TipoServicio;
-import model.Venta;
-
 public class Config {
     // Configuraciones renta
     private static float precio_hora_locker = 50.0f;
@@ -25,6 +16,7 @@ public class Config {
     public static void setMinutosTolerancia(int minutos) { minutos_tolerancia = minutos; }
     public static void setMinutosCancelacion(int minutos) { minutos_cancelacion = minutos; }
     public static void setDescuentoUnico(float descuento) { descuento_unico = descuento; }
+<<<<<<< HEAD
 
     /**
      * Metodo que convierte diferentes tiupos de objetos a LinkedHashMap.
@@ -105,4 +97,6 @@ public class Config {
                          (objeto != null ? objeto.getClass().getName() : "null"));
         return objeto;
     }
+=======
+>>>>>>> temp.TM-01.Design.DATABASE-WIP
 }
