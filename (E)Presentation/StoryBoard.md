@@ -2,7 +2,7 @@
 
 ## Scene 1
 
-![Scene1.png](StoryBoard5..png)
+![Scene1.png](StoryBoard5.png)
 
 **Description:** The presenter appears on camera, introducing the topic of the video and briefly explaining the purpose of the LockerEasy project.
 
@@ -10,7 +10,7 @@
 
 ## Scene 2
 
-![Scene2.png](StoryBoard3..png)
+![Scene2.png](StoryBoard3.png)
 
 **Description:** The presenter continues discussing the project while showing supporting visuals related to the development process and the initial stages of the system.
 
@@ -26,7 +26,7 @@
 
 ## Scene 4
 
-![Scene4.png](StoryBoard1..png)
+![Scene4.png](StoryBoard1.png)
 
 **Description:** The video returns to the main camera shot where the presenter expands on key technical decisions and important parts of the project.
 
