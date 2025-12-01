@@ -19,3 +19,11 @@
         "${env:HOME}/.m2/repository/org/openjfx/javafx-base/23.0.1/javafx-base-23.0.1-linux.jar"
     ]
 }
+"files.exclude": {
+        "(B)Product/": false,
+        "(C)Requeriments/": false,
+        "(E)Design/": false,
+        "(E)Presentation/": true,
+        "Competences/": true,
+        "LockerEasy/": true
+    }
