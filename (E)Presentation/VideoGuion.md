@@ -86,13 +86,10 @@
 
 ## **4. Conclusión (30–40 segundos)**
 
-> [TOMA FINAL: plano medio, logo LockerEasy al fondo.]
-> 
+> **[TOMA FINAL: plano medio, logo LockerEasy al fondo.]**
 
 **Presentador:**
-
-“En resumen, estas tres stages nos enseñaron más que solo diseño y código. Nos enseñaron a trabajar bajo presión, a comunicarnos mejor y a tomar decisiones realistas. Ahora estamos listos para iniciar la fase de programación completa con un equipo más fuerte y un sistema más claro.”
+"En estas tres stages entendimos que un proyecto no solo se construye con diagramas y líneas de código, sino con comunicación, paciencia y trabajo en conjunto. Cada etapa nos obligó a adaptarnos, reorganizarnos y tomar decisiones más conscientes. Hoy cerramos esta fase con una visión más clara y un equipo más preparado para seguir construyendo LockerEasy."
 
 **Presentador:**
-
-“Gracias por acompañarnos en este proceso. Lo mejor está por venir.”
+"Gracias por acompañarnos en este camino. Continuamos adelante."
