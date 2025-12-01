@@ -1,9 +1,0 @@
-{
-  "id" : 20,
-  "fecha_reporte" : "2025-11-30",
-  "tiempo_emision" : "2025-11-30T19:46:58.905115032Z",
-  "nombre_cliente" : "aaaa",
-  "correo_cliente" : "",
-  "servicios" : [ ],
-  "total_ticket" : 50.0
-}

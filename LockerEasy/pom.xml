@@ -59,7 +59,6 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- ==== DB (por si luego lo usas) ==== -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -128,5 +127,3 @@
     </build>
 
 </project>
-
-

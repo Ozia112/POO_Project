@@ -10,12 +10,12 @@ import model.Etiqueta;
 
 import java.util.List;
 
-public class VentaGUI {
+public class ConfigVentaGUI {
 
 	private final VentaController ventaController;
 	private final InventarioController inventarioController;
 
-	public VentaGUI(VentaController ventaController) {
+	public ConfigVentaGUI(VentaController ventaController) {
 		this.ventaController = ventaController;
 		this.inventarioController = new InventarioController();
 	}

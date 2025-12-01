@@ -15,15 +15,30 @@ public class TicketDAO {
      * Metodo para guardar un nuevo ticket en la base de datos
      * @param Ticket El ticket a guardar
      */
-    public void guardar(Ticket ticket) {
+    public boolean guardar(Ticket ticket) {
         Transaction transaction = null;
-        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
+        Session session = null;
+
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
+
             session.persist(ticket);
             transaction.commit();
+            System.out.println("Ticket guardado con ID: " + ticket.getTicketId());
+            return true;
+
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            throw new RuntimeException("Error al guardar el ticket");
+            if (transaction != null && transaction.getStatus().canRollback()) {
+                transaction.rollback();
+            }
+            System.err.println("Error al guardar el ticket: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
         }
     }
 
@@ -31,15 +46,30 @@ public class TicketDAO {
      * Metodo para actualizar un ticket existente en la base de datos
      * @param Ticket El ticket a actualizar
      */
-    public void actualizar(Ticket ticket) {
+    public boolean actualizar(Ticket ticket) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()){
+        Session session = null;
+        
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
+            
             session.merge(ticket);
+            
             transaction.commit();
+            return true;
+            
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            throw new RuntimeException("Error al actualizar el ticket");
+            if (transaction != null && transaction.getStatus().canRollback()) {
+                transaction.rollback();
+            }
+            System.err.println("Error al actualizar ticket: " + e.getMessage());
+            return false;
+            
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
         }
     }
 
@@ -55,13 +85,13 @@ public class TicketDAO {
     }
 
     /**
-     * Metodo para obtener los tickets de unq fecha especifica
+     * Metodo para obtener los tickets de una fecha especifica
      * @param fecha LocalDate de los tickets a obtener
      * @return Lista de tickets encontrados
      */
     public List<Ticket> obtener(LocalDate fecha) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "FROM Ticket t WHERE t.fecha_reporte =:fecha";
+            String hql = "FROM Ticket t WHERE t.reporte.fecha_reporte =:fecha";
             Query<Ticket> query = session.createQuery(hql, Ticket.class);
             query.setParameter("fecha", fecha);
             return query.list();
@@ -70,18 +100,26 @@ public class TicketDAO {
 
     public boolean eliminar(Long ticketId) {
         Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        Session session = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
             transaction = session.beginTransaction();
+
             Ticket ticket = session.get(Ticket.class, ticketId);
             if (ticket != null) {
                 session.remove(ticket);
-                transaction.commit();
-                return true;
             }
-            return false;
+
+            transaction.commit();
+            return true;
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            throw new RuntimeException("Error al eliminar ticket", e);
+            if (transaction != null && transaction.getStatus().canRollback()) {
+                transaction.rollback();
+            }
+            System.err.println("Error al eliminar ticket: " + e.getMessage());
+            return false;
+        } finally {
+            if (session != null && session.isOpen()) session.close();
         }
     }
 }

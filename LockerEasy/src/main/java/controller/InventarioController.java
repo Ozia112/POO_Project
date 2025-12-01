@@ -8,15 +8,11 @@ import java.util.List;
 
 public class InventarioController {
     private final VentaDAO ventaDAO;
-    private EtiquetaController etiquetaController;
+    private final EtiquetaController etiquetaController;
 
     public InventarioController() {
         this.ventaDAO = new VentaDAO();
-    }
-
-    public InventarioController(EtiquetaController etiquetaController) {
-        this();
-        this.etiquetaController = etiquetaController;
+        this.etiquetaController = new EtiquetaController();
     }
 
     public boolean agregarProducto(String nombre, float precio, int existentes, Long etiquetaId) {

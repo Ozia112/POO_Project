@@ -19,13 +19,13 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.Etiqueta;
 
-public class EtiquetasGUI {
+public class ConfigEtiquetasGUI {
 
     private final EtiquetaController etiquetaController;
     private VBox formularioContainer;
     private VBox listaEtiquetas;
 
-    public EtiquetasGUI(EtiquetaController etiquetaController) {
+    public ConfigEtiquetasGUI(EtiquetaController etiquetaController) {
         this.etiquetaController = etiquetaController;
     }
 

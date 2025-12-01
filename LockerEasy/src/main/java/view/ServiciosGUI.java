@@ -20,21 +20,6 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.time.Instant;
 
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import model.Renta;
 import model.Servicio;
 import model.Ticket;
@@ -166,15 +151,20 @@ public class ServiciosGUI {
 
         // Sub-pestaña Venta
         Tab tabVenta = new Tab("Venta");
-        VentaGUI ventaGUI = new VentaGUI(ventaController);
-        tabVenta.setContent(ventaGUI.getVistaIntegrada());
+        ConfigVentaGUI configVentaGUI = new ConfigVentaGUI(ventaController);
+        tabVenta.setContent(configVentaGUI.getVistaIntegrada());
 
         // Sub-pestaña Etiquetas
         Tab tabEtiquetas = new Tab("Etiquetas");
-        EtiquetasGUI etiquetasGUI = new EtiquetasGUI(etiquetaController);
-        tabEtiquetas.setContent(etiquetasGUI.getVistaIntegrada());
+        ConfigEtiquetasGUI configEtiquetasGUI = new ConfigEtiquetasGUI(etiquetaController);
+        tabEtiquetas.setContent(configEtiquetasGUI.getVistaIntegrada());
 
-        subTabPane.getTabs().addAll(tabVenta, tabEtiquetas);
+        // Sub-pestaña Renta (configuración)
+        Tab tabRentaConfig = new Tab("Renta");
+        ConfigRentaGUI configRentaGUI = new ConfigRentaGUI(rentaController);
+        tabRentaConfig.setContent(configRentaGUI.getVistaIntegrada());
+
+        subTabPane.getTabs().addAll(tabVenta, tabEtiquetas, tabRentaConfig);
 
         root.getChildren().add(subTabPane);
         VBox.setVgrow(subTabPane, Priority.ALWAYS);
@@ -553,38 +543,38 @@ private HBox crearBotonesUtilidad() {
         actualizarGridUbicaciones();
     }
 
-        private void manejarCrearTicketConVenta() {
-            String nombre = txtNombre.getText().trim();
-            String correo = txtCorreo.getText().trim();
+    private void manejarCrearTicketConVenta() {
+        String nombre = txtNombre.getText().trim();
+        String correo = txtCorreo.getText().trim();
 
-            // Crear ticket si es el primero
-            ticketActual = ticketController.crearNuevoTicket(nombre, correo);
+        // Crear ticket si es el primero
+        ticketActual = ticketController.crearNuevoTicket(nombre, correo);
 
-            // Obtener el producto seleccionado del ComboBox
-            ComboBox<Venta> comboProductos = (ComboBox<Venta>) ((HBox)((VBox)((VBox) ((HBox)((VBox) tabPane.getTabs().get(0).getContent()).getChildren().get(1)).getChildren().get(1))).getChildren().get(0)).getChildren().get(0);
-            Venta producto = comboProductos.getValue();
+        // Obtener el producto seleccionado del ComboBox
+        ComboBox<Venta> comboProductos = (ComboBox<Venta>) ((HBox)((VBox)((VBox) ((HBox)((VBox) tabPane.getTabs().get(0).getContent()).getChildren().get(1)).getChildren().get(1))).getChildren().get(0)).getChildren().get(0);
+        Venta producto = comboProductos.getValue();
 
-            if (producto == null) {
-                consolaTickets.appendText("[ERROR] Selecciona un producto.\n");
-                return;
-            }
-
-            Long idProducto = producto.getIdProducto();
-
-            // Registrar venta REAL
-            boolean ok = ventaController.registrarVenta(idProducto, 1, ticketActual);
-
-            if (ok) {
-                agregarTicketALista(ticketActual);
-                consolaTickets.appendText("[OK] Se agregó: " + producto.getNombre() + "\n");
-                txtNombre.clear();
-                txtCorreo.clear();
-            } else {
-                consolaTickets.appendText("[ERROR] No se pudo registrar la venta.\n");
-            }
-
-            showCurrentTicket(ticketActual);
+        if (producto == null) {
+            consolaTickets.appendText("[ERROR] Selecciona un producto.\n");
+            return;
         }
+
+        Long idProducto = producto.getIdProducto();
+
+        // Registrar venta REAL
+        boolean ok = ventaController.registrarVenta(idProducto, 1, ticketActual);
+
+        if (ok) {
+            agregarTicketALista(ticketActual);
+            consolaTickets.appendText("[OK] Se agregó: " + producto.getNombre() + "\n");
+            txtNombre.clear();
+            txtCorreo.clear();
+        } else {
+            consolaTickets.appendText("[ERROR] No se pudo registrar la venta.\n");
+        }
+
+        showCurrentTicket(ticketActual);
+    }
 
 
     private void manejarClickUbicacion(Ubicacion ubicacion) {
@@ -646,17 +636,32 @@ private HBox crearBotonesUtilidad() {
         } else {
             Ticket ticket = rentaController.getTicketDeRenta(ubicacion);
 
+            String nombreCliente;
+            Long ticketId;
+            
+            if (ticket != null) {
+                nombreCliente = ticket.getNombreCliente();
+                ticketId = ticket.getTicketId();
+            } else {
+                nombreCliente = nombreClienteTemp != null ? nombreClienteTemp : "Cliente sin asignar";
+                ticketId = null;
+            }
+
             int horasAcumuladas = rentaController.calcularTiempoTrancurrido(renta, Instant.now());
             float totalAcumuladoActual = horasAcumuladas * renta.getPrecio();
 
             Label lblEstado = new Label("Estado: Ocupado");
             lblEstado.setStyle("-fx-text-fill: red;");
 
+            estadoUbicacionBox.getChildren().add(lblTitulo);
+            estadoUbicacionBox.getChildren().add(lblEstado);
+            
+            if (ticketId != null) {
+                estadoUbicacionBox.getChildren().add(new Label("TicketID: " + ticketId));
+            }
+            
             estadoUbicacionBox.getChildren().addAll(
-                    lblTitulo,
-                    lblEstado,
-                    new Label("TicketID: " + ticket.getTicketId()),
-                    new Label("Cliente: " + ticket.getNombreCliente()),
+                    new Label("Cliente: " + nombreCliente),
                     new Label("Inicio: " + instantToString(renta.getInicioRenta())),
                     new Label("Horas acumuladas: " + horasAcumuladas),
                     new Label("Total acumulado: $" + String.format("%.2f", totalAcumuladoActual)),
@@ -858,12 +863,24 @@ private HBox crearBotonesUtilidad() {
 
     private void actualizarRentasEnProgreso() {
         rentasEnProgresoBox.getChildren().clear();
-        
+    
         for (Ubicacion ub : rentaController.getUbicacionDAO().obtenerTodas()) {
             Renta renta = rentaController.getRenta(ub);
             if (renta != null) {
                 Ticket ticket = rentaController.getTicketDeRenta(ub);
-                Label lblRenta = new Label(ub.getNombreLocker() + "\n" + ticket.getNombreCliente());
+                
+                String nombreCliente;
+                if (ticket != null) {
+                    nombreCliente = ticket.getNombreCliente();
+                } else if (modoIniciarRenta && nombreClienteTemp != null) {
+                    // Si estamos en modo de iniciar renta, usar el temporal
+                    nombreCliente = nombreClienteTemp;
+                } else {
+                    // Fallback si no hay información disponible
+                    nombreCliente = "Cliente sin asignar";
+                }
+                
+                Label lblRenta = new Label(ub.getNombreLocker() + "\n" + nombreCliente);
                 lblRenta.setStyle("-fx-padding: 8; -fx-border-color: #cccccc; -fx-border-width: 1; -fx-background-color: #fff3cd; -fx-cursor: hand;");
                 
                 lblRenta.setOnMouseClicked(e -> {
