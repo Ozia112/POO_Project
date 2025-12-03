@@ -1,57 +1,52 @@
-import controller.EtiquetaController;
-import controller.RentaController;
-import controller.ReporteController;
-import controller.TicketController;
-import controller.VentaController;
-import controller.EtiquetaController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
-import javafx.application.Application;
-import javafx.stage.Stage;
-import view.ServiciosGUI;
+import view.MainGUI;
+import view.LoginDialog;
+import controller.Config;
+import dao.HibernateUtil;
 
 public class Main extends Application {
 
-  
     @Override
     public void start(Stage stage) {
-
-        // Instancia DIRECTA porque ServiciosGUI NO tiene constructor 
-        ServiciosGUI gui = new ServiciosGUI();
-
-        // Mostrar GUI
-        gui.mostrar(stage);
-      
-        // ===== Controladores Reales =====
-        ReporteController reporteController = new ReporteController();
-        TicketController ticketController = new TicketController(reporteController);
-        VentaController ventaController = new VentaController();
-        RentaController rentaController = new RentaController();
-        EtiquetaController etiquetaController = new EtiquetaController();
-
-        // ===== Configurar dependencias =====
-        rentaController.setReporteController(reporteController);
-
-        // ===== UI Bonita =====
+        // Intentar inicializar Hibernate (puede requerir diálogo de login)
+        if (!inicializarConexion(stage)) {
+            // Si no se pudo conectar, cerrar la aplicación
+            Platform.exit();
+            return;
+        }
         
+        // Inicializar configuración desde la base de datos
+        Config.inicializar();
         
-        ServiciosGUI gui = new ServiciosGUI(
-            ticketController,
-            ventaController,
-            rentaController,
-            reporteController,
-            etiquetaController
-        );
-
-        gui.mostrar(stage);
-        
-
-        /*  Versión temporal para probar la gestión de productos
-        VentaGUI ventaGui = new VentaGUI(ventaController);
-        ventaGui.mostrar(stage);
-        */
+        // ServiciosGUI ya tiene sus propios controladores internos
+        new MainGUI().mostrar(stage);
     }
-
+    
+    /**
+     * Inicializa la conexión a la base de datos.
+     * Si no hay credenciales, muestra el diálogo de login.
+     * @return true si la conexión fue exitosa, false si se canceló
+     */
+    private boolean inicializarConexion(Stage ownerStage) {
+        // Verificar si ya hay una SessionFactory inicializada
+        if (HibernateUtil.estaInicializado()) {
+            return true;
+        }
+        
+        // Intentar inicializar (puede usar variables de entorno o archivo)
+        try {
+            HibernateUtil.getSessionFactory();
+            return true;
+        } catch (IllegalStateException e) {
+            // No hay credenciales, mostrar diálogo
+            System.out.println("[Main] No hay credenciales guardadas. Mostrando diálogo de login...");
+        }
+        
+        // Mostrar diálogo de login
+        LoginDialog loginDialog = new LoginDialog();
+        return loginDialog.mostrarYEsperar(ownerStage);
     }
     
     public static void main(String[] args) {

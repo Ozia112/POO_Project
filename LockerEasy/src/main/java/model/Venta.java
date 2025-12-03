@@ -1,51 +1,31 @@
 package model;
 
-import java.util.List;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "ventas") 
+@PrimaryKeyJoinColumn(name = "venta_id")
 public class Venta extends TipoServicio {
 
-    private int id;
-    private int existentes; // inventario
-    private List<String> etiquetas;
-            private boolean disponible; // true si existen > 0 o si es inagotable(estos pueden ser modificados desde configuracion)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "producto_catalogo_id", nullable = false)
+    private ProductoCatalogo productoCatalogo;
 
-                   
+    public Venta() {
+        super();
+    }
+
+    public Venta(String nombre, int cantidad, ProductoCatalogo productoCatalogo) {
+        super(nombre, cantidad);
+        this.productoCatalogo = productoCatalogo;
+    }
+
+    public ProductoCatalogo getProductoCatalogo() { return productoCatalogo; }
+
     
-        @Override
-        public String toString() {
-            return getNombre() + " ($" + getPrecio() + ")";
-        }
+    
+    @Override
+    public float getPrecio() { return productoCatalogo != null ? productoCatalogo.getPrecio() : 0f; }
 
-
-
-    public Venta(int id, String nombre, float precio, int cantidad, int existentes, List<String> etiquetas, boolean disponible) {
-        super(nombre, precio, cantidad);
-        this.id = id;
-        this.existentes = existentes;
-        this.etiquetas = etiquetas;
-        this.disponible = disponible;
-    }
-
-    public Venta(int id, String nombre, float precio, int existentes, List<String> etiquetas, boolean disponible) {
-        super(nombre, precio);
-        this.id = id;
-        this.existentes = existentes;
-        this.etiquetas = etiquetas;
-        this.disponible = disponible;
-    }
-
-    public Venta() { }
-
-    public int getIdProducto() { return id; }
-    public int getExistentes() { return existentes; }
-    public List<String> getEtiquetas() { return etiquetas; }
-    public boolean isDisponible() { return disponible; }
-
-    public void setIdProducto(int id) { this.id = id; }
-    public void setExistentes(int existentes) { this.existentes = existentes; }
-    public void setDisponible(boolean disponible) { this.disponible = disponible; }
-    public void setEtiquetas(List<String> etiquetas) { this.etiquetas = etiquetas; }
-
-
-
+    public void setProductoCatalogo(ProductoCatalogo productoCatalogo) { this.productoCatalogo = productoCatalogo; }
 }
