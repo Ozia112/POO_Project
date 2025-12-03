@@ -1,6 +1,6 @@
 {
     "java.project.sourcePaths": [
-        "LockerEasy\\src\\main\\java"
+        "LockerEasy/src/main/java"
     ],
     "files.exclude": {
         "(E)Presentation": true,
@@ -10,5 +10,12 @@
     },
     "java.maven.downloadSources": true,
     "liveshare.languages.allowGuestCommandControl": true,
-    "liveshare.allowGuestDebugControl": true
+    "liveshare.allowGuestDebugControl": true,
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "${env:HOME}/.m2/repository/org/openjfx/javafx-controls/23.0.1/javafx-controls-23.0.1-linux.jar",
+        "${env:HOME}/.m2/repository/org/openjfx/javafx-graphics/23.0.1/javafx-graphics-23.0.1-linux.jar",
+        "${env:HOME}/.m2/repository/org/openjfx/javafx-base/23.0.1/javafx-base-23.0.1-linux.jar"
+    ]
 }

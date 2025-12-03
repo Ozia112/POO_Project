@@ -1,39 +1,31 @@
 package model;
 
-import java.util.List;
+import jakarta.persistence.*;
 
-public class Venta {
+@Entity
+@Table(name = "ventas") 
+@PrimaryKeyJoinColumn(name = "venta_id")
+public class Venta extends TipoServicio {
 
-    private int id;
-    private String nombre;
-    private float precio;
-    private int existentes; // inventario
-    private List<String> etiquetas;
-    private int cantidad; // cantidad vendida
-    private boolean disponible; // true si existen > 0 o si es inagotable(estos pueden ser modificados desde configuracion)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "producto_catalogo_id", nullable = false)
+    private ProductoCatalogo productoCatalogo;
 
-    public Venta(int id, String nombre, float precio, int existentes, List<String> etiquetas, boolean disponible) {
-        this.id = id;
-        this.nombre = nombre;
-        this.precio = precio;
-        this.existentes = existentes;
-        this.etiquetas = etiquetas;
-        this.cantidad = 0;
-        this.disponible = disponible;
+    public Venta() {
+        super();
     }
 
-    public int getId() { return id; }
-    public String getNombre() { return nombre; }
-    public float getPrecio() { return precio; }
-    public int getExistentes() { return existentes; }
-    public List<String> getEtiquetas() { return etiquetas; }
-    public int getCantidad() { return cantidad; }
-    public boolean isDisponible() { return disponible; }
+    public Venta(String nombre, int cantidad, ProductoCatalogo productoCatalogo) {
+        super(nombre, cantidad);
+        this.productoCatalogo = productoCatalogo;
+    }
 
-    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public void setPrecio(float precio) { this.precio = precio; }
-    public void setExistentes(int existentes) { this.existentes = existentes; }
-    public void setDisponible(boolean disponible) { this.disponible = disponible; }
-    public void setEtiquetas(List<String> etiquetas) { this.etiquetas = etiquetas; }
+    public ProductoCatalogo getProductoCatalogo() { return productoCatalogo; }
+
+    
+    
+    @Override
+    public float getPrecio() { return productoCatalogo != null ? productoCatalogo.getPrecio() : 0f; }
+
+    public void setProductoCatalogo(ProductoCatalogo productoCatalogo) { this.productoCatalogo = productoCatalogo; }
 }

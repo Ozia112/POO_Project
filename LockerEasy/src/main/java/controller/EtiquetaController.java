@@ -1,72 +1,87 @@
 package controller;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import dao.EtiquetaDAO;
 import model.Etiqueta;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
 public class EtiquetaController {
-    private static final String ETIQUETAS_FILE = "LockerEasy/src/main/resources/data/etiquetas.json";
+    private final EtiquetaDAO etiquetaDAO;
 
-    public static List<Etiqueta> cargarEtiquetas() {
-        List<Etiqueta> etiquetas = new ArrayList<>();
+    public EtiquetaController() {
+        this.etiquetaDAO = new EtiquetaDAO();
+    }
+
+    public boolean agregarEtiqueta(String nombre, boolean afectaInventario) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            System.err.println("El nombre de la etiqueta no puede estar vac├¡o");
+            return false;
+        }
+
+        Etiqueta etiqueta = new Etiqueta(nombre, afectaInventario);
         try {
-            String content = new String(Files.readAllBytes(Paths.get(ETIQUETAS_FILE)));
-            JSONArray arr = new JSONArray(content);
-            for (int i = 0; i < arr.length(); i++) {
-                JSONObject obj = arr.getJSONObject(i);
-                etiquetas.add(new Etiqueta(
-                    obj.getString("nombre"),
-                    obj.getBoolean("afecta_inventario")
-                ));
-            }
+            etiquetaDAO.guardar(etiqueta);
+            System.out.println("Etiqueta agregada: " + nombre);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al guardar etiqueta: " + e.getMessage());
+            return false;
         }
-        return etiquetas;
     }
 
-    public static void agregarEtiqueta(Etiqueta nueva) {
-        List<Etiqueta> etiquetas = cargarEtiquetas();
-        etiquetas.add(nueva);
-        guardarEtiquetas(etiquetas);
-    }
-
-    public static void eliminarEtiqueta(String nombre) {
-        List<Etiqueta> etiquetas = cargarEtiquetas();
-        etiquetas.removeIf(e -> e.getNombre().equalsIgnoreCase(nombre));
-        guardarEtiquetas(etiquetas);
-    }
-
-    public static void guardarEtiquetas(List<Etiqueta> etiquetas) {
-        JSONArray arr = new JSONArray();
-        for (Etiqueta e : etiquetas) {
-            JSONObject obj = new JSONObject();
-            obj.put("nombre", e.getNombre());
-            obj.put("afecta_inventario", e.isAfectaInventario());
-            arr.put(obj);
+    public boolean actualizarEtiqueta(Long id, String nuevoNombre, boolean afectaInventario) {
+        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
+            System.err.println("El nombre de la etiqueta no puede estar vac├¡o");
+            return false;
         }
+
+        Etiqueta etiqueta = etiquetaDAO.obtener(id);
+        if (etiqueta == null) {
+            System.err.println("Etiqueta no encontrada: ID " + id);
+            return false;
+        }
+
+        etiqueta.setNombre(nuevoNombre);
+        etiqueta.setAfectaInventario(afectaInventario);
         try {
-            Files.write(Paths.get(ETIQUETAS_FILE), arr.toString(2).getBytes());
+            etiquetaDAO.actualizar(etiqueta);
+            System.out.println("Etiqueta actualizada: ID " + id);
+            return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al actualizar etiqueta: " + e.getMessage());
+            return false;
         }
     }
 
-    public static boolean etiquetasAfectanInventario(List<String> etiquetasProducto) {
-        List<Etiqueta> etiquetas = cargarEtiquetas();
-        for (String nombre : etiquetasProducto) {
-            for (Etiqueta e : etiquetas) {
-                if (e.getNombre().equalsIgnoreCase(nombre)) {
-                    if (!e.isAfectaInventario()) return false;
-                }
+    public boolean eliminarEtiqueta(Etiqueta etiqueta) {
+        try {
+            etiquetaDAO.eliminar(etiqueta.getEtiquetaId());
+            System.out.println("Etiqueta eliminada: " + etiqueta.getNombre());
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al eliminar etiqueta: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean eliminarEtiqueta(String nombre) {
+        Long idAEliminar = null;
+        
+        List<Etiqueta> todasEtiquetas = etiquetaDAO.obtenerTodas();
+        for (Etiqueta e : todasEtiquetas) {
+            if (e.getNombre().equalsIgnoreCase(nombre)) {
+                idAEliminar = e.getEtiquetaId();
+                break;
             }
         }
-        return true;
+        if (idAEliminar == null) {
+            System.err.println("Etiqueta no encontrada: " + nombre);
+            return false;
+        }
+        return eliminarEtiqueta(etiquetaDAO.obtener(idAEliminar));
+    }
+
+    public EtiquetaDAO getEtiquetaDAO() {
+        return etiquetaDAO;
     }
 }
