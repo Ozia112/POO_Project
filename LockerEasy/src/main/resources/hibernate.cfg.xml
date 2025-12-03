@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<!--
+    =====================================================
+    CONFIGURACIÓN DE HIBERNATE - LOCKEREASY
+    =====================================================
+    
+    Las credenciales se cargan desde variables de entorno:
+    - DB_URL: URL de conexión (ej: jdbc:postgresql://localhost:5432/lockereasy)
+    - DB_USER: Usuario de la base de datos
+    - DB_PASSWORD: Contraseña de la base de datos
+    
+    Si no hay variables de entorno, la aplicación pedirá
+    las credenciales al iniciar.
+    
+    =====================================================
+-->
+
+<hibernate-configuration>
+    <session-factory>
+        <!-- Configuracion de la base de datos - Se sobreescriben programáticamente -->
+        <!-- Estos valores son placeholders, las credenciales reales se cargan desde: -->
+        <!-- 1. Variables de entorno (DB_URL, DB_USER, DB_PASSWORD) -->
+        <!-- 2. Archivo ~/.lockereasy/db.properties -->
+        <!-- 3. Diálogo de login al iniciar -->
+        <property name="connection.url">jdbc:postgresql://localhost:5432/DATABASE</property>
+        <property name="connection.username">USERNAME</property>
+        <property name="connection.password">PASSWORD</property>
+
+        <!-- Dialecto de Hibernate -->
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        
+        <!-- Configuración del pool de conexiones -->
+        <property name="connection.pool_size">10</property>
+        
+        <!-- Mostrar SQL en consola -->
+        <property name="show_sql">false</property>
+        <property name="format_sql">false</property>
+        <property name="use_sql_comments">false</property>
+        <property name="hbm2ddl.auto">update</property>
+        
+        <!-- Mapeo de las clases (orden de dependencias) -->
+        <!-- Entidades base sin dependencias -->
+        <mapping class="model.Configuracion"/>
+        <mapping class="model.CredencialBD"/>
+        <mapping class="model.Etiqueta"/>
+        <mapping class="model.Ubicacion"/>
+        <mapping class="model.ProductoCatalogo"/>
+        <mapping class="model.Reporte"/>
+        
+        <!-- Entidades con dependencias -->
+        <mapping class="model.Ticket"/>
+        <mapping class="model.TipoServicio"/>
+        <mapping class="model.Venta"/>
+        <mapping class="model.Renta"/>
+
+    </session-factory>
+</hibernate-configuration>
