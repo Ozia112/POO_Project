@@ -1,156 +1,95 @@
-# Guion – LockerEasy
-
-## Presentación
-
-> [ACOTACIÓN]
-> 
-> 
-> Frente a la cámara, tono sincero, relajado.
-> 
-> (Se mantiene pequeña mención a Don David y el contexto del negocio.)
-> 
-
-**[DIALOGO]**
-
-Presentador:
-
-"¡Hola! Soy Nico. Para los que no conocen el proyecto, LockerEasy nació para ayudar a negocios como el de Don David, quien renta lockers e imprime documentos en la Gran Plaza, a organizarse mejor y atender más fácil a sus clientes. Pero en esta etapa, más que avanzar en nuevas funciones, nos tocó enfrentar un montón de retos, adaptarnos… y aprender."
+# Guion - LockerEasy
 
 ---
 
-## Principales retos y problemas
+### *Versión compacta, seria, clara y directa.*
 
-> [ACOTACIÓN]
-> 
-> 
-> Aquí empiezan a entrar breves clips o audios de miembros del equipo respondiendo preguntas. (Tú puedes meter después las respuestas reales).
-> 
-> Ejemplo:
-> 
-- ¿Qué fue lo más complicado de esta etapa?
-- ¿Cómo les afectó el cambio de scope en los departamentos de cada uno?
-- ¿Qué sintieron cuando un integrante se fue del equipo?
-- -¿Cuál crees que sera mayor reto al entrar al proyecto?
-- ¿Cómo fue integrarte a un equipo que ya tenía camino recorrido con su proyecto?
-- -¿Qué tu crees que podrías aportar al equipo?
+## **1. Introducción – Stage 1 (Aproximadamente 1 minuto)**
 
-**[DIALOGO]**
-
-Presentador:
-
-"Esta vez, los problemas fueron los protagonistas. Por eso, mejor que te lo cuenten algunos de mis compañeros…"
-
-> [ACOTACIÓN]
+> [TOMA: Tú frente a cámara, tono profesional, tranquilo.]
 > 
+
+**Presentador (Nico):**
+
+“Hola, soy Nico. Este video resume lo que ocurrió a lo largo de las tres stages de nuestro proyecto LockerEasy, un sistema pensado para apoyar a negocios como el de Don David en la renta de lockers y en la atención rápida a clientes.”
+
+**Presentador:**
+
+“En el Stage 1 nos enfocamos en entender el problema real: cómo funciona hoy el proceso de renta de lockers, qué fallos existen y qué necesita realmente el usuario. A partir de eso definimos los flujos principales, los objetivos del cliente y los primeros criterios de aceptación.”
+
+> [INSERTAR B-ROLL: diagramas iniciales, backlog, primeras notas.]
 > 
-> [Se intercalan respuestas del equipo, cada quien contando brevemente su experiencia: problemas para definir qué quería el cliente, reorganización interna, dificultad para organizar el trabajo, etc.]
-> 
+
+**Presentador:**
+
+“Esta etapa fue principalmente de análisis: observar, revisar, simplificar y proponer. Con eso nació el concepto general de LockerEasy: un sistema rápido, claro y configurable.”
 
 ---
 
-## Replanteamiento: lo que hicimos para seguir avanzando
+## **2. Desarrollo – Stage 2 (Aproximadamente 1 minuto y medio)**
 
-> [ACOTACIÓN]
-> 
-> 
-> Vuelve la cámara al presentador. Tono de reflexión y honestidad.
+> [TOMA: Tú sentado, tono más reflexivo.]
 > 
 
-**[DIALOGO]**
+**Presentador:**
 
-Presentador:
+“El Stage 2 trajo más complejidad. Tuvimos que redefinir tareas, ajustar lo que ya habíamos hecho y enfrentarnos a cambios de requerimientos. También tuvimos cambios en el equipo, lo que significó volver a adaptarnos.”
 
-"Ante todo esto, tuvimos que reagruparnos. Juntamos y depuramos los requerimientos, analizamos lo que sí podíamos hacer para esta entrega, y adaptamos el proyecto según lo que pidió el cliente. Ya no solo era un tema de sumar funciones, sino de entender hasta dónde podíamos llegar realmente."
+> [INSERTAR B-ROLL: UMLs, pizarrón, clips del repo.]
+> 
+
+**Presentador:**
+
+“A nivel técnico, empezamos a estructurar modelos más sólidos, identificar relaciones entre clases y priorizar lo que sí podíamos construir de manera realista. No se trataba de agregar más ideas, sino de elegir bien qué era posible dentro del tiempo.”
+
+> [AUDIO DEL EQUIPO (corto, 5–7s cada uno): ‘Lo más complicado fue adaptarnos…’, ‘Sentí presión por los exámenes…’]
+> 
+
+**Presentador:**
+
+“El Stage 2 fue, sobre todo, una etapa de ajuste y de claridad. De entender nuestros límites y de organizarnos mejor.”
 
 ---
 
-## Cambios en el equipo
+## **3. Cierre del Proyecto – Stage 3 (Aproximadamente 2 minutos)**
 
-> [ACOTACIÓN]
-> 
-> 
-> Puedes meter aquí otra intervención breve de algún miembro, comentando sobre la salida/entrada del nuevo integrante.
+> [TOMA: iluminación más suave, tono honesto pero serio.]
 > 
 
-**[DIALOGO]**
+**Presentador:**
 
-Presentador:
+“En el Stage 3, ya no se trató solo del proyecto. Se trató de manejar la presión. Tuvimos que programar bajo tiempo, enfrentar errores que aparecían una y otra vez y seguir avanzando mientras teníamos exámenes encima.”
 
-"También nos tocó vivir cambios en el equipo: uno de nuestros compañeros se fue y decidimos sumar a alguien nuevo. No fue fácil adaptarse, pero al final lo importante fue no detenernos."
+**Presentador:**
+
+“A nivel técnico tomamos decisiones importantes: simplificar partes del sistema para asegurar estabilidad, reconstruir algunos controladores, limitar el alcance a las funciones esenciales y documentar cada corrección para evitar retrocesos.”
+
+> [INSERTAR B-ROLL: controladores, JSON, interfaz.]
+> 
+
+**Presentador:**
+
+“Hubo momentos complicados. Personalmente, me sentía cargado porque la interfaz dependía de mí y sin el UI muchas partes no podían avanzar. Y sí, hubo momentos donde pensé que no íbamos a terminar.”
+
+> [AUDIO DEL EQUIPO — breve testimonio emocional]
+> 
+
+**Presentador:**
+
+“Pero también hubo un punto de calma: volver a empezar desde cero, paso a paso, sin prisa. En cuanto el sistema comenzó a responder de nuevo, supimos que sí podíamos lograrlo.”
+
+**Presentador:**
+
+“Stage 3 no fue solo programación. Fue aprendizaje. Fue organización. Fue honestidad con nuestros límites. Salimos de él como un equipo más maduro y más consciente de lo que puede lograr.”
 
 ---
 
-## Proceso para determinar los modelos UML
+## **4. Conclusión (30–40 segundos)**
 
-> [ACOTACIÓN]
-> 
-> 
-> El presentador explica cómo fue el proceso de selección y diseño de los modelos UML, sin entrar en detalles técnicos de cada clase.
-> 
+> **[TOMA FINAL: plano medio, logo LockerEasy al fondo.]**
 
-**[DIALOGO]**
+**Presentador:**
+"En estas tres stages entendimos que un proyecto no solo se construye con diagramas y líneas de código, sino con comunicación, paciencia y trabajo en conjunto. Cada etapa nos obligó a adaptarnos, reorganizarnos y tomar decisiones más conscientes. Hoy cerramos esta fase con una visión más clara y un equipo más preparado para seguir construyendo LockerEasy."
 
-Presentador:
-
-"En esta etapa del proyecto, nos enfrentamos a un nuevo reto: definir los modelos y relaciones para construir el sistema de LockerEasy.
-
-Lo más importante aquí no era tanto el contenido específico de cada clase, sino **cómo llegamos a decidir qué modelos realmente necesitábamos**.
-
-Para lograrlo, hicimos lo siguiente:
-
-1. **Analizamos los requerimientos reales del cliente**.
-    
-    Antes de dibujar cualquier diagrama, nos sentamos como equipo a entender exactamente qué procesos y servicios quería Don David que cubriéramos en el sistema: la renta de lockers, las ventas rápidas, y la emisión de tickets para cada servicio.
-    
-2. **Priorizamos lo esencial y lo que sí podíamos implementar**.
-    
-    Hubo muchas ideas al principio, pero tuvimos que ser realistas y elegir solo lo que el tiempo y el equipo nos permitían desarrollar. Decidimos enfocarnos en los flujos principales:
-    
-    - Gestión de lockers físicos
-    - Registro de ventas y rentas
-    - Control de servicios y descuentos
-    - Generación de tickets claros para el cliente
-3. **Iteramos los modelos en equipo**.
-    
-    Cada integrante propuso su visión y, con base en ejemplos reales y retroalimentación, fuimos ajustando las clases y sus relaciones. Fue importante siempre preguntarnos:
-    
-    - ¿Este modelo realmente representa algo necesario para Don David?
-    - ¿Está claro cómo se conecta con los otros procesos?
-
----
-
-## Lo que aprendimos y lo que sigue
-
-> [ACOTACIÓN]
-> 
-> 
-> Cierra el bloque de entrevistas y regresa el foco al presentador.
-> 
-
-**[DIALOGO]**
-
-Presentador:
-
-"¿Y qué aprendimos? Que los proyectos van de personas, comunicación y de adaptarse a los cambios. Ahora sí, con los requerimientos claros y el equipo completo, lo que sigue es pasar de la planeación a la programación. En la próxima entrega, nuestro enfoque va a estar en convertir todo lo planeado en un sistema real que funcione para Don David y sus clientes."
-
----
-
-## Cierre
-
-> [ACOTACIÓN]
-> 
-> 
-> Toma final, tono honesto pero positivo. Logo LockerEasy en pantalla.
-> 
-
-**[DIALOGO]**
-
-Presentador:
-
-"Gracias por acompañarnos en esta etapa, que más que de resultados visibles, fue de aprendizaje real. Nos vemos en la próxima, donde ahora sí: a programar en serio."
-
-> [ACOTACIÓN]
-> 
-> 
-> Música ligera, logo LockerEasy para cerrar.
->
+**Presentador:**
+"Gracias por acompañarnos en este camino. Continuamos adelante."
