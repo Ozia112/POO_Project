@@ -5,27 +5,30 @@
 
 <!--
     =====================================================
-    ARCHIVO DE EJEMPLO - hibernate.cfg.xml
+    CONFIGURACIÓN DE HIBERNATE - LOCKEREASY
     =====================================================
     
-    INSTRUCCIONES:
-    1. Copia este archivo y renómbralo a: hibernate.cfg.xml
-    2. Reemplaza los valores TU_USUARIO, TU_CONTRASEÑA y NOMBRE_DB
-    3. NO subas hibernate.cfg.xml al repositorio (está en .gitignore)
+    Las credenciales se cargan desde variables de entorno:
+    - DB_URL: URL de conexión (ej: jdbc:postgresql://localhost:5432/lockereasy)
+    - DB_USER: Usuario de la base de datos
+    - DB_PASSWORD: Contraseña de la base de datos
     
-    OPCIONES DE CONEXIÓN:
-    - Local: jdbc:postgresql://localhost:5432/lockereasy
-    - Cloud: jdbc:postgresql://tu-servidor.com:5432/lockereasy
+    Si no hay variables de entorno, la aplicación pedirá
+    las credenciales al iniciar.
     
     =====================================================
 -->
 
 <hibernate-configuration>
     <session-factory>
-        <!-- Configuracion de la base de datos -->
-        <property name="connection.url">jdbc:postgresql://localhost:5432/NOMBRE_DB</property>
-        <property name="connection.username">TU_USUARIO</property>
-        <property name="connection.password">TU_CONTRASEÑA</property>
+        <!-- Configuracion de la base de datos - Se sobreescriben programáticamente -->
+        <!-- Estos valores son placeholders, las credenciales reales se cargan desde: -->
+        <!-- 1. Variables de entorno (DB_URL, DB_USER, DB_PASSWORD) -->
+        <!-- 2. Archivo ~/.lockereasy/db.properties -->
+        <!-- 3. Diálogo de login al iniciar -->
+        <property name="connection.url">jdbc:postgresql://localhost:5432/DATABASE</property>
+        <property name="connection.username">USERNAME</property>
+        <property name="connection.password">PASSWORD</property>
 
         <!-- Dialecto de Hibernate -->
         <property name="connection.driver_class">org.postgresql.Driver</property>
@@ -34,7 +37,7 @@
         <!-- Configuración del pool de conexiones -->
         <property name="connection.pool_size">10</property>
         
-        <!-- Mostrar SQL en consola (cambiar a false en producción) -->
+        <!-- Mostrar SQL en consola -->
         <property name="show_sql">false</property>
         <property name="format_sql">false</property>
         <property name="use_sql_comments">false</property>

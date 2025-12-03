@@ -1,35 +1,25 @@
-package controller;   //list0
+package controller;
 
 import dao.RentaDAO;
 import dao.UbicacionDAO;
-import dao.ServicioDAO;
 import model.Renta;
-import model.Servicio;
 import model.Ticket;
 import model.Ubicacion;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
-
 public class RentaController {
     private final RentaDAO rentaDAO;
     private final UbicacionDAO ubicacionDAO;
-    private final ServicioDAO servicioDAO;
     private ReporteController reporteController;
     private TicketController ticketController;
 
     private static final int MINUTOS_EN_HORA = 60;
-    private final int MINUTOS_CANCELACION = Config.getMinutosCancelacion();
-    private final int MINUTOS_TOLERANCIA = Config.getMinutosTolerancia();
-    private final int LIMITE_MINUTOS_PRIMERA_HORA = MINUTOS_EN_HORA + MINUTOS_TOLERANCIA;
-    
 
     public RentaController() {
         this.rentaDAO = new RentaDAO();
         this.ubicacionDAO = new UbicacionDAO();
-        this.servicioDAO = new ServicioDAO();
     }
 
     public RentaController(TicketController ticketController, ReporteController reporteController) {
@@ -39,87 +29,71 @@ public class RentaController {
     }
 
     /**
-     * FLUJO CORRECTO:
-     * 1. Crear TipoServicio (Renta) -> Guardar en BD
-     * 2. Crear Servicio con el TipoServicio -> Guardar en BD
-     * 3. Agregar Servicio al Ticket -> Guardar Ticket en BD
-     * 4. Marcar Ubicaci├│n como NO disponible -> Guardar en BD
-     * 5. Agregar Ticket al Reporte -> Guardar Reporte en BD
+     * Inicia una renta en una ubicación específica
      */
     public boolean iniciarRenta(Ubicacion ubicacion, Ticket ticket) {
         if (ubicacion == null || ticket == null) {
-            System.err.println("Ubicaci├│n o ticket no pueden ser nulos");
+            System.err.println("Ubicación o ticket no pueden ser nulos");
             return false;
         }
 
-        // Recargar ubicaci├│n desde BD para asegurar estado actualizado
+        // Recargar ubicación desde BD
         ubicacion = ubicacionDAO.obtener(ubicacion.getUbicacionId());
 
         if (ubicacion == null) {
-            System.err.println("La ubicaci├│n no existe");
+            System.err.println("La ubicación no existe");
             return false;
         }
 
         if (!ubicacion.isDisponible()) {
-            System.err.println("La ubicaci├│n" + ubicacion + "ya esta ocupada");
+            System.err.println("La ubicación " + ubicacion.getNombreLocker() + " ya está ocupada");
             return false;
         }
 
         try {
-            // 1. Crear y guardar Renta (TipoServicio)
+            // 1. Crear Renta (TipoServicio)
             Renta renta = new Renta(
                 "Renta - " + ubicacion.getNombreLocker(),
-                Config.getPrecioHoraLocker(),
+                1, // Cantidad inicial (horas)
                 ticket.getTiempoEmision(),
                 ubicacion
             );
+            renta.setTicket(ticket);
+            renta.setAplicarDescuento(false);
+
+            // 2. Guardar renta
             rentaDAO.guardar(renta);
-            System.out.println("Renta guardada en DB - ID: " + renta.getTipoServicioId());
+            System.out.println("Renta guardada - ID: " + renta.getTipoServicioId());
 
+            // 3. Marcar ubicación como ocupada
             ubicacion.setDisponible(false);
             ubicacionDAO.actualizar(ubicacion);
 
-            // 2. Crear y guardar Servicio
-            Servicio servicio = new Servicio();
-            servicio.setTipoServicio(renta);
-            servicio.setAplicarDescuento(false);
+            // 4. Agregar al ticket
+            ticket.agregarServicio(renta);
 
-            float totalInicial = renta.getPrecio() * 1; // Hora inicial
-            servicio.setTotalServicio(totalInicial);
+            // 5. Actualizar totales
+            if (ticketController != null) {
+                ticket.setTotalTicket(ticketController.calcularTotalTicket(ticket));
+                ticketController.getTicketDAO().actualizar(ticket);
+            }
 
-            servicioDAO.guardar(servicio);
-            System.out.println("Servicio de renta guardado en DB - ID: " + servicio.getServicioId());
-
-            // 3. Agregar serivicio al ticket y guardar
-            ticket.getServicios().add(servicio);
-
-            float nuevoTotal = ticketController.calcularTotalTicket(ticket);
-            ticket.setTotalTicket(nuevoTotal);
-
-            ticketController.getTicketDAO().actualizar(ticket);
-            System.out.println("Ticket actualizado en DB - ID: " + ticket.getTicketId());
-
-            // 4. Marcar ubicaci├│n como no disponible
-            ubicacion.setDisponible(false);
-            ubicacionDAO.actualizar(ubicacion);
-            System.out.println("Ubicaci├│n marcada como no disponible en DB: " + ubicacion);
-
+            // 6. Actualizar reporte
             if (reporteController != null) {
-                boolean inReporte = reporteController.getReporteActual()
-                                    .getTickets()
-                                    .stream()
-                                    .anyMatch(t -> t.getTicketId().equals(ticket.getTicketId()));
-                if (!inReporte) {
+                boolean enReporte = reporteController.getReporteActual()
+                    .getTickets()
+                    .stream()
+                    .anyMatch(t -> t.getTicketId().equals(ticket.getTicketId()));
+                
+                if (!enReporte) {
                     reporteController.agregarTicket(ticket);
-                    System.out.println("Ticket agregado al reporte actual");
                 } else {
                     reporteController.recalcularTotal();
-                    reporteController.getReporteDAO().actualizar(reporteController.getReporteActual());
-                    System.out.println("Reporte actualizado con nuevo total");
+                    reporteController.guardarReporte();
                 }
             }
 
-            System.out.println("Renta iniciada exitosamente en " + ubicacion);
+            System.out.println("Renta iniciada en: " + ubicacion.getNombreLocker());
             return true;
 
         } catch (Exception e) {
@@ -130,113 +104,186 @@ public class RentaController {
     }
 
     /**
-     * FLUJO CORRECTO:
-     * 1. Obtener Renta activa (cierre_renta = NULL)
-     * 2. Establecer cierre_renta -> Actualizar Renta en BD
-     * 3. Calcular horas -> Actualizar cantidad en Renta -> Actualizar en BD
-     * 4. Liberar Ubicaci├│n -> Actualizar en BD
-     * 5. Buscar Servicio en Ticket
-     * 6. Calcular total del Servicio -> Actualizar Servicio en BD
-     * 7. Recalcular total del Ticket -> Actualizar Ticket en BD
-     * 8. Recalcular total del Reporte -> Actualizar Reporte en BD
+     * Finaliza una renta calculando las horas transcurridas
      */
     public boolean finalizarRenta(Ubicacion ubicacion, Ticket ticket) {
         if (ubicacion == null || ticket == null) {
-            System.err.println("Ubicaci├│n o ticket no pueden ser nulos");
+            System.err.println("Ubicación o ticket no pueden ser nulos");
             return false;
-        } 
+        }
 
         try {
-            // 1. Obtener Renta activa
+            // 1. Obtener renta activa
             Renta renta = rentaDAO.obtener(ubicacion);
             
             if (renta == null) {
-                System.err.println("No hay una renta activa en ubicaci├│n " + ubicacion);
+                System.err.println("No hay renta activa en: " + ubicacion.getNombreLocker());
                 return false;
             }
 
             if (renta.getCierreRenta() != null) {
-                System.err.println("La renta en ya ha sido finalizada");
+                System.err.println("La renta ya fue finalizada");
                 return false;
             }
 
-            // 2. Establecer cierre_renta
+            // 2. Establecer cierre y calcular horas
             Instant cierre = Instant.now();
             renta.setCierreRenta(cierre);
             
-            // 3. Calcular horas y actualizar cantidad
-            int horasRentadas = calcularTiempoTrancurrido(renta, cierre);
+            int horasRentadas = calcularTiempoTranscurrido(renta, cierre);
             renta.setCantidad(horasRentadas);
 
             rentaDAO.actualizar(renta);
-            System.out.println("Renta actualizada en DB - Horas: " + horasRentadas);
+            System.out.println("Renta actualizada - Horas: " + horasRentadas);
 
-            // 4. Liberar Ubicaci├│n
-            ubicacion.setDisponible(true);
-            ubicacionDAO.actualizar(ubicacion);
-            System.out.println("Ubicaci├│n liberada en DB: " + ubicacion);
-            
-            // 5. Buscar Servicio en Ticket
-            Servicio servicioRenta = getServicioRentaEnTicket(ticket, ubicacion);
-
-            if (servicioRenta == null) {
-                System.err.println("No se encontr├│ el servicio de renta en el ticket");
-                return false;
+            // 3. Liberar ubicación - IMPORTANTE: recargar desde BD para evitar problemas de sesión
+            Ubicacion ubicacionActualizada = ubicacionDAO.obtener(ubicacion.getUbicacionId());
+            if (ubicacionActualizada != null && !ubicacionActualizada.isDisponible()) {
+                ubicacionActualizada.setDisponible(true);
+                ubicacionDAO.actualizar(ubicacionActualizada);
+                System.out.println("Ubicación liberada: " + ubicacionActualizada.getNombreLocker());
+            } else {
+                System.out.println("ADVERTENCIA: La ubicación ya estaba disponible o no se encontró");
             }
 
-            // 6. Calcular total del Servicio
-            float totalCobrar =  horasRentadas*renta.getPrecio();
-            servicioRenta.setTotalServicio(totalCobrar);
+            // 4. Recalcular totales del ticket
+            // IMPORTANTE: La renta ya fue actualizada en BD con JDBC, pero el objeto en memoria
+            // del ticket puede tener valores viejos. Calculamos el total manualmente.
+            if (ticketController != null) {
+                Ticket ticketActualizado = ticketController.getTicketDAO().obtener(ticket.getTicketId());
+                if (ticketActualizado != null) {
+                    // Recalcular total sumando todos los servicios con valores frescos
+                    float nuevoTotal = 0f;
+                    for (model.TipoServicio servicio : ticketActualizado.getServicios()) {
+                        if (servicio instanceof Renta) {
+                            Renta r = (Renta) servicio;
+                            // Si es la renta que acabamos de cerrar, usar los valores recalculados
+                            if (r.getTipoServicioId().equals(renta.getTipoServicioId())) {
+                                nuevoTotal += renta.getTotal();
+                            } else {
+                                nuevoTotal += r.getTotal();
+                            }
+                        } else {
+                            nuevoTotal += servicio.getTotal();
+                        }
+                    }
+                    ticketActualizado.setTotalTicket(nuevoTotal);
+                    ticketController.getTicketDAO().actualizar(ticketActualizado);
+                }
+            }
 
-            servicioDAO.actualizar(servicioRenta);
-            System.out.println("Servicio actualizado en DB - Total: $" + totalCobrar);
-
-            float nuevoTotal = ticketController.calcularTotalTicket(ticket);
-            ticket.setTotalTicket(nuevoTotal);
-
-            ticketController.getTicketDAO().actualizar(ticket);
-
-            // 8. Recalcular total del Reporte
+            // 5. Actualizar reporte
             if (reporteController != null) {
                 reporteController.recalcularTotal();
-                reporteController.getReporteDAO().actualizar(reporteController.getReporteActual());
-                System.out.println("Reporte actualizado en DB");
+                reporteController.guardarReporte();
             }
 
-            System.out.println("Renta finalizada exitosamente en " + ubicacion + 
-                                " - Horas: " + horasRentadas +
-                                " Cierre: " + cierre.toString());
+            System.out.println("Renta finalizada - Ubicación: " + ubicacion.getNombreLocker() + 
+                             " Horas: " + horasRentadas + 
+                             " Total: $" + renta.getTotal());
             return true;
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             System.err.println("Error al finalizar renta: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    public int calcularTiempoTrancurrido(Renta renta, Instant tiempo) {
+    /**
+     * Calcula el tiempo transcurrido en horas según las reglas de negocio
+     * Lee dinámicamente la configuración para respetar los valores del usuario
+     * 
+     * Reglas:
+     * - Menos de minutosCancelacion (5 min): 0 horas (cancelación gratuita)
+     * - Primera hora: cuenta desde minutosCancelacion hasta 60+tolerancia minutos
+     * - Horas adicionales: cada 60 minutos adicionales cuenta como 1 hora
+     */
+    public int calcularTiempoTranscurrido(Renta renta, Instant tiempo) {
         Instant inicio = renta.getInicioRenta();
         long diferenciaMinutos = Duration.between(inicio, tiempo).toMinutes();
-        int horasRentadas;
-        if (diferenciaMinutos <= MINUTOS_CANCELACION) {
-                horasRentadas = 0;
-        } else if (diferenciaMinutos <= LIMITE_MINUTOS_PRIMERA_HORA) {
-            horasRentadas = 1;
-        } else {
-            long minutosRestantes = diferenciaMinutos - LIMITE_MINUTOS_PRIMERA_HORA;
-            int horasAdicionales = (int) ((minutosRestantes + MINUTOS_EN_HORA - 1) / MINUTOS_EN_HORA);
-            horasRentadas = 1 + horasAdicionales;
+        
+        // Leer valores dinámicamente de Config para respetar configuración del usuario
+        int minutosCancelacion = Config.getMinutosCancelacion();
+        int minutosTolerancia = Config.getMinutosTolerancia();
+        
+        // Ventana de cancelación gratuita
+        if (diferenciaMinutos <= minutosCancelacion) {
+            return 0;
         }
-
-        return horasRentadas;
+        
+        // Primera hora incluye tolerancia (ej: 0-75 min = 1 hora si tolerancia=15)
+        int limiteMinutosPrimeraHora = MINUTOS_EN_HORA + minutosTolerancia;
+        if (diferenciaMinutos <= limiteMinutosPrimeraHora) {
+            return 1;
+        }
+        
+        // Horas adicionales: cada 60 minutos adicionales después de la primera hora
+        // Ejemplo con tolerancia=15:
+        //   76-135 min = 2 horas (1 base + 1 adicional)
+        //   136-195 min = 3 horas (1 base + 2 adicionales)
+        long minutosExcedentes = diferenciaMinutos - limiteMinutosPrimeraHora;
+        int horasAdicionales = (int) Math.ceil((double) minutosExcedentes / MINUTOS_EN_HORA);
+        
+        return 1 + horasAdicionales;
     }
 
+    /**
+     * Calcula el total actual de una renta activa
+     */
+    public float calcularTotalActual(Ubicacion ubicacion) {
+        Renta renta = getRenta(ubicacion);
+        if (renta == null || renta.getCierreRenta() != null) {
+            return 0f;
+        }
+
+        int horasActuales = calcularTiempoTranscurrido(renta, Instant.now());
+        renta.setCantidad(horasActuales); // Actualizar cantidad temporal
+        return renta.getTotal();
+    }
+
+    /**
+     * Aplica descuento a una renta específica
+     */
+    public boolean aplicarDescuento(Ubicacion ubicacion, boolean aplicar) {
+        Renta renta = getRenta(ubicacion);
+        if (renta == null) {
+            System.err.println("No hay renta activa en esta ubicación");
+            return false;
+        }
+
+        renta.setAplicarDescuento(aplicar);
+        
+        try {
+            rentaDAO.actualizar(renta);
+            
+            // Actualizar totales
+            if (ticketController != null && renta.getTicket() != null) {
+                Ticket ticket = renta.getTicket();
+                ticket.setTotalTicket(ticketController.calcularTotalTicket(ticket));
+                ticketController.getTicketDAO().actualizar(ticket);
+                
+                if (reporteController != null) {
+                    reporteController.recalcularTotal();
+                    reporteController.guardarReporte();
+                }
+            }
+            
+            System.out.println("Descuento " + (aplicar ? "aplicado" : "removido") + 
+                             " en renta de: " + ubicacion.getNombreLocker());
+            return true;
+            
+        } catch (Exception e) {
+            System.err.println("Error al aplicar descuento: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Métodos auxiliares
     public boolean estaDisponible(Ubicacion ubicacion) {
         if (ubicacion == null) return false;
-
-        Ubicacion ubicacionAtual = ubicacionDAO.obtener(ubicacion.getUbicacionId());
-        return ubicacionAtual != null && ubicacionAtual.isDisponible();
+        Ubicacion ubicacionActual = ubicacionDAO.obtener(ubicacion.getUbicacionId());
+        return ubicacionActual != null && ubicacionActual.isDisponible();
     }
 
     public Renta getRenta(Ubicacion ubicacion) {
@@ -246,45 +293,7 @@ public class RentaController {
 
     public Ticket getTicketDeRenta(Ubicacion ubicacion) {
         Renta renta = getRenta(ubicacion);
-        if (renta == null) return null;
-        
-        // Buscar en el reporte el ticket que contenga este servicio de renta
-        if (reporteController != null) {
-            List<Ticket> tickets = reporteController.getReporteActual().getTickets();
-            for (Ticket ticket : tickets) {
-                for (Servicio servicio : ticket.getServicios()) {
-                    if (servicio.getTipoServicio() instanceof Renta) {
-                        Renta r = (Renta) servicio.getTipoServicio();
-                        if (r.getUbicacion().equals(ubicacion)) {
-                            return ticket;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private Servicio getServicioRentaEnTicket(Ticket ticket, Ubicacion ubicacion) {
-        if (ticket == null || ubicacion == null) return null;
-
-        for (Servicio servicio : ticket.getServicios()) {
-            if (servicio.getTipoServicio() instanceof Renta) {
-                Renta r = (Renta) servicio.getTipoServicio();
-                if (r.getUbicacion().equals(ubicacion)) {
-                    return servicio;
-                }
-            }
-        }
-        return null;
-    }
-
-    public float calcularTotalActual(Ubicacion ubicacion) {
-        Renta renta = getRenta(ubicacion);
-        if (renta == null || renta.getCierreRenta() != null) return 0f;
-
-        int horasRentadas = calcularTiempoTrancurrido(renta, Instant.now());
-        return horasRentadas * renta.getPrecio();
+        return renta != null ? renta.getTicket() : null;
     }
 
     public RentaDAO getRentaDAO() {
@@ -293,9 +302,5 @@ public class RentaController {
 
     public UbicacionDAO getUbicacionDAO() {
         return ubicacionDAO;
-    }
-
-    public ServicioDAO getServicioDAO() {
-        return servicioDAO;
     }
 }

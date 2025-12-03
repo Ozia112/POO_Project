@@ -1,0 +1,584 @@
+/* ============================================================
+   STYLES-APP.CSS - ESTILOS DE APLICACION LOCKEREASY
+   ============================================================
+   
+   Este archivo contiene todos los estilos inline extraídos 
+   de las clases Java para centralizar el diseño.
+   
+   ESTRUCTURA:
+   1. Variables CSS (colores, tamaños)
+   2. Fondos y contenedores base
+   3. ConfigEtiquetasGUI
+   4. ConfigVentaGUI
+   5. ConfigRentaGUI
+   6. ConfigCuentaGUI (Credenciales)
+   7. MainGUI y navegación
+   8. Componentes reutilizables
+   
+   ============================================================ */
+
+
+/* ============================================================
+   1. FONDOS Y CONTENEDORES BASE
+   ============================================================ */
+
+/* Fondo general de vistas de configuración */
+.config-root {
+    -fx-background-color: #f5f5f5;
+}
+
+/* Título principal de secciones */
+.config-titulo {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+/* Subtítulo de secciones */
+.config-subtitulo {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #E65100;
+}
+
+
+/* ============================================================
+   2. PANELES INFORMATIVOS (Info boxes)
+   Usados en: ConfigEtiquetasGUI, ConfigVentaGUI
+   ============================================================ */
+
+.info-box {
+    -fx-background-color: #E3F2FD;
+    -fx-padding: 12;
+    -fx-background-radius: 10;
+    -fx-border-color: #2196F3;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+}
+
+.info-box-titulo {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1976D2;
+}
+
+.info-box-texto {
+    -fx-font-size: 11px;
+}
+
+.info-box-texto-bold {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #D32F2F;
+}
+
+.info-box-texto-italic {
+    -fx-font-size: 11px;
+    -fx-font-style: italic;
+    -fx-text-fill: #666;
+}
+
+/* Panel naranja (configuración de rentas) */
+.config-box-naranja {
+    -fx-background-color: #FFF3E0;
+    -fx-border-color: #FF9800;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+
+/* ============================================================
+   3. LISTAS Y SCROLL PANES
+   Usados en: ConfigEtiquetasGUI, ConfigVentaGUI
+   ============================================================ */
+
+.lista-items {
+    -fx-background-color: white;
+}
+
+.scroll-lista {
+    -fx-background: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+
+/* ============================================================
+   4. ITEMS DE LISTA (Filas individuales)
+   Usados en: ConfigEtiquetasGUI, ConfigVentaGUI
+   ============================================================ */
+
+.item-fila {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 5, 0, 0, 2);
+}
+
+.item-fila-compacta {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* Header de listas (tabla) */
+.header-lista {
+    -fx-background-color: #E0E0E0;
+    -fx-background-radius: 8;
+}
+
+.header-lista-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+
+/* ============================================================
+   5. BADGES Y ETIQUETAS
+   Usados en: ConfigEtiquetasGUI, ConfigVentaGUI
+   ============================================================ */
+
+.badge-id {
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-background-color: #2196F3;
+    -fx-padding: 4 10;
+    -fx-background-radius: 12;
+    -fx-font-size: 12px;
+    -fx-min-width: 45;
+}
+
+.badge-id-texto {
+    -fx-font-weight: bold;
+    -fx-text-fill: #2196F3;
+    -fx-font-size: 12px;
+}
+
+/* Nombre de item en lista */
+.item-nombre {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.item-nombre-normal {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* Precio en listas */
+.item-precio {
+    -fx-font-size: 13px;
+    -fx-text-fill: #4CAF50;
+    -fx-font-weight: bold;
+}
+
+.item-texto-normal {
+    -fx-font-size: 13px;
+}
+
+/* Label vacío */
+.label-vacio {
+    -fx-text-fill: #999;
+    -fx-font-size: 14px;
+    -fx-padding: 20;
+}
+
+
+/* ============================================================
+   6. BOTONES
+   ============================================================ */
+
+/* Botón principal (verde) - Agregar */
+.btn-agregar {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 14 28;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 6, 0, 0, 3);
+}
+
+.btn-agregar:hover {
+    -fx-background-color: #45a049;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 8, 0, 0, 4);
+}
+
+/* Botón guardar (icono) */
+.btn-guardar-icono {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-guardar-icono-pequeno {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 6 12;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+/* Botón eliminar (icono) */
+.btn-eliminar-icono {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 8 14;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 2);
+}
+
+.btn-eliminar-icono:hover {
+    -fx-background-color: #d32f2f;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 6, 0, 0, 3);
+}
+
+.btn-eliminar-icono-pequeno {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 6 12;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-eliminar-icono-pequeno:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* Botón guardar configuración (inline) */
+.btn-guardar-config {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-padding: 5 10;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+/* Botón cancelar */
+.btn-cancelar {
+    -fx-background-color: #9E9E9E;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-cancelar:hover {
+    -fx-background-color: #757575;
+}
+
+/* Botón secundario (azul) */
+.btn-secundario {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-secundario:hover {
+    -fx-background-color: #1976D2;
+}
+
+
+/* ============================================================
+   7. TOGGLE BUTTONS
+   ============================================================ */
+
+/* Toggle activo (verde) */
+.toggle-activo {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 12;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+}
+
+/* Toggle inactivo (gris/rojo) */
+.toggle-inactivo {
+    -fx-background-color: #E0E0E0;
+    -fx-text-fill: #666;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 12;
+    -fx-background-radius: 15;
+    -fx-cursor: hand;
+}
+
+/* Toggle pequeño (para disponibilidad) */
+.toggle-disp-activo {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 4 8;
+    -fx-background-radius: 10;
+}
+
+.toggle-disp-inactivo {
+    -fx-background-color: #ffcdd2;
+    -fx-text-fill: #c62828;
+    -fx-font-weight: bold;
+    -fx-padding: 4 8;
+    -fx-background-radius: 10;
+}
+
+
+/* ============================================================
+   8. FORMULARIOS INLINE
+   Usados en: ConfigEtiquetasGUI, ConfigVentaGUI
+   ============================================================ */
+
+.formulario-agregar {
+    -fx-background-color: #E8F5E9;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 4);
+}
+
+.formulario-titulo {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2E7D32;
+}
+
+.formulario-campo-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+
+/* ============================================================
+   9. MENSAJES DE FEEDBACK
+   ============================================================ */
+
+.mensaje-exito {
+    -fx-background-color: #C8E6C9;
+    -fx-text-fill: #2E7D32;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-border-color: #81C784;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.mensaje-error {
+    -fx-background-color: #FFCDD2;
+    -fx-text-fill: #C62828;
+    -fx-padding: 12 20;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-border-color: #EF9A9A;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+
+/* ============================================================
+   10. POPUPS Y DIÁLOGOS
+   ============================================================ */
+
+.popup-edicion {
+    -fx-background-color: white;
+    -fx-padding: 15;
+    -fx-background-radius: 10;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 15, 0, 0, 5);
+}
+
+.popup-titulo {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+
+/* ============================================================
+   11. CONFIG CUENTA GUI (Credenciales de BD)
+   ============================================================ */
+
+/* Contenedor principal de credenciales */
+.cuenta-container {
+    -fx-background-color: #FAFAFA;
+    -fx-padding: 25;
+    -fx-background-radius: 15;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+}
+
+/* Card de configuración de BD */
+.cuenta-card {
+    -fx-background-color: white;
+    -fx-padding: 20;
+    -fx-background-radius: 12;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 3);
+}
+
+.cuenta-card-titulo {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1976D2;
+}
+
+.cuenta-campo-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #555;
+}
+
+/* Indicador de conexión */
+.conexion-activa {
+    -fx-background-color: #C8E6C9;
+    -fx-text-fill: #2E7D32;
+    -fx-padding: 8 15;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+}
+
+.conexion-inactiva {
+    -fx-background-color: #FFCDD2;
+    -fx-text-fill: #C62828;
+    -fx-padding: 8 15;
+    -fx-background-radius: 20;
+    -fx-font-weight: bold;
+}
+
+/* Botón probar conexión */
+.btn-probar-conexion {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-probar-conexion:hover {
+    -fx-background-color: #F57C00;
+}
+
+/* Alerta de seguridad */
+.alerta-seguridad {
+    -fx-background-color: #FFF3E0;
+    -fx-border-color: #FF9800;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12;
+}
+
+.alerta-seguridad-texto {
+    -fx-font-size: 11px;
+    -fx-text-fill: #E65100;
+}
+
+
+/* ============================================================
+   12. SECCIONES DE TORRES/LOCKERS (ConfigRentaGUI)
+   ============================================================ */
+
+.torre-container {
+    -fx-background-color: white;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 2;
+    -fx-border-radius: 15;
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 3);
+}
+
+.torre-header {
+    -fx-background-color: #E3F2FD;
+    -fx-background-radius: 12 12 0 0;
+    -fx-padding: 15;
+}
+
+.torre-titulo {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1565C0;
+}
+
+/* Locker individual */
+.locker-item {
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+.locker-item-disponible {
+    -fx-background-color: #E8F5E9;
+    -fx-border-color: #4CAF50;
+}
+
+.locker-item-ocupado {
+    -fx-background-color: #FFF3E0;
+    -fx-border-color: #FF9800;
+}
+
+.locker-item-nodisponible {
+    -fx-background-color: #FFEBEE;
+    -fx-border-color: #f44336;
+}
+
+
+/* ============================================================
+   13. DESCRIPCIÓN INFORMATIVA
+   ============================================================ */
+
+.descripcion-info {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666;
+}
+
+.descripcion-info-bold {
+    -fx-font-weight: bold;
+}
+
+
+/* ============================================================
+   14. TABS DE CONFIGURACIÓN
+   ============================================================ */
+
+.tab-config {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.tab-config-warning {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FF9800;
+}

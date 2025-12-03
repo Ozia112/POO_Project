@@ -20,6 +20,9 @@ public class Ubicacion {
     @Column(name = "localizacion", nullable = false)
     private String localizacion; // Ej: "Planta Baja", "Planta Alta"
 
+    @Column(name = "precio", nullable = false)
+    private float precio; // Precio de la ubicacion
+
     @Column(name = "disponible")
     private boolean disponible; // true = libre, false = ocupado
     
@@ -27,10 +30,11 @@ public class Ubicacion {
         this.disponible = true;
     }
 
-    public Ubicacion(String nombre_locker, String nombre_torre, String localizacion) {
+    public Ubicacion(String nombre_locker, String nombre_torre, String localizacion, float precio) {
         this.nombre_locker = nombre_locker;
         this.nombre_torre = nombre_torre;
         this.localizacion = localizacion;
+        this.precio = precio;
         this.disponible = true;
     }
 
@@ -39,11 +43,13 @@ public class Ubicacion {
     public String getNombreLocker() { return nombre_locker; }
     public String getNombreTorre() { return nombre_torre; }
     public String getLocalizacion() { return localizacion; }
+    public float getPrecio() { return precio; }
     public boolean isDisponible() { return disponible; }
 
     public void setUbicacionId(Long ubicacion_id) {this.ubicacion_id = ubicacion_id; }
     public void setNombreLocker(String nombre_locker) { this.nombre_locker = nombre_locker; }
     public void setNombreTorre(String nombre_torre) { this.nombre_torre = nombre_torre; }
     public void setLocalizacion(String localizacion) { this.localizacion = localizacion; }
+    public void setPrecio(float precio) { this.precio = precio; }
     public void setDisponible(boolean disponible) { this.disponible = disponible; }
 }

@@ -42,7 +42,20 @@ public class ReporteController {
         if (reporteActual != null) {
             reporteDAO.actualizar(reporteActual);
         }
-    }    
+    }
+    
+    /**
+     * Recarga el reporte actual desde la base de datos para obtener datos frescos.
+     * Útil para sincronizar después de operaciones que modifican tickets.
+     */
+    public Reporte recargarReporte() {
+        LocalDate hoy = LocalDate.now();
+        Reporte reporteFresco = reporteDAO.obtener(hoy);
+        if (reporteFresco != null) {
+            this.reporteActual = reporteFresco;
+        }
+        return this.reporteActual;
+    }
 
     public void agregarTicket(Ticket ticket) {
         if (ticket == null) {
@@ -71,19 +84,21 @@ public class ReporteController {
             throw new IllegalStateException("No se puede eliminar tickets de un reporte cerrado");
         }
 
-        boolean eliminado = reporteActual.getTickets().remove(ticket);
-
-        if (!eliminado) {
-            throw new IllegalArgumentException("El ticket no existe en el reporte");
+        Long ticketId = ticket.getTicketId();
+        
+        // Primero eliminar de la BD
+        ticketDAO.eliminar(ticketId);
+        
+        // IMPORTANTE: Recargar el reporte desde la BD para evitar referencias huérfanas
+        // Esto asegura que reporteActual no tenga referencias a tickets eliminados
+        reporteActual = reporteDAO.obtener(reporteActual.getFechaReporte());
+        
+        if (reporteActual == null) {
+            // Si por alguna razón no existe, recrearlo
+            reporteActual = cargarOCrearReporteDelDia();
         }
 
-        ticketDAO.eliminar(ticket.getTicketId());
-
-        recalcularTotal();
-
-        reporteDAO.actualizar(reporteActual);
-
-        System.out.println("Ticket " + ticket.getTicketId() + " eliminado del reporte de " + reporteActual.getFechaReporte());
+        System.out.println("Ticket " + ticketId + " eliminado del reporte de " + reporteActual.getFechaReporte());
     }
 
     public void recalcularTotal(){
@@ -91,8 +106,16 @@ public class ReporteController {
 
         float total = 0.0f;
 
+        // Recargar cada ticket desde la BD para obtener totales actualizados
         for (Ticket ticket : reporteActual.getTickets()) {
-            total += ticket.getTotalTicket();
+            Ticket ticketActualizado = ticketDAO.obtener(ticket.getTicketId());
+            if (ticketActualizado != null) {
+                total += ticketActualizado.getTotalTicket();
+                // Actualizar también el total en memoria para mantener sincronizado
+                ticket.setTotalTicket(ticketActualizado.getTotalTicket());
+            } else {
+                total += ticket.getTotalTicket();
+            }
         }
         reporteActual.setTotal(total);
     }

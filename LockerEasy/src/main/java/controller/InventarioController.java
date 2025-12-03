@@ -1,23 +1,27 @@
 package controller;
 
-import dao.VentaDAO;
+import dao.ProductoCatalogoDAO;
 import model.Etiqueta;
-import model.Venta;
-
+import model.ProductoCatalogo;
 import java.util.List;
 
 public class InventarioController {
-    private final VentaDAO ventaDAO;
+    private final ProductoCatalogoDAO productoCatalogoDAO;
     private final EtiquetaController etiquetaController;
 
     public InventarioController() {
-        this.ventaDAO = new VentaDAO();
+        this.productoCatalogoDAO = new ProductoCatalogoDAO();
         this.etiquetaController = new EtiquetaController();
     }
 
     public boolean agregarProducto(String nombre, float precio, int existentes, Long etiquetaId) {
         if (nombre == null || nombre.trim().isEmpty()) {
-            System.err.println("El nombre del producto no puede estar vac├¡o");
+            System.err.println("El nombre del producto no puede estar vacío");
+            return false;
+        }
+
+        if (precio < 0) {
+            System.err.println("El precio no puede ser negativo");
             return false;
         }
 
@@ -27,36 +31,22 @@ public class InventarioController {
             return false;
         }
         
-        boolean disponible;
-
+        // Validar existencias según la etiqueta
         if (etiqueta.isAfectaInventario()) {
             if (existentes < 0) {
-                System.err.println("Las existentes no pueden ser negativas para etiquetas que afectan inventario");
+                System.err.println("Las existencias no pueden ser negativas");
                 return false;
             }
-
-            disponible = existentes > 0;
         } else {
-            if (existentes == 0) {
-                existentes = 1; // Cambiar 0 a 1 automaticamente
-            } else if (existentes < 0) {
-                System.err.println("Las existentes no pueden ser negativas");
-                return false;
-            }
-
-            disponible = true; // Siempre disponible si no afecta inventario
+            // Servicios sin inventario siempre tienen existencias = 1
+            existentes = 1;
         }
 
-        Venta producto = new Venta();
-        producto.setNombre(nombre);
-        producto.setPrecio(precio);
-        producto.setExistentes(existentes);
-        producto.setDisponible(disponible);
-        producto.setEtiqueta(etiqueta); // IMPORTANTE: Asignar la etiqueta al producto
+        ProductoCatalogo producto = new ProductoCatalogo(nombre, precio, existentes, etiqueta);
 
         try {
-            ventaDAO.guardar(producto);
-            System.out.println("Producto agregado: " + nombre);
+            productoCatalogoDAO.guardar(producto);
+            System.out.println("Producto agregado al catálogo: " + nombre);
             return true;
         } catch (Exception e) {
             System.err.println("Error al guardar producto: " + e.getMessage());
@@ -64,39 +54,82 @@ public class InventarioController {
         }
     }
 
-    public boolean actualizarProducto(Long idProducto, String nuevoNombre) {
-        Venta producto = ventaDAO.obtener(idProducto);
-        if (producto != null) {
-            producto.setNombre(nuevoNombre);
-            ventaDAO.actualizar(producto);
-            return true;
+    public boolean actualizarNombre(Long idProducto, String nuevoNombre) {
+        if (nuevoNombre == null || nuevoNombre.trim().isEmpty()) {
+            System.err.println("El nombre no puede estar vacío");
+            return false;
         }
-        return false;
-    }
 
-    public boolean actualizarProducto(Long idProducto, float nuevoPrecio) {
-        Venta producto = ventaDAO.obtener(idProducto);
-        if (producto != null) {
-            producto.setPrecio(nuevoPrecio);
-            ventaDAO.actualizar(producto);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean actualizarExistencias(Long idProducto, int nuevasExistentes) {
-        Venta producto = ventaDAO.obtener(idProducto);
+        ProductoCatalogo producto = productoCatalogoDAO.obtener(idProducto);
         if (producto == null) {
             System.err.println("Producto no encontrado: " + idProducto);
             return false;
         }
 
-        producto.setExistentes(nuevasExistentes);
-        actualizarDisponibilidad(producto);
+        producto.setNombre(nuevoNombre);
+        
+        try {
+            productoCatalogoDAO.actualizar(producto);
+            System.out.println("Nombre actualizado para producto ID: " + idProducto);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al actualizar nombre: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean actualizarPrecio(Long idProducto, float nuevoPrecio) {
+        if (nuevoPrecio < 0) {
+            System.err.println("El precio no puede ser negativo");
+            return false;
+        }
+
+        ProductoCatalogo producto = productoCatalogoDAO.obtener(idProducto);
+        if (producto == null) {
+            System.err.println("Producto no encontrado: " + idProducto);
+            return false;
+        }
+
+        producto.setPrecio(nuevoPrecio);
+        
+        try {
+            productoCatalogoDAO.actualizar(producto);
+            System.out.println("Precio actualizado para producto ID: " + idProducto);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al actualizar precio: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza las existencias del producto y su disponibilidad
+     * Solo aplica para productos que afectan inventario
+     */
+    public boolean actualizarExistencias(Long idProducto, int nuevasExistencias) {
+        if (nuevasExistencias < 0) {
+            System.err.println("Las existencias no pueden ser negativas");
+            return false;
+        }
+
+        ProductoCatalogo producto = productoCatalogoDAO.obtener(idProducto);
+        if (producto == null) {
+            System.err.println("Producto no encontrado: " + idProducto);
+            return false;
+        }
+
+        // Solo actualizar si afecta inventario
+        if (!producto.getEtiqueta().isAfectaInventario()) {
+            System.err.println("Este producto no maneja inventario");
+            return false;
+        }
+
+        producto.setExistentes(nuevasExistencias);
+        producto.setDisponible(nuevasExistencias > 0);
 
         try {
-            ventaDAO.actualizar(producto);
-            System.out.println("Existencias actualizadas para producto: " + idProducto);
+            productoCatalogoDAO.actualizar(producto);
+            System.out.println("Existencias actualizadas para producto: " + producto.getNombre());
             return true;
         } catch (Exception e) {
             System.err.println("Error al actualizar existencias: " + e.getMessage());
@@ -104,37 +137,109 @@ public class InventarioController {
         }
     }
 
-    private void actualizarDisponibilidad(Venta producto) {
-        // Si hay inventario, est├í disponible.
-        producto.setDisponible(producto.getExistentes() > 0);
-    }
+    /**
+     * Reduce las existencias por una venta
+     * IMPORTANTE: Solo llamar desde VentaController
+     */
+    public boolean reducirExistencias(Long idProducto, int cantidad) {
+        ProductoCatalogo producto = productoCatalogoDAO.obtener(idProducto);
+        if (producto == null) {
+            System.err.println("Producto no encontrado: " + idProducto);
+            return false;
+        }
 
-    public void actualizarDisponibilidad(Venta producto, boolean disponible) {
-        producto.setDisponible(disponible);
+        if (!producto.getEtiqueta().isAfectaInventario()) {
+            // No reducir existencias para productos sin inventario
+            return true;
+        }
+
+        int existenciasActuales = producto.getExistentes();
+        if (existenciasActuales < cantidad) {
+            System.err.println("Inventario insuficiente. Disponible: " + existenciasActuales);
+            return false;
+        }
+
+        producto.setExistentes(existenciasActuales - cantidad);
+        producto.setDisponible(producto.getExistentes() > 0);
+
         try {
-            ventaDAO.actualizar(producto);
+            productoCatalogoDAO.actualizar(producto);
+            System.out.println("Existencias reducidas: " + producto.getNombre() + 
+                             " (Restantes: " + producto.getExistentes() + ")");
+            return true;
         } catch (Exception e) {
-            System.err.println("Error al actualizar disponibilidad: " + e.getMessage());
+            System.err.println("Error al reducir existencias: " + e.getMessage());
+            return false;
         }
     }
 
-    public Venta buscarProducto(Long idProducto) {
-        return ventaDAO.obtener(idProducto);
+    /**
+     * Aumenta las existencias (revertir una venta/devolución)
+     * IMPORTANTE: Llamar al eliminar un ticket con ventas que afectan inventario
+     */
+    public boolean aumentarExistencias(Long idProducto, int cantidad) {
+        ProductoCatalogo producto = productoCatalogoDAO.obtener(idProducto);
+        if (producto == null) {
+            System.err.println("Producto no encontrado para devolución: " + idProducto);
+            return false;
+        }
+
+        if (!producto.getEtiqueta().isAfectaInventario()) {
+            // No aumentar existencias para productos sin inventario
+            return true;
+        }
+
+        int existenciasActuales = producto.getExistentes();
+        producto.setExistentes(existenciasActuales + cantidad);
+        producto.setDisponible(true); // Si devolvemos productos, ya está disponible
+
+        try {
+            productoCatalogoDAO.actualizar(producto);
+            System.out.println("Existencias restauradas: " + producto.getNombre() + 
+                             " (Nuevas existencias: " + producto.getExistentes() + ")");
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al restaurar existencias: " + e.getMessage());
+            return false;
+        }
     }
 
-    public List<Venta> obtenerTodosLosProductos() {
-        return ventaDAO.obtenerTodas();
+    public boolean cambiarDisponibilidad(Long idProducto, boolean disponible) {
+        ProductoCatalogo producto = productoCatalogoDAO.obtener(idProducto);
+        if (producto == null) {
+            System.err.println("Producto no encontrado: " + idProducto);
+            return false;
+        }
+
+        producto.setDisponible(disponible);
+        
+        try {
+            productoCatalogoDAO.actualizar(producto);
+            System.out.println("Disponibilidad actualizada para: " + producto.getNombre());
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al cambiar disponibilidad: " + e.getMessage());
+            return false;
+        }
     }
 
-    public List<Venta> obtenerProductosDisponibles() {
-        return ventaDAO.obtenerDisponibles();
+    public ProductoCatalogo buscarProducto(Long idProducto) {
+        return productoCatalogoDAO.obtener(idProducto);
+    }
+
+    public List<ProductoCatalogo> obtenerTodosLosProductos() {
+        return productoCatalogoDAO.obtenerTodos();
+    }
+
+    public List<ProductoCatalogo> obtenerProductosDisponibles() {
+        return productoCatalogoDAO.obtenerDisponibles();
     }
     
     public boolean eliminarProducto(Long idProducto) {
-        return ventaDAO.eliminar(idProducto);
+        return productoCatalogoDAO.eliminar(idProducto);
     }
 
-    public VentaDAO getVentaDAO() {
-        return ventaDAO;
+    public ProductoCatalogoDAO getProductoCatalogoDAO() {
+        return productoCatalogoDAO;
     }
 }
