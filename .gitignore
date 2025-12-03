@@ -1,2 +1,6 @@
-.github/
-.github/*
+
+LockerEasy/target/
+LockerEasy/src/main/resources/hibernate.cfg.xml
+LockerEasy/target/*
+*.classLockerEasy/target/
+Class

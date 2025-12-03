@@ -1,0 +1,9 @@
+{
+  "id" : 2,
+  "fecha_reporte" : "2025-11-29",
+  "tiempo_emision" : "2025-11-29T07:34:04.974652400Z",
+  "nombre_cliente" : "as",
+  "correo_cliente" : "asa",
+  "servicios" : [ ],
+  "total_ticket" : 50.0
+}

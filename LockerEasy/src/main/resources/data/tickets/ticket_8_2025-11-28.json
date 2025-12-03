@@ -1,0 +1,9 @@
+{
+  "id" : 8,
+  "fecha_reporte" : "2025-11-28",
+  "tiempo_emision" : "2025-11-29T03:40:34.667193800Z",
+  "nombre_cliente" : "aaaa",
+  "correo_cliente" : "correo@desconocido.com",
+  "servicios" : [ ],
+  "total_ticket" : 0.0
+}
