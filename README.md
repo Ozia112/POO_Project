@@ -5,6 +5,12 @@ Poo project repository aiming to save all project progress
 ## Project Stages
 
 - [Stage 1](https://github.com/Ozia112/POO_Project/tree/Stage1)
+- [Stage 2](https://github.com/Ozia112/POO_Project/tree/Stage2)
+- [Stage 3](https://github.com/Ozia112/POO_Project/tree/Stage3)
+
+## Video de presentacion final
+
+- [Video de presentacion final](https://alumnosuady-my.sharepoint.com/:v:/g/personal/a21201316_alumnos_uady_mx/IQDzsk1gPrZkRZ_IeSTpd14IAcmFq0ytqwTq79ZoJaiXapE?e=3lbmg0&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
 
 ## ID Team Members
 
@@ -16,15 +22,15 @@ Poo project repository aiming to save all project progress
 
 ## Chief Departments
 
-- [Product department] : `TM-02`
-- [Requirements department] : `TM-05`
+- [Product department] : `TM-06`
+- [Requirements department] : `TM-02`
 - [Process department] : `TM-01`
 - [Presentation department] : `TM-03`
-- [Competencies department] : `TM-04`
+- [Competencies department] : `TM-05`
 
 ## Team roles
 
-- **Log keeper**: `TM-04`
+- **Log keeper**: `TM-03`
 - **SCRUM Master**: `TM-01`
 - **Github Manager**: `TM-01`
 
