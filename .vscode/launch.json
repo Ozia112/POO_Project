@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Run LockerEasy",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "LockerEasy",
+            "cwd": "${workspaceFolder}/LockerEasy",
+            "preLaunchTask": "compileMaven"
+        },
+        {
+            "type": "java",
+            "name": "Run LockerEasy (Debug)",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "LockerEasy",
+            "cwd": "${workspaceFolder}/LockerEasy",
+            "console": "integratedTerminal",
+            "preLaunchTask": "compileMaven"
+        }
+    ]
+}

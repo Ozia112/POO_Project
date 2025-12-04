@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Patrón personalizado con contexto completo -->
+    <property name="LOG_PATTERN" value="[%d{dd/MM/yyyy - HH:mm:ss}] [%level] [%logger{0}] %msg%n"/>
+    
+    <!-- Usar la variable LOG_HOME configurada por AppLogger, con fallback a logs/ -->
+    <property name="LOG_HOME" value="${LOG_HOME:-logs}"/>
+
+    <!-- Consola con colores -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Archivo general -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/lockereasy.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/lockereasy-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Archivo solo para errores (crítico para debugging) -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/errors.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/errors-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{dd/MM/yyyy - HH:mm:ss}] [%thread] %msg%n%ex{full}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Archivo para operaciones de base de datos -->
+    <appender name="DB_OPERATIONS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/database.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/database-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Silenciar Hibernate pero mantener errores -->
+    <logger name="org.hibernate" level="ERROR"/>
+    <logger name="org.hibernate.SQL" level="ERROR"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="ERROR"/>
+    
+    <!-- Silenciar JavaFX warnings -->
+    <logger name="javafx" level="ERROR"/>
+    <logger name="com.sun.javafx" level="ERROR"/>
+    
+    <!-- Logger específico para operaciones DB -->
+    <logger name="dao" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="DB_OPERATIONS"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
+    
+    <logger name="model" level="INFO"/>
+    <logger name="util" level="INFO"/>
+    <logger name="controller" level="INFO"/>
+    
+    <!-- Root logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
+    </root>
+</configuration>

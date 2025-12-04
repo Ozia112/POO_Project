@@ -1,2 +1,39 @@
-.github/
-.github/*
+# ===========================================
+# ARCHIVOS DE COMPILACION
+# ===========================================
+# Maven target
+target/
+**/target/
+*.class
+
+# ===========================================
+# ARCHIVOS IDE Y SISTEMA
+# ===========================================
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ===========================================
+# ARCHIVOS SENSIBLES - NO SUBIR AL REPO
+# ===========================================
+# Logs de la aplicacion
+logs/
+*.log
+
+# Credenciales locales
+*.credentials
+credentials.json
+credentials.properties
+db.properties
+.lockereasy/
+
+# ===========================================
+# ARCHIVOS TEMPORALES
+# ===========================================
+*.tmp
+*.temp
+*.bak
