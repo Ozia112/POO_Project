@@ -1,6 +1,6 @@
 # Use Case Diagram - LockerEasy System
 
-## Mermaid Diagram
+## Diagram
 
 ```mermaid
 graph TB
@@ -48,127 +48,6 @@ graph TB
     class Employee,Admin,Manager,System_Actor actorStyle
 ```
 
----
-
-## Alternative Diagram (Detailed)
-
-```mermaid
-flowchart LR
-    subgraph Actors
-        E[Employee]
-        A[Administrator]
-        M[Manager]
-        S[System]
-    end
-    
-    subgraph "Rental Management"
-        UC1_1[Register Locker Rental]
-        UC1_2[End Rental]
-        UC1_3[View Rental Status]
-    end
-    
-    subgraph "Product Management"
-        UC2_1[Add Product]
-        UC2_2[Edit Product]
-        UC2_3[Delete Product]
-        UC2_4[Manage Categories]
-    end
-    
-    subgraph "Sales Management"
-        UC3_1[Record Sale]
-        UC3_2[Link to Customer]
-        UC3_3[Update Inventory]
-    end
-    
-    subgraph "Financial Management"
-        UC4_1[Apply Discounts]
-        UC5_1[Generate Reports]
-        UC5_2[Export to Excel]
-        UC6_1[Manage Prices]
-    end
-    
-    subgraph "Monitoring"
-        UC7_1[View Locker Grid]
-        UC7_2[View Dashboard]
-        UC7_3[Track Metrics]
-    end
-    
-    E --> UC1_1
-    E --> UC1_2
-    E --> UC1_3
-    E --> UC3_1
-    E --> UC4_1
-    E --> UC7_1
-    
-    A --> UC1_1
-    A --> UC1_2
-    A --> UC2_1
-    A --> UC2_2
-    A --> UC2_3
-    A --> UC2_4
-    A --> UC3_1
-    A --> UC6_1
-    A --> UC7_2
-    
-    M --> UC5_1
-    M --> UC5_2
-    M --> UC7_2
-    M --> UC7_3
-    
-    S -.-> UC3_3
-    S -.-> UC5_1
-    
-    UC3_1 --> UC3_2
-    UC3_1 --> UC3_3
-    UC1_1 -.->|may include| UC4_1
-    UC3_1 -.->|may include| UC4_1
-
-    style E fill:#ffcccc
-    style A fill:#ccffcc
-    style M fill:#ccccff
-    style S fill:#ffffcc
-```
-
----
-
-## Simplified Use Case Diagram
-
-```mermaid
-graph TD
-    E((Employee))
-    A((Administrator))
-    M((Manager))
-    
-    E --> RentLocker[Manage Locker<br/>Rentals]
-    E --> RecordSale[Record Product<br/>Sales]
-    E --> ApplyDiscount[Apply<br/>Discounts]
-    E --> ViewStatus[View Locker<br/>Status]
-    
-    A --> RentLocker
-    A --> ManageProducts[Manage Product<br/>Catalog]
-    A --> RecordSale
-    A --> ManagePrices[Manage Prices<br/>& Rates]
-    A --> ViewDashboard[View<br/>Dashboard]
-    
-    M --> GenerateReports[Generate Financial<br/>Reports]
-    M --> ViewDashboard
-    M --> ExportExcel[Export to<br/>Excel]
-    
-    style E fill:#e1f5ff
-    style A fill:#ffe1e1
-    style M fill:#e1ffe1
-    style RentLocker fill:#b3d9ff
-    style ManageProducts fill:#b3d9ff
-    style RecordSale fill:#b3d9ff
-    style ApplyDiscount fill:#b3d9ff
-    style ManagePrices fill:#b3d9ff
-    style GenerateReports fill:#b3d9ff
-    style ViewStatus fill:#b3d9ff
-    style ViewDashboard fill:#b3d9ff
-    style ExportExcel fill:#ffb3b3,stroke-dasharray: 5 5
-```
-
----
 
 ## Implementation Status Legend
 
