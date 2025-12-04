@@ -1,313 +1,192 @@
 package controller;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import model.Servicio;
+import dao.VentaDAO;
+import model.ProductoCatalogo;
 import model.Ticket;
 import model.Venta;
 
 public class VentaController {
-    private static final String PRODUCTOS_FILE = "src/main/resources/data/catalogo/productos.json";
     
-    private final Map<Integer, Venta> catalogo;
-    private final EtiquetaController etiquetaController;
-    private int contadorIds;
+    private final VentaDAO ventaDAO;
+    private TicketController ticketController;
+    private ReporteController reporteController;
+    private final InventarioController inventarioController;
 
     public VentaController() {
-        this.catalogo = new HashMap<>();
-        this.etiquetaController = new EtiquetaController();
-        cargarProductos();
+        this.ventaDAO = new VentaDAO();
+        this.inventarioController = new InventarioController();
     }
-    
+
+    public VentaController(TicketController ticketController, ReporteController reporteController) {
+        this();
+        this.ticketController = ticketController;
+        this.reporteController = reporteController;
+    }
+
     /**
-     * Carga el catálogo de productos en memoria
+     * Registra una venta de un producto del catálogo
+     * @param idProductoCatalogo ID del producto en el catálogo
+     * @param cantidad Cantidad a vender
+     * @param ticket Ticket al que se agregará la venta
+     * @return true si la venta se registró exitosamente
      */
-    private void cargarProductos() {
-        catalogo.clear();
-        int maxId = 0;
+    public boolean registrarVenta(Long idProductoCatalogo, int cantidad, Ticket ticket) {
+        if (cantidad <= 0) {
+            System.err.println("La cantidad debe ser mayor a 0");
+            return false;
+        }
+
+        // 1. Obtener producto del catálogo
+        ProductoCatalogo producto = inventarioController.buscarProducto(idProductoCatalogo);
+        
+        if (producto == null) {
+            System.err.println("Producto no encontrado: " + idProductoCatalogo);
+            return false;
+        }
+
+        if (!producto.isDisponible()) {
+            System.err.println("Producto no disponible: " + producto.getNombre());
+            return false;
+        }
 
         try {
-            if (!Files.exists(Paths.get(PRODUCTOS_FILE))) {
-                crearArchivoVacio();
-                return;
-            }
-
-            String content = new String(Files.readAllBytes(Paths.get(PRODUCTOS_FILE)));
-            JSONArray arr = new JSONArray(content);
-
-            for (int i = 0; i < arr.length(); i++) {
-                JSONObject obj = arr.getJSONObject(i);
-
-                int id = obj.getInt("id");
-                String nombre = obj.getString("nombre");
-                float precio = obj.getFloat("precio");
-                int existentes = obj.getInt("existentes");
-                boolean disponible = obj.getBoolean("disponible");
-
-                List<String> etiquetas = new ArrayList<>();
-                if (obj.has("etiquetas")) {
-                    Object etiquetasObj = obj.get("etiquetas");
-                    switch (etiquetasObj) {
-                        case JSONArray etiquetasArr -> {
-                            for (int j = 0; j < etiquetasArr.length(); j++) {
-                                etiquetas.add(etiquetasArr.getString(j));
-                            }
-                        }
-                        case String etiquetaStr -> etiquetas.add(etiquetaStr);
-                        default -> {
-                            // Tipo no soportado
-                        }
-                    }
-                }
-
-                Venta producto = new Venta(id, nombre, precio, existentes, etiquetas, disponible);
-                catalogo.put(id, producto);
-
-                if (id > maxId) maxId = id;
-            }
-
-            contadorIds = maxId + 1;
-            System.out.println("Productos cargados: " + catalogo.size());
-
-        } catch (java.io.IOException | org.json.JSONException e) {
-            System.err.println("Error al cargar productos: " + e.getMessage());
-        }
-    }
-
-    public boolean agregarProducto(String nombre, float precio, int existentes, List<String> etiquetas) {
-        if (nombre == null || nombre.trim().isEmpty()) {
-            System.err.println("El nombre del producto no puede estar vacío");
-            return false;
-        }
-
-        int nuevoId = contadorIds++;
-
-        boolean disponible = existentes > 0 || !etiquetaController.etiquetasAfectanInventario(etiquetas);
-
-        Venta producto = new Venta(nuevoId, nombre, precio, existentes, etiquetas, disponible);
-        catalogo.put(nuevoId, producto);
-
-        guardarProductos();
-        System.out.println("Producto agregado: " + nombre + " (ID: " + nuevoId + ")");
-        return true;
-    }
-
-    public boolean actualizarProducto(int idProducto, String nuevoNombre) {
-        Venta producto = catalogo.get(idProducto);
-        if (producto == null) {
-            System.err.println("Producto no encontrado: " + idProducto);
-            return false;
-        }
-
-        producto.setNombre(nuevoNombre);
-        guardarProductos();
-        System.out.println("Producto actualizado: " + idProducto);
-        return true;
-    }
-
-    public boolean actualizarProducto(int idProducto, float nuevoPrecio) {
-        Venta producto = catalogo.get(idProducto);
-        if (producto == null) {
-            System.err.println("Producto no encontrado: " + idProducto);
-            return false;
-        }
-
-        producto.setPrecio(nuevoPrecio);
-        guardarProductos();
-        System.out.println("Producto actualizado: " + idProducto);
-        return true;
-    }
-
-    public boolean actualizarProducto(int idProducto, int nuevasExistentes) {
-        Venta producto = catalogo.get(idProducto);
-        if (producto == null) {
-            System.err.println("Producto no encontrado: " + idProducto);
-            return false;
-        }
-
-        producto.setExistentes(nuevasExistentes);
-        guardarProductos();
-        System.out.println("Producto actualizado: " + idProducto);
-        return true;
-    }
-
-    public boolean actualizarProdcuto(int idProducto, List<String> nuevasEtiquetas) {
-        Venta producto = catalogo.get(idProducto);
-        if (producto == null) {
-            System.err.println("Producto no encontrado: " + idProducto);
-            return false;
-        }
-
-        producto.setEtiquetas(nuevasEtiquetas);
-        actualizarDisponibilidad(producto);
-
-        guardarProductos();
-        System.out.println("Producto actualizado: " + idProducto);
-        return true;
-    }
-
-    public boolean actualizarProducto(int idProducto, boolean disponible) {
-        Venta producto = catalogo.get(idProducto);
-        if (producto == null) {
-            System.err.println("Producto no encontrado: " + idProducto);
-            return false;
-        }
-
-        producto.setDisponible(disponible);
-        guardarProductos();
-        System.out.println("Producto actualizado: " + idProducto);
-        return true;
-    }
-
-    private void actualizarDisponibilidad(Venta producto) {
-        if (etiquetaController.etiquetasAfectanInventario(producto.getEtiquetas())) {
-            producto.setDisponible(producto.getExistentes() > 0);
-        } else {
-            producto.setDisponible(true);
-        }
-    }
-        public boolean registrarVenta(int idProducto, int cantidad, Ticket ticket, TicketController ticketController) {
-
-            Venta producto = catalogo.get(idProducto);
-            if (producto == null) {
-                System.err.println("Producto no encontrado: " + idProducto);
-                return false;
-            }
-
-            if (!producto.isDisponible()) {
-                System.err.println("Producto no disponible: " + producto.getNombre());
-                return false;
-            }
-
-            // Inventario si aplica
-            if (etiquetaController.etiquetasAfectanInventario(producto.getEtiquetas())) {
-                if (producto.getExistentes() < cantidad) {
-                    System.err.println("Inventario insuficiente. Disponible: " + producto.getExistentes());
+            // 2. Reducir existencias si afecta inventario (lógica de negocio en InventarioController)
+            if (producto.getEtiqueta().isAfectaInventario()) {
+                boolean reducido = inventarioController.reducirExistencias(idProductoCatalogo, cantidad);
+                if (!reducido) {
                     return false;
                 }
-
-                producto.setExistentes(producto.getExistentes() - cantidad);
-                actualizarDisponibilidad(producto);
-                guardarProductos();
             }
 
-            // ---------------------------------------------
-            // *** CREAR OBJETO SERVICIO ***
-            // ---------------------------------------------
-            Servicio servicio = new Servicio();
-            servicio.setServicioId(ticket.getServicios().size() + 1);
-            servicio.setTipoServicio(producto);       // TipoServicio = Venta
-            producto.setCantidad(cantidad);           // Aplicar cantidad a la venta
-            servicio.setAplicarDescuento(false);
+            // 3. Crear instancia de Venta (TipoServicio)
+            Venta venta = new Venta(
+                producto.getNombre(),
+                cantidad,
+                producto
+            );
+            venta.setTicket(ticket);
+            venta.setAplicarDescuento(false);
 
-            // ---------------------------------------------
-            // AGREGAR AL TICKET
-            // ---------------------------------------------
-            ticket.getServicios().add(servicio);
+            // 4. Guardar la venta
+            ventaDAO.guardar(venta);
+            System.out.println("Venta guardada - ID: " + venta.getTipoServicioId() + 
+                             " Producto: " + producto.getNombre() + 
+                             " Cantidad: " + cantidad);
 
-            // ---------------------------------------------
-            // RE-CALCULAR TOTAL DEL TICKET
-            // ---------------------------------------------
-            float total = 0f;
-            for (Servicio s : ticket.getServicios()) {
-                total += s.getTotalServicio();
+            // 5. Agregar al ticket
+            ticket.agregarServicio(venta);
+            
+            // 6. Actualizar totales
+            if (ticketController != null) {
+                ticket.setTotalTicket(ticketController.calcularTotalTicket(ticket));
+                ticketController.getTicketDAO().actualizar(ticket);
             }
-            ticket.setTotalTicket(total);
 
-            // ---------------------------------------------
-            // GUARDAR
-            // ---------------------------------------------
-            ticketController.guardarTicket(ticket);
+            // 7. Actualizar reporte
+            if (reporteController != null) {
+                reporteController.recalcularTotal();
+                reporteController.guardarReporte();
+            }
 
-            System.out.println("Venta registrada y agregada al ticket: " + producto.getNombre() + " x" + cantidad);
+            System.out.println("Venta registrada exitosamente: " + producto.getNombre());
             return true;
+
+        } catch (Exception e) {
+            System.err.println("Error al registrar venta: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-
-
-
-    public Venta buscarProdcuto(int idProducto) {
-        return catalogo.get(idProducto);
     }
 
-    public Venta buscarProducto(String nombre) {
-        for (Venta producto : catalogo.values()) {
-            if (producto.getNombre().equalsIgnoreCase(nombre)) {
-                return producto;
-            }
-        }
-        return null;
-    }
-
-    public List<Venta> obtenerTodosLosProductos() {
-        return new ArrayList<>(catalogo.values());
-    }
-
-    public List<Venta> obtenerProductosDisponibles() {
-        List<Venta> disponibles = new ArrayList<>();
-        for (Venta producto : catalogo.values()) {
-            if (producto.isDisponible()) {
-                disponibles.add(producto);
-            }
-        }
-        return disponibles;
-    }
-    
     /**
-     * Elimina un producto del catálogo
+     * Aplica o remueve descuento de una venta específica
      */
-    public boolean eliminarProducto(int idProducto) {
-
-        if (!catalogo.containsKey(idProducto)) {
-            System.err.println("Producto no encontrado: " + idProducto);
+    public boolean aplicarDescuento(Long ventaId, boolean aplicar) {
+        Venta venta = ventaDAO.obtener(ventaId);
+        if (venta == null) {
+            System.err.println("Venta no encontrada: " + ventaId);
             return false;
         }
 
-        catalogo.remove(idProducto);
-        guardarProductos();
-        System.out.println("Producto eliminado: " + idProducto);
-        return true;
+        venta.setAplicarDescuento(aplicar);
+        
+        try {
+            ventaDAO.actualizar(venta);
+            
+            // Actualizar totales del ticket
+            if (ticketController != null && venta.getTicket() != null) {
+                Ticket ticket = venta.getTicket();
+                ticket.setTotalTicket(ticketController.calcularTotalTicket(ticket));
+                ticketController.getTicketDAO().actualizar(ticket);
+                
+                // Actualizar reporte
+                if (reporteController != null) {
+                    reporteController.recalcularTotal();
+                    reporteController.guardarReporte();
+                }
+            }
+            
+            System.out.println("Descuento " + (aplicar ? "aplicado" : "removido") + 
+                             " en venta ID: " + ventaId);
+            return true;
+            
+        } catch (Exception e) {
+            System.err.println("Error al aplicar descuento: " + e.getMessage());
+            return false;
+        }
     }
 
-    private void guardarProductos() {
-        try {
-            Files.createDirectories(Paths.get(PRODUCTOS_FILE).getParent());
+    /**
+     * Cancela una venta y restaura el inventario si aplica
+     */
+    public boolean cancelarVenta(Long ventaId) {
+        Venta venta = ventaDAO.obtener(ventaId);
+        if (venta == null) {
+            System.err.println("Venta no encontrada: " + ventaId);
+            return false;
+        }
 
-            JSONArray arr = new JSONArray();
-            for (Venta p : catalogo.values()) {
-                JSONObject obj = new JSONObject();
-                obj.put("id", p.getIdProducto());
-                obj.put("nombre", p.getNombre());
-                obj.put("precio", p.getPrecio());
-                obj.put("existentes", p.getExistentes());
-                obj.put("disponible", p.isDisponible());
-                obj.put("etiquetas", new JSONArray(p.getEtiquetas()));
-                arr.put(obj);
+        try {
+            ProductoCatalogo producto = venta.getProductoCatalogo();
+            
+            // Restaurar existencias si afecta inventario
+            if (producto.getEtiqueta().isAfectaInventario()) {
+                int existenciasActuales = producto.getExistentes();
+                inventarioController.actualizarExistencias(
+                    producto.getId(), 
+                    existenciasActuales + venta.getCantidad()
+                );
             }
 
-            Files.write(Paths.get(PRODUCTOS_FILE), arr.toString(2).getBytes());
-            System.out.println("Productos guardados correctamente.");
+            // Eliminar venta
+            Ticket ticket = venta.getTicket();
+            if (ticket != null) {
+                ticket.eliminarServicio(venta);
+            }
+            
+            ventaDAO.eliminar(ventaId);
 
-        } catch (java.io.IOException | org.json.JSONException e) {
-            System.err.println("Error al guardar productos: " + e.getMessage());
+            // Actualizar totales
+            if (ticketController != null && ticket != null) {
+                ticket.setTotalTicket(ticketController.calcularTotalTicket(ticket));
+                ticketController.getTicketDAO().actualizar(ticket);
+                
+                if (reporteController != null) {
+                    reporteController.recalcularTotal();
+                    reporteController.guardarReporte();
+                }
+            }
+
+            System.out.println("Venta cancelada: " + producto.getNombre());
+            return true;
+
+        } catch (Exception e) {
+            System.err.println("Error al cancelar venta: " + e.getMessage());
+            return false;
         }
     }
 
-    private void crearArchivoVacio() {
-        try {
-            Files.createDirectories(Paths.get(PRODUCTOS_FILE).getParent());
-            JSONArray arr = new JSONArray();
-            Files.write(Paths.get(PRODUCTOS_FILE), arr.toString(2).getBytes());
-            System.out.println("Archivo de productos creado.");
-        } catch (java.io.IOException e) {
-            System.err.println("Error al crear archivo de productos: " + e.getMessage());
-        }
+    public VentaDAO getVentaDAO() {
+        return ventaDAO;
     }
 }

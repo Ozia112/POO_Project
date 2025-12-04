@@ -1,101 +1,60 @@
 package controller;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedHashMap;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
+import dao.ReporteDAO;
+import dao.TicketDAO;
 import model.Reporte;
 import model.Ticket;
 
-public class ReporteController {
-    private static final String REPORTES_FOLDER = "src/main/resources/data/reportes/";
+import java.time.LocalDate;
+import java.util.List;
 
-    private final TicketController ticketController;
+public class ReporteController {
+    private final ReporteDAO reporteDAO;
+    private final TicketDAO ticketDAO;
+    private Reporte reporteActual; // Cach├® en memoria del dia
 
     public ReporteController() {
-        this.ticketController = new TicketController();
-        cargarReporteActual(); // Si falla al cargar, crea uno nuevo
+        this.reporteDAO = new ReporteDAO();
+        this.ticketDAO = new TicketDAO();
+        this.reporteActual = cargarOCrearReporteDelDia();
     }
 
     /**
      * Cargar el reporte actual desde un archivo JSON basado en la fecha actual.
     
      */
-    private void cargarReporteActual() {
-        try {
-            LocalDate hoy = LocalDate.now();
-            String nombre_archivo = REPORTES_FOLDER + "reporte_" + hoy.toString() + ".json";
+    private Reporte cargarOCrearReporteDelDia() {
+        LocalDate hoy = LocalDate.now();
+        Reporte reporte = reporteDAO.obtener(hoy);
 
-            if (Files.exists(Paths.get(nombre_archivo))) {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode rootNode = mapper.readTree(new File(nombre_archivo));
+        if (reporte == null) {
+            reporte = new Reporte(hoy);
+            reporteDAO.guardar(reporte);
+            System.out.println("Nuevo reporte creado para el dia: " + hoy);
+        } else {
+            System.out.println("Reporte cargado para el dia: " + hoy);
+        }
 
-                Reporte reporte = Reporte.crearNuevaInstancia();
-                reporte.setFechaReporte(LocalDate.parse(rootNode.get("fecha").asText()));
-                reporte.setTotal((float) rootNode.get("total").asDouble());
-
-                // Cargar tickets asociados por ID
-                if (rootNode.has("tickets_ids")) {
-                    JsonNode ticketsIdsNode = rootNode.get("tickets_ids");
-                    List<Ticket> tickets = cargarTicketsDesdeIds(ticketsIdsNode, hoy);
-                    reporte.setTickets(tickets);
-                }
-
-                Reporte.setInstancia(reporte);
-                System.out.println("Reporte cargado: " + hoy);
-            } else {
-                crearReporteActual();
-                System.out.println("Nuevo reporte creado: " + hoy);
-            }
-        } catch (java.io.IOException | java.time.format.DateTimeParseException e) {
-            System.err.println("Error al cargar reporte: " + e.getMessage());
-            crearReporteActual();
+        return reporte;
+    }
+    //Permite que otros controladores fuercen el guardado del reporte actual
+    public void guardarReporte() {
+        if (reporteActual != null) {
+            reporteDAO.actualizar(reporteActual);
         }
     }
-
+    
     /**
-     * Cargar tickets desde una lista de IDs.
-     * @param ticketsIdsArray
-     * @param fecha_reporte
-     * @return Lista de tickets cargados
+     * Recarga el reporte actual desde la base de datos para obtener datos frescos.
+     * Útil para sincronizar después de operaciones que modifican tickets.
      */
-    private List<Ticket> cargarTicketsDesdeIds(JsonNode ticketsIdsNode, LocalDate fecha_reporte) {
-        List<Ticket> tickets = new ArrayList<>();
-        if (ticketsIdsNode.isArray()) {
-            for (JsonNode ticketINode : ticketsIdsNode) {
-                try {
-                    int ticketId = ticketINode.asInt();
-                    Ticket ticket = ticketController.cargarTicket(ticketId, fecha_reporte);
-                
-                    if (ticket != null) {
-                        tickets.add(ticket);
-                    } else {
-                        System.err.println("Ticket no encontrado: ID " + ticketId);
-                    }
-                } catch (org.json.JSONException e) {
-                    int ticketId = ticketINode.asInt();
-                    System.err.println("Error al cargar ticket con ID " + ticketId + ": " + e.getMessage());
-                }
-            }
+    public Reporte recargarReporte() {
+        LocalDate hoy = LocalDate.now();
+        Reporte reporteFresco = reporteDAO.obtener(hoy);
+        if (reporteFresco != null) {
+            this.reporteActual = reporteFresco;
         }
-        return tickets;
-    }
-
-    /**
-     * Crear un nuevo reporte actual y guardarlo.
-     */
-    public void crearReporteActual() {
-        Reporte nuevo_reporte = Reporte.crearNuevaInstancia();
-        Reporte.setInstancia(nuevo_reporte);
-        guardarReporte();
+        return this.reporteActual;
     }
 
     public void agregarTicket(Ticket ticket) {
@@ -103,130 +62,128 @@ public class ReporteController {
             throw new IllegalArgumentException("El ticket no puede ser nulo");
         }
 
-        Reporte reporte = Reporte.getInstancia();
-        if (reporte == null) {
-            crearReporteActual();
-            reporte = Reporte.getInstancia();
+        if (!reporteActual.esActivo()) {
+            throw new IllegalStateException("No se puede agregar tickets a un reporte cerrado");
         }
 
-        ticketController.guardarTicket(ticket);
-
-        reporte.getTickets().add(ticket);
+        reporteActual.getTickets().add(ticket);
 
         recalcularTotal();
 
-        guardarReporte();
-        int ticketId = ticket.getTicketId();
-        System.out.println("Ticket agregado al reporte:" + ticketId);
+        reporteDAO.actualizar(reporteActual);
+
+        System.out.println("Ticket " + ticket.getTicketId() + " agregado al reporte de " + reporteActual.getFechaReporte());
     }
 
-    /**
-     * Eliminar un ticket del reporte actual.
-     * @param ticket
-     */
-    public void eliminarTicketDelReporte(Ticket ticket) {
+    public void eliminarTicket(Ticket ticket) {
         if (ticket == null) {
             throw new IllegalArgumentException("El ticket no puede ser nulo");
         }
 
-        Reporte reporte = Reporte.getInstancia();
-        if (reporte == null) {
-            throw new IllegalStateException("No hay un reporte cargado");
+        if (!reporteActual.esActivo()) {
+            throw new IllegalStateException("No se puede eliminar tickets de un reporte cerrado");
         }
 
-        boolean eliminado = reporte.getTickets().remove(ticket);
-        if (!eliminado) {
-            throw new IllegalArgumentException("El ticket no existe en el reporte");
+        Long ticketId = ticket.getTicketId();
+        
+        // Primero eliminar de la BD
+        ticketDAO.eliminar(ticketId);
+        
+        // IMPORTANTE: Recargar el reporte desde la BD para evitar referencias huérfanas
+        // Esto asegura que reporteActual no tenga referencias a tickets eliminados
+        reporteActual = reporteDAO.obtener(reporteActual.getFechaReporte());
+        
+        if (reporteActual == null) {
+            // Si por alguna razón no existe, recrearlo
+            reporteActual = cargarOCrearReporteDelDia();
         }
 
-        LocalDate fecha_ticket = ticket.getFechaReporte();
-        ticketController.eliminarTicket(ticket.getTicketId(), fecha_ticket);
-
-        recalcularTotal();
-
-        guardarReporte();
-        System.out.println("Ticket eliminado del reporte: " + ticket.getTicketId());
-    }
-
-    public Reporte getReporte() {
-        return Reporte.getInstancia();
+        System.out.println("Ticket " + ticketId + " eliminado del reporte de " + reporteActual.getFechaReporte());
     }
 
     public void recalcularTotal(){
-        Reporte reporte = Reporte.getInstancia();
-        if (reporte == null) return;
+        if (reporteActual == null) return;
 
         float total = 0.0f;
-        List<Ticket> tickets = reporte.getTickets();
 
-        for (Ticket ticket : tickets) {
-            total += ticket.getTotalTicket();
+        // Recargar cada ticket desde la BD para obtener totales actualizados
+        for (Ticket ticket : reporteActual.getTickets()) {
+            Ticket ticketActualizado = ticketDAO.obtener(ticket.getTicketId());
+            if (ticketActualizado != null) {
+                total += ticketActualizado.getTotalTicket();
+                // Actualizar también el total en memoria para mantener sincronizado
+                ticket.setTotalTicket(ticketActualizado.getTotalTicket());
+            } else {
+                total += ticket.getTotalTicket();
+            }
         }
-        reporte.setTotal(total);
+        reporteActual.setTotal(total);
     }
 
-
-
-    public void guardarReporte() {
-        try {
-            Reporte reporte = Reporte.getInstancia();
-            if (reporte == null) return;
-
-            Files.createDirectories(Paths.get(REPORTES_FOLDER));
-            String nombre_archivo = REPORTES_FOLDER + "reporte_" + reporte.getFechaReporte().toString() + ".json";
-
-            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
-            map.put("fecha", reporte.getFechaReporte().toString());
-            map.put("total", reporte.getTotal());
-            
-            // Guardar solo los IDs de los tickets (no los objetos completos)
-            List<Integer> ticketsIds = new ArrayList<>();
-            if (reporte.getTickets() != null) {
-                for (Ticket ticket : reporte.getTickets()) {
-                    ticketsIds.add(ticket.getTicketId());
-                }
-            }
-            map.put("tickets_ids", ticketsIds);
-
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            
-            String json = mapper.writeValueAsString(map);
-            Files.write(Paths.get(nombre_archivo), json.getBytes());
-            System.out.println("Reporte guardado:" + nombre_archivo);
-
-        } catch (java.io.IOException e) {
-            System.err.println("Error al guardar reporte: " + e.getMessage());
+    public void cerrarReporteDelDia() {
+        if (reporteActual == null) {
+            throw new IllegalStateException("No hay un reporte activo para cerrar");
         }
+
+        LocalDate hoy = LocalDate.now();
+        if (!reporteActual.getFechaReporte().equals(hoy)) {
+            throw new IllegalStateException("El reporte actual no corresponde al dia de hoy");
+        }
+
+        recalcularTotal();
+
+        reporteDAO.cerrar(hoy);
+
+        System.out.println("Reporte del " + hoy + " cerrado. Total: $" + reporteActual.getTotal());
     }
 
-    public Reporte generarReportePorFecha(LocalDate fecha) {
-        try {
-            String nombre_archivo = REPORTES_FOLDER + "reporte_" + fecha.toString() + ".json";
-
-            if (!Files.exists(Paths.get(nombre_archivo))) {
-                System.err.println("No existe un reporte para la fecha: " + fecha);
-                return null;
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode rootNode = mapper.readTree(new File(nombre_archivo));
-
-            Reporte reporte = new Reporte();
-            reporte.setFechaReporte(LocalDate.parse(rootNode.get("fecha").asText()));
-            reporte.setTotal((float) rootNode.get("total").asDouble());
-
-            // Cargar tickets asociados por ID
-            if (rootNode.has("tickets_ids")) {
-                JsonNode ticketsIdsNode = rootNode.get("tickets_ids");
-                List<Ticket> tickets = cargarTicketsDesdeIds(ticketsIdsNode, fecha);
-                reporte.setTickets(tickets);
-            }
-            return reporte;
-
-        } catch (java.io.IOException | org.json.JSONException | java.time.format.DateTimeParseException e) {
-            System.err.println("Error al generar reporte por fecha: " + e.getMessage());
-            return null;
+    public Reporte getReporteActual() {
+        //A├▒ad├¡ esto debido a que si el cliente no cerr├│ el programa y pasa un dia, pues al guardar se guardaran las cosas al dia anteriror
+        if (!reporteActual.getFechaReporte().equals(LocalDate.now())){
+            this.reporteActual = cargarOCrearReporteDelDia();
         }
+        return reporteActual;
+    }
+
+    public List<Reporte> obtenerReportesSemana() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate haceUnaSemana = hoy.minusDays(7);
+        return reporteDAO.obtener(haceUnaSemana, hoy);
+    }
+
+    public List<Reporte> obtenerReportesMes() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate haceUnMes = hoy.minusMonths(1);
+        return reporteDAO.obtener(haceUnMes, hoy);
+    }
+
+    public List<Reporte> obtenerReportesSeisMeses() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate haceSeisMeses = hoy.minusMonths(6);
+        return reporteDAO.obtener(haceSeisMeses, hoy);
+    } 
+
+    public List<Reporte> obtenerReportesUltimoAnio() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate haceUnAnio = hoy.minusYears(1);
+        return reporteDAO.obtener(haceUnAnio, hoy);
+    }
+
+    public List<Reporte> obtenerReportesUltimos5Anios() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate haceCincoAnios = hoy.minusYears(5);
+        return reporteDAO.obtener(haceCincoAnios, hoy);
+    }
+
+    public float obtenerGananciaPorgrupo(List<Reporte> reportes) {
+        float total = 0.0f;
+        for (Reporte reporte : reportes) {
+            total += reporte.getTotal();
+        }
+        return total;
+    }
+    
+    public ReporteDAO getReporteDAO() {
+        return reporteDAO;
     }
 }

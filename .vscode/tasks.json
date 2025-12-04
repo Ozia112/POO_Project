@@ -10,6 +10,31 @@
                 "cwd": "${workspaceFolder}/LockerEasy"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Run LockerEasy",
+            "type": "shell",
+            "command": "mvn",
+            "args": ["javafx:run"],
+            "options": {
+                "cwd": "${workspaceFolder}/LockerEasy"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Debug LockerEasy",
+            "type": "shell",
+            "command": "mvn",
+            "args": ["javafx:run", "-Djavafx.debug=true", "-Djavafx.debug.port=5005"],
+            "options": {
+                "cwd": "${workspaceFolder}/LockerEasy"
+            },
+            "problemMatcher": [],
+            "isBackground": true
         }
     ]
 }

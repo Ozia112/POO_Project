@@ -1,6 +1,6 @@
 # Use Case Diagram - LockerEasy System
 
-## Mermaid Diagram
+## Diagram
 
 ```mermaid
 graph TB
@@ -48,9 +48,6 @@ graph TB
     class Employee,Admin,Manager,System_Actor actorStyle
 ```
 
-
-
----
 
 ## Implementation Status Legend
 

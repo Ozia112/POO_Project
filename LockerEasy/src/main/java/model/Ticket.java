@@ -1,89 +1,81 @@
-package model;
+package model;       
 
-import jakarta.persistence.*; //bd
+import jakarta.persistence.*;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
 
-/*@Entity     //Con esto identificamos que la clase va a ae ser una tabla 
-@Table(name = "tickets")*/
-
+@Entity
+@Table(name = "tickets")
 public class Ticket {
-    private LocalDate fecha_reporte;
-    private int ticket_id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ticket_id")
+    private Long ticket_id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporte_id")
+    private Reporte reporte;
+
+    @Column(name = "nombre_cliente")
     private String nombre_cliente;
+
+    @Column(name = "correo_cliente") 
     private String correo_cliente;
+
+    @Column(name = "tiempo_emision") 
     private Instant tiempo_emision;
-    private List<Servicio> servicios;
+
+    @Column(name = "total_ticket") 
     private float total_ticket;
 
-    public Ticket(LocalDate fecha_reporte ,int ticket_id, String nombre_cliente, String correo_cliente, Instant tiempo_emision, List<Servicio> servicios, float total_ticket) {
-        this.fecha_reporte = fecha_reporte;
-        this.ticket_id = ticket_id;
-        this.nombre_cliente = nombre_cliente;
-        this.correo_cliente = correo_cliente;
-        this.tiempo_emision = tiempo_emision;
-        this.servicios = servicios;
-        this.total_ticket = total_ticket;
-    }
-
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<TipoServicio> servicios;
+    
     public Ticket() {
         this.servicios = new ArrayList<>();
-        this.fecha_reporte = LocalDate.now();
     }
 
-    public LocalDate getFechaReporte() { return fecha_reporte; }
-    public int getTicketId() { return ticket_id; }
+    public Ticket(String nombre_cliente, String correo_cliente, Reporte reporte) {
+        this.nombre_cliente = nombre_cliente;
+        this.correo_cliente = correo_cliente;
+        this.reporte = reporte;
+        this.tiempo_emision = Instant.now();
+        this.servicios = new ArrayList<>();
+        this.total_ticket = 0f;
+    }
+
+    // Getters
+    public Reporte getReporte() { return reporte; }
+    public Long getTicketId() { return ticket_id; }
     public String getNombreCliente() { return nombre_cliente; }
     public String getCorreoCliente() { return correo_cliente; }
     public Instant getTiempoEmision() { return tiempo_emision; }
-    public List<Servicio> getServicios() { return servicios; }
+    public List<TipoServicio> getServicios() { return servicios; }
     public float getTotalTicket() { return total_ticket; }
 
-    public void setFechaReporte(LocalDate fecha_reporte) { this.fecha_reporte = fecha_reporte; }
-    public void setTicketId(int ticket_id) { this.ticket_id = ticket_id; }
+    // Setters
+    public void setReporte(Reporte reporte) { this.reporte = reporte; }
+    public void setTicketId(Long ticket_id) { this.ticket_id = ticket_id; }
     public void setNombreCliente(String nombre_cliente) { this.nombre_cliente = nombre_cliente; }
     public void setCorreoCliente(String correo_cliente) { this.correo_cliente = correo_cliente; }
     public void setTiempoEmision(Instant tiempo_emision) { this.tiempo_emision = tiempo_emision; }
-    public void setServicios(List<Servicio> servicios) { this.servicios = servicios; }
+    public void setServicios(List<TipoServicio> servicios) { this.servicios = servicios; }
     public void setTotalTicket(float total_ticket) { this.total_ticket = total_ticket; }
-    
-    //================================
-    //  NUEVOS MÉTODOS NECESARIOS
-    // ================================
 
-    /**
-     * Agrega un servicio al ticket y recalcula automáticamente el total.
-     */
-    public void agregarServicio(Servicio servicio) {
-        if (servicio == null) return;
-
+    // Métodos auxiliares
+    public void agregarServicio(TipoServicio servicio) {
         if (this.servicios == null) {
             this.servicios = new ArrayList<>();
         }
-
         this.servicios.add(servicio);
-        recalcularTotal();
+        servicio.setTicket(this); // Establecer relación bidireccional
     }
-
-    /**
-     * Recalcula el total del ticket sumando todos los servicios existentes.
-     */
-    public void recalcularTotal() {
-        float total = 0f;
-
-        if (servicios != null) {
-            for (Servicio s : servicios) {
-                if (s != null) {
-                    total += s.getTotalServicio();
-                }
-            }
+    
+    public void eliminarServicio(TipoServicio servicio) {
+        if (this.servicios != null) {
+            this.servicios.remove(servicio);
+            servicio.setTicket(null); // Romper relación bidireccional
         }
-
-        this.total_ticket = total;
     }
-
-
-
 }
